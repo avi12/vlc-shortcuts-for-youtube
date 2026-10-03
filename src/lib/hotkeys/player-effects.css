@@ -1,0 +1,7 @@
+.vlc-controls-aspect-ratio .html5-main-video {
+  top: var(--vlc-controls-video-top) !important;
+  left: var(--vlc-controls-video-left) !important;
+  object-fit: fill !important;
+  width: var(--vlc-controls-video-width) !important;
+  height: var(--vlc-controls-video-height) !important;
+}
