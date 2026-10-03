@@ -1,0 +1,8 @@
+verifyDepsBeforeRun: false
+confirmModulesPurge: false
+# sharp (via @wxt-dev/auto-icons) ships prebuilt binaries, so its install script is never needed
+allowBuilds:
+  esbuild: true
+  sharp: false
+  spawn-sync: true
+  unrs-resolver: true

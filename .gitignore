@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+node_modules
+build
+.output
+stats.html
+stats-*.json
+
+# WXT generated files
+.wxt/
+
+# Local env files
+chrome.env
+firefox.env
+edge.env
+opera.env
+.env
+.env.*
+!.env.example
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.sw?
+
+# Claude Code scratch state
+.claude/scheduled_tasks.lock
+.claude/settings.*.bak
+.claude/worktrees/
+.tmp/
+
+# fallow cache
+.fallow/
+
+# Isolated dev browser profiles cloned by scripts/clone-chrome-profile.ts - contain cookies, tokens
+user-profiles/
