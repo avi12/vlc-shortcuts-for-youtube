@@ -4,6 +4,8 @@ export const BEZEL_SELECTOR = ".ytp-bezel";
 export const BEZEL_TEXT_SELECTOR = ".ytp-bezel-text";
 // Hides the bezel's icon circle, so only YouTube's text pill shows - YouTube has no icon for these statuses
 const TEXT_ONLY_CLASS = "vlc-controls-text-bezel";
+// YouTube's own flag for a bezel without text, left on by its last icon-only bezel (play/pause, mute)
+const YOUTUBE_TEXT_HIDDEN_CLASS = "ytp-bezel-text-hide";
 // How long YouTube keeps its own bezel up
 const BEZEL_VISIBLE_MS = 1000;
 
@@ -60,6 +62,7 @@ export function showStatusInNativeBezel({ player, text }: {
   hideBezel(elLayer);
   elText.textContent = text;
   elBezel.setAttribute("aria-label", text);
+  elLayer.classList.remove(YOUTUBE_TEXT_HIDDEN_CLASS);
   elLayer.classList.add(TEXT_ONLY_CLASS);
   requestAnimationFrame(() => elLayer.style.removeProperty("display"));
   hideTimer = setTimeout(() => hideBezel(elLayer), BEZEL_VISIBLE_MS);
