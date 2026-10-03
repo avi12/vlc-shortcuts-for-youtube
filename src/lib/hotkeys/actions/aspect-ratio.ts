@@ -1,4 +1,4 @@
-import { getVideo, type YoutubePlayer } from "@/lib/player";
+import { getVideo, isMainVideo, type YoutubePlayer } from "@/lib/player";
 
 const ASPECT_RATIO_CLASS = "vlc-controls-aspect-ratio";
 
@@ -60,7 +60,7 @@ function fitVideoBox({ player, ratio }: {
   player: YoutubePlayer;
   ratio: number;
 }) {
-  const elVideo = getVideo();
+  const elVideo = getVideo(player);
   const elVideoParent = elVideo?.offsetParent;
   if (!elVideoParent) {
     return;
@@ -120,8 +120,7 @@ export function cycleAspectRatio(player: YoutubePlayer) {
 
 export function installAspectRatioReset() {
   document.addEventListener("loadstart", e => {
-    const isMainVideo = e.target === getVideo();
-    if (isMainVideo) {
+    if (isMainVideo(e.target)) {
       resetAspectRatio();
     }
   }, true);

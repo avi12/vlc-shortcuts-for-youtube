@@ -144,12 +144,24 @@ function toModuleTrack({ player, track }: {
   };
 }
 
+// Shorts has no caption key, so there the captions module itself is switched off or on
+function toggleCaptionsModule(player: YoutubePlayer) {
+  const isOn = getActiveVssId(player) !== null;
+  if (isOn) {
+    player.unloadModule?.(CAPTIONS_MODULE);
+    return;
+  }
+
+  player.loadModule?.(CAPTIONS_MODULE);
+}
+
 // Every on/off goes through YouTube's own caption key and every switch through its own API, so the
 // feedback is YouTube's native bezel ("Subtitles/closed captions on/off") and track card - never ours
 function toggleNativeCaptions(player: YoutubePlayer) {
   dispatchYoutubeHotkey({
     player,
-    hotkey: YOUTUBE_HOTKEYS.captions
+    hotkey: YOUTUBE_HOTKEYS.captions,
+    fallback: () => toggleCaptionsModule(player)
   });
 }
 

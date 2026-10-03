@@ -1,7 +1,9 @@
 import { createTypeGuard, z } from "@/lib/zod";
 
-const PLAYER_SELECTOR = "#movie_player";
-const VIDEO_SELECTOR = "#movie_player video.html5-main-video";
+// Every YouTube player shares this class: the watch page's, Shorts' and the embed's
+export const PLAYER_SELECTOR = ".html5-video-player";
+const MAIN_VIDEO_SELECTOR = "video.html5-main-video";
+const SHORTS_PLAYER_ID = "shorts-player";
 
 enum PlayerState {
   Unstarted = -1,
@@ -74,19 +76,28 @@ function isYoutubePlayer(element: Element | null): element is YoutubePlayer {
 
 const videoDataSchema = z.object({ title: z.string() });
 
-// Re-queried on every call: YouTube's SPA swaps players and <video> sources without a reload
+// Re-queried on every call: YouTube's SPA swaps players and <video> sources without a reload, and keeps the
+// watch page's player mounted but hidden while Shorts plays in its own
 export function getPlayer() {
-  const elPlayer = document.querySelector(PLAYER_SELECTOR);
-  if (!isYoutubePlayer(elPlayer) || !elPlayer.checkVisibility()) {
-    return null;
+  for (const elPlayer of document.querySelectorAll(PLAYER_SELECTOR)) {
+    if (isYoutubePlayer(elPlayer) && elPlayer.checkVisibility()) {
+      return elPlayer;
+    }
   }
-
-  return elPlayer;
+  return null;
 }
 
-export function getVideo() {
-  const elVideo = document.querySelector(VIDEO_SELECTOR);
+export function getVideo(player: YoutubePlayer) {
+  const elVideo = player.querySelector(MAIN_VIDEO_SELECTOR);
   return elVideo instanceof HTMLVideoElement ? elVideo : null;
+}
+
+export function isShortsPlayer(player: YoutubePlayer) {
+  return player.id === SHORTS_PLAYER_ID;
+}
+
+export function isMainVideo(target: EventTarget | null) {
+  return target instanceof HTMLVideoElement && target.matches(`${PLAYER_SELECTOR} ${MAIN_VIDEO_SELECTOR}`);
 }
 
 export function getVideoTitle(player: YoutubePlayer) {

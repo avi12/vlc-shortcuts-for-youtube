@@ -1,5 +1,6 @@
 import { applyOverride, createOverrideRecords, type OverrideSlot, restoreOverride } from "@/lib/dom-overrides";
 import { isVlcControlsEnabled, onEnabledChange } from "@/lib/enabled-flag";
+import { PLAYER_SELECTOR } from "@/lib/player";
 import { ShortcutStyle } from "@/lib/shortcut";
 import { formatActionShortcut, VlcAction } from "@/lib/vlc-keymap";
 
@@ -66,7 +67,6 @@ const SHORTCUT_BUTTONS: ShortcutButton[] = [
 ];
 
 const SHORTCUT_BUTTON_SELECTOR = SHORTCUT_BUTTONS.map(button => button.selector).join(",");
-const PLAYER_SELECTOR = ".html5-video-player";
 const TOOLTIP_TEXT_SELECTOR = ".ytp-tooltip-text";
 const SHORTCUT_SUFFIX_PATTERN = /\s*\([^()]*\)\s*$/;
 const TOOLTIP_ATTRIBUTES = Object.values(TooltipAttribute);

@@ -75,7 +75,8 @@ function planPresses(seconds: number) {
 
 // Every jump is made of YouTube's own seek presses, so YouTube's seek overlay shows it. A jump off
 // YouTube's step (VLC's 3 seconds) rides on the nearest press, the remainder is applied silently and
-// the running total in YouTube's own overlay element is corrected to match
+// the running total in YouTube's own overlay element is corrected to match. Shorts ignores YouTube's seek
+// keys and has no seek overlay, so there the jump is silent
 export function seekNatively({ player, seconds }: {
   player: YoutubePlayer;
   seconds: number;
@@ -90,11 +91,15 @@ export function seekNatively({ player, seconds }: {
   }
 
   const { hotkey, count, stepSeconds } = planPresses(seconds);
-  dispatchYoutubeHotkey({
+  const isPressed = dispatchYoutubeHotkey({
     player,
     hotkey,
-    count
+    count,
+    fallback: () => player.seekTo(player.getCurrentTime() + seconds, true)
   });
+  if (!isPressed) {
+    return;
+  }
 
   const correctionSeconds = seconds - Math.sign(seconds) * count * stepSeconds;
   if (correctionSeconds !== 0) {

@@ -174,6 +174,23 @@ export const YOUTUBE_SEEK_SECONDS = {
   long: 10
 } as const;
 
+// YouTube's volume keys step by this many percent, as VLC's do
+export const YOUTUBE_VOLUME_STEP = 5;
+
+// Shorts moves between shorts on the keys the watch page uses for volume, so there they stay YouTube's
+const YOUTUBE_SHORTS_NAVIGATION_HOTKEYS = [YOUTUBE_HOTKEYS.volumeUp, YOUTUBE_HOTKEYS.volumeDown];
+
+// The only YouTube keys Shorts' player honors; it ignores the rest (seek, speed, frame, captions...)
+const SHORTS_HONORED_HOTKEYS: ReadonlySet<YoutubeHotkey> = new Set([
+  YOUTUBE_HOTKEYS.playPause,
+  YOUTUBE_HOTKEYS.mute,
+  YOUTUBE_HOTKEYS.fullscreen
+]);
+
+export function isHonoredOnShorts(hotkey: YoutubeHotkey) {
+  return SHORTS_HONORED_HOTKEYS.has(hotkey);
+}
+
 function toCombo({ key, shiftKey }: YoutubeHotkey): KeyCombo {
   return {
     key,
@@ -191,6 +208,13 @@ export function formatYoutubeHotkey(hotkey: YoutubeHotkey) {
 
 // YouTube's shortcuts for controls VLC also has - VLC's keys replace them, so these are swallowed
 const YOUTUBE_REPLACED_COMBOS = Object.values(YOUTUBE_HOTKEYS).map(toCombo);
+
+export function isShortsNavigationKey(e: KeyboardEvent) {
+  return YOUTUBE_SHORTS_NAVIGATION_HOTKEYS.some(hotkey => isComboMatch({
+    combo: toCombo(hotkey),
+    e
+  }));
+}
 
 export function isReplacedYoutubeKey(e: KeyboardEvent) {
   return YOUTUBE_REPLACED_COMBOS.some(combo => isComboMatch({

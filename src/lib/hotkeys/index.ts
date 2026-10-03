@@ -5,9 +5,9 @@ import { isKeyForPage } from "@/lib/hotkeys/event-targets";
 import { runAction } from "@/lib/hotkeys/run-action";
 import { installWheelVolume } from "@/lib/hotkeys/wheel-volume";
 import { isDispatchedYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
-import { getPlayer } from "@/lib/player";
+import { getPlayer, isShortsPlayer } from "@/lib/player";
 import { findBinding } from "@/lib/vlc-keymap";
-import { isReplacedYoutubeKey } from "@/lib/youtube-keymap";
+import { isReplacedYoutubeKey, isShortsNavigationKey } from "@/lib/youtube-keymap";
 
 // Swallowed on keydown, so the matching keypress/keyup never reach YouTube either
 const swallowedKeyCodes = new Set<string>();
@@ -35,7 +35,8 @@ function onKeyDown(e: KeyboardEvent) {
   }
 
   const player = getTargetPlayer(e);
-  if (!player) {
+  const isShortsNavigation = player !== null && isShortsPlayer(player) && isShortsNavigationKey(e);
+  if (!player || isShortsNavigation) {
     return;
   }
 

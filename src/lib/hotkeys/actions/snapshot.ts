@@ -27,7 +27,7 @@ function downloadFile({ url, filename }: {
 }
 
 export function takeSnapshot(player: YoutubePlayer) {
-  const elVideo = getVideo();
+  const elVideo = getVideo(player);
   const isFrameAvailable = elVideo !== null && elVideo.videoWidth > 0;
   if (!isFrameAvailable) {
     return;

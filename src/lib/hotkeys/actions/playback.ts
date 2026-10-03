@@ -1,8 +1,14 @@
 import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
-import { getVideo, isPlaying, type YoutubePlayer } from "@/lib/player";
+import { getVideo, isPlaying, isShortsPlayer, type YoutubePlayer } from "@/lib/player";
 import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 
 const START_SECONDS = 0;
+
+// Shorts' own next/previous buttons; its player swallows the arrow keys Shorts otherwise moves with
+enum ShortsNavigationButton {
+  Next = "#navigation-button-down button",
+  Previous = "#navigation-button-up button"
+}
 
 export function togglePlayPause(player: YoutubePlayer) {
   dispatchYoutubeHotkey({
@@ -20,7 +26,17 @@ export function stop(player: YoutubePlayer) {
   player.seekTo(START_SECONDS, true);
 }
 
+function clickShortsNavigation(button: ShortsNavigationButton) {
+  document.querySelector<HTMLElement>(button)?.click();
+}
+
+// On Shorts the next and previous video are the next and previous short
 export function playNext(player: YoutubePlayer) {
+  if (isShortsPlayer(player)) {
+    clickShortsNavigation(ShortsNavigationButton.Next);
+    return;
+  }
+
   dispatchYoutubeHotkey({
     player,
     hotkey: YOUTUBE_HOTKEYS.next
@@ -28,6 +44,11 @@ export function playNext(player: YoutubePlayer) {
 }
 
 export function playPrevious(player: YoutubePlayer) {
+  if (isShortsPlayer(player)) {
+    clickShortsNavigation(ShortsNavigationButton.Previous);
+    return;
+  }
+
   dispatchYoutubeHotkey({
     player,
     hotkey: YOUTUBE_HOTKEYS.previous
@@ -35,7 +56,7 @@ export function playPrevious(player: YoutubePlayer) {
 }
 
 export function toggleLoop(player: YoutubePlayer) {
-  const elVideo = getVideo();
+  const elVideo = getVideo(player);
   if (!elVideo) {
     return;
   }

@@ -23,7 +23,7 @@ function applyRate({ player, rate }: {
 }) {
   player.setPlaybackRate(rate);
   const isRateApplied = Math.abs(player.getPlaybackRate() - rate) < RATE_EPSILON;
-  const elVideo = getVideo();
+  const elVideo = getVideo(player);
   if (!isRateApplied && elVideo) {
     elVideo.playbackRate = rate;
   }
@@ -32,7 +32,23 @@ function applyRate({ player, rate }: {
 }
 
 function getCurrentRate(player: YoutubePlayer) {
-  return getVideo()?.playbackRate ?? player.getPlaybackRate();
+  return getVideo(player)?.playbackRate ?? player.getPlaybackRate();
+}
+
+function stepPresetSpeedSilently({ player, direction }: {
+  player: YoutubePlayer;
+  direction: SpeedDirection;
+}) {
+  const rates = player.getAvailablePlaybackRates();
+  const currentRate = player.getPlaybackRate();
+  const nextRate = direction === SpeedDirection.Faster ?
+    rates.find(rate => rate > currentRate) :
+    rates.findLast(rate => rate < currentRate);
+  if (nextRate === undefined) {
+    return;
+  }
+
+  player.setPlaybackRate(nextRate);
 }
 
 // VLC's preset steps map onto YouTube's own speed keys, which walk the same preset list
@@ -42,7 +58,11 @@ export function stepPresetSpeed({ player, direction }: {
 }) {
   dispatchYoutubeHotkey({
     player,
-    hotkey: direction === SpeedDirection.Faster ? YOUTUBE_HOTKEYS.faster : YOUTUBE_HOTKEYS.slower
+    hotkey: direction === SpeedDirection.Faster ? YOUTUBE_HOTKEYS.faster : YOUTUBE_HOTKEYS.slower,
+    fallback: () => stepPresetSpeedSilently({
+      player,
+      direction
+    })
   });
 }
 

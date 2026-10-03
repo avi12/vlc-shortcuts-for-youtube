@@ -1,7 +1,7 @@
 import { isVlcControlsEnabled } from "@/lib/enabled-flag";
 import { stepVolume, VolumeDirection } from "@/lib/hotkeys/actions/volume";
 import { isEventInside } from "@/lib/hotkeys/event-targets";
-import { getPlayer } from "@/lib/player";
+import { getPlayer, isShortsPlayer } from "@/lib/player";
 
 const PIXELS_PER_WHEEL_NOTCH = 100;
 const PIXELS_PER_LINE = 40;
@@ -14,10 +14,11 @@ function toPixels(e: WheelEvent) {
   return e.deltaMode === WheelEvent.DOM_DELTA_LINE ? delta * PIXELS_PER_LINE : delta;
 }
 
-// VLC's default wheel action is volume, claimed anywhere over the player (with or without Shift)
+// VLC's default wheel action is volume, claimed anywhere over the player (with or without Shift). On Shorts
+// the wheel moves between shorts, so it stays YouTube's there
 function getWheelVolumePlayer(e: WheelEvent) {
   const player = getPlayer();
-  if (!player || !isEventInside({
+  if (!player || isShortsPlayer(player) || !isEventInside({
     e,
     elContainer: player
   })) {
