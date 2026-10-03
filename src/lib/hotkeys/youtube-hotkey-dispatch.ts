@@ -68,9 +68,11 @@ export function holdYoutubeHotkey({ player, hotkey }: {
     return;
   }
 
-  return () => dispatchKey({
-    player,
-    hotkey,
-    eventType: KeyEventType.Release
-  });
+  return () => {
+    return dispatchKey({
+      player,
+      hotkey,
+      eventType: KeyEventType.Release
+    });
+  };
 }
