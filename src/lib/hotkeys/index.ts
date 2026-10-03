@@ -8,14 +8,18 @@ import { resetVolumeBoost } from "@/lib/hotkeys/volume-boost";
 import { installWheelVolume } from "@/lib/hotkeys/wheel-volume";
 import { isDispatchedYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import { getPlayer, isShortsPlayer, isSphericalVideo, type YoutubePlayer } from "@/lib/player";
+import { getSite, isMusicSite } from "@/lib/site";
 import { findBindings, type VlcBinding } from "@/lib/vlc-keymap";
 import { isReplacedYoutubeKey, isShortsNavigationKey } from "@/lib/youtube-keymap";
+import { isMusicNavigationPrefix, isReplacedMusicKey } from "@/lib/youtube-music-keymap";
 
 // Swallowed on keydown, so the matching keypress/keyup never reach YouTube either. Each keydown decides afresh,
 // since a keyup can be lost (Ctrl+H opening the history tab) and the key may next be typed into a text box
 const swallowedKeyCodes = new Set<string>();
 // YouTube keys held down for as long as the viewer holds the VLC key that pressed them
 const releaseByKeyCode = new Map<string, () => void>();
+// The key after YouTube Music's "g" completes one of Music's navigation keys
+let isAfterMusicNavigationPrefix = false;
 
 function releaseHeldKey(code: string) {
   releaseByKeyCode.get(code)?.();
@@ -51,12 +55,13 @@ function isBindingActive({ binding, player, e }: {
   player: YoutubePlayer;
   e: KeyboardEvent;
 }) {
+  const isSiteSupported = !binding.site || binding.site === getSite();
   const isVideoSupported = !binding.isSphericalOnly || isSphericalVideo(player);
   const isFocusSupported = !binding.isPlayerFocusOnly || isEventInside({
     e,
     elContainer: player
   });
-  return isVideoSupported && isFocusSupported;
+  return isSiteSupported && isVideoSupported && isFocusSupported;
 }
 
 function findActiveBinding({ e, player }: {
@@ -77,9 +82,11 @@ function onKeyDown(e: KeyboardEvent) {
   }
 
   swallowedKeyCodes.delete(e.code);
+  const isMusicNavigation = isAfterMusicNavigationPrefix;
+  isAfterMusicNavigationPrefix = isMusicSite() && isMusicNavigationPrefix(e);
   const player = getTargetPlayer(e);
   const isShortsNavigation = player !== null && isShortsPlayer(player) && isShortsNavigationKey(e);
-  if (!player || isShortsNavigation) {
+  if (!player || isShortsNavigation || isMusicNavigation) {
     return;
   }
 
@@ -102,7 +109,8 @@ function onKeyDown(e: KeyboardEvent) {
     return;
   }
 
-  if (isReplacedYoutubeKey(e)) {
+  const isReplacedKey = isMusicSite() ? isReplacedMusicKey(e) : isReplacedYoutubeKey(e);
+  if (isReplacedKey) {
     swallow(e);
   }
 }

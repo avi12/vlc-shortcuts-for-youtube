@@ -2,6 +2,7 @@ import { cycleAspectRatio } from "@/lib/hotkeys/actions/aspect-ratio";
 import { cycleAudioTrack } from "@/lib/hotkeys/actions/audio-tracks";
 import { toggleControls } from "@/lib/hotkeys/actions/controls-visibility";
 import { stepFrame } from "@/lib/hotkeys/actions/frame-step";
+import { shuffle } from "@/lib/hotkeys/actions/music-queue";
 import {
   playNext,
   playPrevious,
@@ -106,6 +107,7 @@ const ACTION_HANDLERS: Record<VlcAction, ActionHandler> = {
   [VlcAction.CycleAudioTrack]: cycleAudioTrack,
   [VlcAction.CycleAspectRatio]: cycleAspectRatio,
   [VlcAction.ToggleLoop]: toggleLoop,
+  [VlcAction.Shuffle]: shuffle,
   [VlcAction.Snapshot]: takeSnapshot,
   [VlcAction.ToggleControls]: toggleControls,
   [VlcAction.ToggleMiniplayer]: toggleMiniplayer,

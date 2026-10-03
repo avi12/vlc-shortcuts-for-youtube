@@ -2,6 +2,7 @@ import { rewriteNativeBezelText, showStatusInNativeBezel } from "@/lib/hotkeys/n
 import { getBoostedVolume, MAX_PLAYER_VOLUME, setBoostedVolume } from "@/lib/hotkeys/volume-boost";
 import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import type { YoutubePlayer } from "@/lib/player";
+import { isMusicSite } from "@/lib/site";
 import { YOUTUBE_HOTKEYS, YOUTUBE_VOLUME_STEP } from "@/lib/youtube-keymap";
 
 const MIN_VOLUME = 0;
@@ -49,6 +50,15 @@ function stepBoostedVolume({ player, direction }: {
   player.unMute();
 
   const text = formatVolume(volume);
+  // YouTube Music's volume key brings up no bezel at all
+  if (isMusicSite()) {
+    showStatusInNativeBezel({
+      player,
+      text
+    });
+    return true;
+  }
+
   const isPressed = dispatchYoutubeHotkey({
     player,
     hotkey: YOUTUBE_HOTKEYS.volumeUp,

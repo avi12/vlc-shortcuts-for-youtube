@@ -7,7 +7,7 @@ import {
   ShortcutStyle
 } from "@/lib/shortcut";
 
-interface YoutubeShortcut {
+export interface YoutubeShortcut {
   section: KeymapSection;
   combos: readonly KeyCombo[];
   hotkeyLabel?: string;
@@ -202,8 +202,9 @@ const YOUTUBE_SHORTS_NAVIGATION_HOTKEYS = [YOUTUBE_HOTKEYS.volumeUp, YOUTUBE_HOT
 
 // The YouTube keys each player variant honors. Shorts ignores seek, speed, frame and caption keys (its Up/Down
 // change the short); the embed ignores volume, speed and frame keys and seeks 10s on the arrows. The watch
-// page honors every key
+// page honors every key, and YouTube Music's player none (Music has keys of its own, see youtube-music-keymap.ts)
 const HONORED_HOTKEYS_BY_PLAYER_KIND: Record<PlayerKind, ReadonlySet<YoutubeHotkey> | null> = {
+  [PlayerKind.Music]: new Set(),
   [PlayerKind.Watch]: null,
   [PlayerKind.Shorts]: new Set([YOUTUBE_HOTKEYS.playPause, YOUTUBE_HOTKEYS.mute, YOUTUBE_HOTKEYS.fullscreen]),
   [PlayerKind.Embed]: new Set([
@@ -225,7 +226,7 @@ export function isHotkeyHonored({ playerKind, hotkey }: {
   return HONORED_HOTKEYS_BY_PLAYER_KIND[playerKind]?.has(hotkey) ?? true;
 }
 
-function toCombo({ key, shiftKey }: YoutubeHotkey): KeyCombo {
+export function toHotkeyCombo({ key, shiftKey }: YoutubeHotkey): KeyCombo {
   return {
     key,
     isShift: shiftKey
@@ -235,13 +236,13 @@ function toCombo({ key, shiftKey }: YoutubeHotkey): KeyCombo {
 // In the notation of YouTube's own Shift+/ dialog, so it finds YouTube's (localized) row for that key
 export function formatYoutubeHotkey(hotkey: YoutubeHotkey) {
   return formatCombos({
-    combos: [toCombo(hotkey)],
+    combos: [toHotkeyCombo(hotkey)],
     style: ShortcutStyle.Dialog
   });
 }
 
 // YouTube's shortcuts for controls VLC also has - VLC's keys replace them, so these are swallowed
-const YOUTUBE_REPLACED_COMBOS = Object.values(YOUTUBE_HOTKEYS).map(toCombo);
+const YOUTUBE_REPLACED_COMBOS = Object.values(YOUTUBE_HOTKEYS).map(toHotkeyCombo);
 
 // YouTube listens for its volume keys on the player itself, so they work only while focus is inside it - elsewhere
 // they stay the page's and scroll it. Every other YouTube key is also handled page-wide
@@ -253,7 +254,7 @@ export function isPlayerFocusKey(e: KeyboardEvent) {
 
 export function isShortsNavigationKey(e: KeyboardEvent) {
   return YOUTUBE_SHORTS_NAVIGATION_HOTKEYS.some(hotkey => isComboMatch({
-    combo: toCombo(hotkey),
+    combo: toHotkeyCombo(hotkey),
     e
   }));
 }

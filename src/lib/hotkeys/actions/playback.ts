@@ -1,6 +1,8 @@
+import { toggleRepeat } from "@/lib/hotkeys/actions/music-queue";
 import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import { getVideo, isPlaying, isShortsPlayer, type YoutubePlayer } from "@/lib/player";
+import { isMusicSite } from "@/lib/site";
 import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 
 const START_SECONDS = 0;
@@ -61,7 +63,13 @@ export function playPrevious(player: YoutubePlayer) {
   });
 }
 
+// On YouTube Music the loop is Music's own repeat, so its player bar shows it
 export function toggleLoop(player: YoutubePlayer) {
+  if (isMusicSite()) {
+    toggleRepeat(player);
+    return;
+  }
+
   const elVideo = getVideo(player);
   if (!elVideo) {
     return;

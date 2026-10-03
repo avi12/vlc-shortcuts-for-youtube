@@ -1,3 +1,4 @@
+import { isMusicSite } from "@/lib/site";
 import { createTypeGuard, z } from "@/lib/zod";
 
 // Every YouTube player shares this class: the watch page's, Shorts' and the embed's
@@ -6,11 +7,12 @@ const MAIN_VIDEO_SELECTOR = "video.html5-main-video";
 const SHORTS_PLAYER_ID = "shorts-player";
 const EMBED_PATH_PREFIX = "/embed/";
 
-// YouTube's player variants differ in which of YouTube's own keys they honor
+// YouTube's player variants differ in which of YouTube's own keys they honor; YouTube Music's honors none
 export enum PlayerKind {
   Watch = "watch",
   Shorts = "shorts",
-  Embed = "embed"
+  Embed = "embed",
+  Music = "music"
 }
 
 enum PlayerState {
@@ -105,6 +107,10 @@ export function getVideo(player: YoutubePlayer) {
 }
 
 export function getPlayerKind(player: YoutubePlayer) {
+  if (isMusicSite()) {
+    return PlayerKind.Music;
+  }
+
   if (player.id === SHORTS_PLAYER_ID) {
     return PlayerKind.Shorts;
   }

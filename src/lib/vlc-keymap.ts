@@ -6,7 +6,9 @@ import {
   KeymapSection,
   type ShortcutStyle
 } from "@/lib/shortcut";
+import { Site } from "@/lib/site";
 import { YOUTUBE_360_HOTKEYS, YOUTUBE_HOTKEYS, type YoutubeHotkey } from "@/lib/youtube-keymap";
+import { YOUTUBE_MUSIC_HOTKEYS } from "@/lib/youtube-music-keymap";
 
 export enum VlcAction {
   PlayPause = "play-pause",
@@ -38,6 +40,7 @@ export enum VlcAction {
   CycleAudioTrack = "cycle-audio-track",
   CycleAspectRatio = "cycle-aspect-ratio",
   ToggleLoop = "toggle-loop",
+  Shuffle = "shuffle",
   Snapshot = "snapshot",
   ToggleControls = "toggle-controls",
   ToggleMiniplayer = "toggle-miniplayer",
@@ -58,6 +61,9 @@ export interface VlcBinding {
   // Acts only on 360° videos, as VLC's viewpoint keys do, and there takes over the key from any other binding (l
   // loops other videos). On any other video the key is left to its other binding, or to the page
   isSphericalOnly?: boolean;
+  // Acts only on this site: YouTube Music has no miniplayer or 360° videos and keeps + for liking a song, and only
+  // Music has a queue to shuffle
+  site?: Site;
   // A page scroll key, so like YouTube's volume keys it acts only while focus is inside the player
   isPlayerFocusOnly?: boolean;
   // A YouTube key that does exactly the same, so YouTube's own (localized) label describes this binding too
@@ -67,6 +73,9 @@ export interface VlcBinding {
     hotkey: YoutubeHotkey;
     step: string;
   };
+  // YouTube Music's key for the same control where it isn't YouTube's (VLC's loop is Music's repeat), so Music's
+  // own (localized) label describes this binding there
+  musicEquivalent?: YoutubeHotkey;
 }
 
 enum JumpDirection {
@@ -203,7 +212,8 @@ for (const { seconds, backwardAction, forwardAction } of JUMP_SIZES) {
 const VIEW_360_BINDING_BASE = {
   section: KeymapSection.General,
   isRepeatable: true,
-  isSphericalOnly: true
+  isSphericalOnly: true,
+  site: Site.Youtube
 } as const satisfies Partial<VlcBinding>;
 
 export const VLC_BINDINGS: VlcBinding[] = [
@@ -251,6 +261,8 @@ export const VLC_BINDINGS: VlcBinding[] = [
     label: FASTER_LABEL,
     combos: [{ key: "+" }],
     isRepeatable: true,
+    // YouTube Music's + likes the song
+    site: Site.Youtube,
     youtubeEquivalent: YOUTUBE_HOTKEYS.faster
   },
   {
@@ -291,7 +303,16 @@ export const VLC_BINDINGS: VlcBinding[] = [
     action: VlcAction.ToggleLoop,
     section: KeymapSection.Playback,
     label: "Toggle loop",
-    combos: [{ key: "l" }]
+    combos: [{ key: "l" }],
+    musicEquivalent: YOUTUBE_MUSIC_HOTKEYS.repeat
+  },
+  {
+    action: VlcAction.Shuffle,
+    section: KeymapSection.Playback,
+    label: "Shuffle",
+    combos: [{ key: "r" }],
+    site: Site.Music,
+    musicEquivalent: YOUTUBE_MUSIC_HOTKEYS.shuffle
   },
   {
     action: VlcAction.ToggleFullscreen,
@@ -308,6 +329,7 @@ export const VLC_BINDINGS: VlcBinding[] = [
       key: "i",
       isShift: true
     }],
+    site: Site.Youtube,
     youtubeEquivalent: YOUTUBE_HOTKEYS.miniplayer
   },
   {

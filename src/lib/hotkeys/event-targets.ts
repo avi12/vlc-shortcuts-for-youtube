@@ -1,3 +1,4 @@
+import { isMusicSite } from "@/lib/site";
 import { isPlayerFocusKey } from "@/lib/youtube-keymap";
 
 const EDITABLE_SELECTOR = [
@@ -46,10 +47,12 @@ function isActivatableOutsidePlayer({ element, elPlayer }: {
   return element.closest(ACTIVATABLE_SELECTOR) !== null && !elPlayer.contains(element);
 }
 
-// Ctrl/Alt combos double as browser shortcuts (Ctrl+H history, Alt+Left back), so they stay the browser's unless
-// the viewer is in the player
-function isBrowserShortcut(e: KeyboardEvent) {
-  return e.ctrlKey || e.altKey || e.metaKey;
+// The volume keys scroll the page and Ctrl/Alt combos double as browser shortcuts (Ctrl+H history, Alt+Left back),
+// so they stay the page's unless the viewer is in the player. YouTube Music's player can't take focus while its
+// player page is closed, so there they act wherever the viewer is
+function isPlayerFocusOnlyKey(e: KeyboardEvent) {
+  const isModified = e.ctrlKey || e.altKey || e.metaKey;
+  return (isPlayerFocusKey(e) || isModified) && !isMusicSite();
 }
 
 export function isKeyForPage({ e, elPlayer }: {
@@ -65,8 +68,7 @@ export function isKeyForPage({ e, elPlayer }: {
   const isOutsidePlayer = !elPlayer.contains(element);
   return isTypingInTextBox(e) ||
     element.closest(OVERLAY_SELECTOR) !== null ||
-    isPlayerFocusKey(e) && isOutsidePlayer ||
-    isBrowserShortcut(e) && isOutsidePlayer ||
+    isPlayerFocusOnlyKey(e) && isOutsidePlayer ||
     isSpace && isActivatableOutsidePlayer({
       element,
       elPlayer
