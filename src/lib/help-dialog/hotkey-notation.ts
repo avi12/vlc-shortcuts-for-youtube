@@ -2,6 +2,7 @@ import { stripBidiMarks, toHotkeySignature } from "@/lib/help-dialog/hotkey-sign
 import {
   formatCombos,
   formatKeyName,
+  getShiftedSymbolBaseKey,
   isLetter,
   type KeyCombo,
   MODIFIER_JOINER,
@@ -11,10 +12,10 @@ import {
 import { formatYoutubeHotkey, YOUTUBE_CHAPTER_COMBOS, YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 
 // How YouTube's dialog writes keys in the viewer's language: its words for the modifiers, the joiner between
-// them, how a Shift+letter reads ("P (SHIFT+p)", "P（Shift+p）"), and in right-to-left languages the
-// invisible direction marks that keep a combo reading left to right
+// them, how a shifted key reads ("P (SHIFT+p)", "P（Shift+p）", "+ (SHIFT+=)"), and in right-to-left languages
+// the invisible direction marks that keep a combo reading left to right
 interface HotkeyNotation {
-  formatShiftedLetter: (letter: string) => string;
+  formatShiftedKey: (key: string) => string;
   controlName: string;
   altName: string;
   shiftName: string;
@@ -35,10 +36,10 @@ const CONTROL_SIGNATURE = toHotkeySignature(
 const SHIFT_NAME_PATTERN = /[(（]\s*([^+＋]+?)\s*[+＋]/;
 const JOINER_KEY = "+";
 
-function formatEnglishShiftedLetter(letter: string) {
+function formatEnglishShiftedKey(key: string) {
   return formatCombos({
     combos: [{
-      key: letter,
+      key,
       isShift: true
     }],
     style: ShortcutStyle.Dialog
@@ -46,7 +47,7 @@ function formatEnglishShiftedLetter(letter: string) {
 }
 
 const ENGLISH_NOTATION: HotkeyNotation = {
-  formatShiftedLetter: formatEnglishShiftedLetter,
+  formatShiftedKey: formatEnglishShiftedKey,
   controlName: MODIFIER_NAMES.control,
   altName: MODIFIER_NAMES.alt,
   shiftName: MODIFIER_NAMES.shift,
@@ -54,23 +55,41 @@ const ENGLISH_NOTATION: HotkeyNotation = {
   directionMark: ""
 };
 
-// YouTube's "P (SHIFT+p)" row becomes a template: its P and p are swapped for any other letter
-function createShiftedLetterFormatter(sample: string) {
+// The character a shifted key types and the key it is typed on: "P" on "p", "+" on "="
+function splitShiftedKey(key: string) {
+  if (isLetter(key)) {
+    return {
+      typedCharacter: key.toUpperCase(),
+      typedOnKey: key.toLowerCase()
+    };
+  }
+
+  return {
+    typedCharacter: key,
+    typedOnKey: getShiftedSymbolBaseKey(key) ?? key
+  };
+}
+
+// YouTube's "P (SHIFT+p)" row becomes a template: its P and p are swapped for any other shifted key
+function createShiftedKeyFormatter(sample: string) {
   const sampleLetter = SHIFTED_LETTER_SAMPLE.key;
   const iUppercase = sample.indexOf(sampleLetter.toUpperCase());
   const iLowercase = sample.lastIndexOf(sampleLetter.toLowerCase());
   const isTemplate = iUppercase !== -1 && iUppercase < iLowercase;
   if (!isTemplate) {
-    return formatEnglishShiftedLetter;
+    return formatEnglishShiftedKey;
   }
 
-  return (letter: string) => [
-    sample.slice(0, iUppercase),
-    letter.toUpperCase(),
-    sample.slice(iUppercase + 1, iLowercase),
-    letter.toLowerCase(),
-    sample.slice(iLowercase + 1)
-  ].join("");
+  return (key: string) => {
+    const { typedCharacter, typedOnKey } = splitShiftedKey(key);
+    return [
+      sample.slice(0, iUppercase),
+      typedCharacter,
+      sample.slice(iUppercase + 1, iLowercase),
+      typedOnKey,
+      sample.slice(iLowercase + 1)
+    ].join("");
+  };
 }
 
 // YouTube's "CONTROL + ←" row tells its word for Ctrl, the joiner, and the direction mark after the key
@@ -109,7 +128,7 @@ export function learnNotation(youtubeRowsBySignature: Map<string, { hotkey: stri
     ...ENGLISH_NOTATION,
     ...controlSample && readControlNotation(controlSample),
     ...shiftedLetterSample && {
-      formatShiftedLetter: createShiftedLetterFormatter(shiftedLetterSample)
+      formatShiftedKey: createShiftedKeyFormatter(shiftedLetterSample)
     },
     shiftName,
     altName: matchCasing({
@@ -123,9 +142,11 @@ function formatCombo({ combo, notation }: {
   combo: KeyCombo;
   notation: HotkeyNotation;
 }) {
-  const isShiftedLetter = Boolean(combo.isShift) && !combo.isCtrl && !combo.isAlt && isLetter(combo.key);
-  if (isShiftedLetter) {
-    return notation.formatShiftedLetter(combo.key);
+  const isShiftedCharacter = Boolean(combo.isShift) && isLetter(combo.key) ||
+    getShiftedSymbolBaseKey(combo.key) !== undefined;
+  const isShiftedKey = isShiftedCharacter && !combo.isCtrl && !combo.isAlt;
+  if (isShiftedKey) {
+    return notation.formatShiftedKey(combo.key);
   }
 
   const parts = [

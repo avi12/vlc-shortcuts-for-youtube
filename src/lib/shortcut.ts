@@ -30,11 +30,17 @@ const KEY_DISPLAY_NAMES: Record<string, string> = {
   End: "END"
 };
 
-// YouTube writes a shifted symbol next to the key it is typed on: "< (SHIFT+,)"
+// YouTube writes a shifted symbol next to the key it is typed on (US layout): "< (SHIFT+,)". "+" is also matched
+// as typed on the numpad, with no Shift
 const SHIFTED_SYMBOL_BASE_KEYS: Record<string, string> = {
   "<": ",",
-  ">": "."
+  ">": ".",
+  "+": "="
 };
+
+export function getShiftedSymbolBaseKey(key: string) {
+  return SHIFTED_SYMBOL_BASE_KEYS[key];
+}
 
 // The English notation of YouTube's dialog; the help dialog learns the viewer's own from YouTube's rows
 export const MODIFIER_NAMES = {
@@ -95,8 +101,10 @@ function formatCombo({ combo, style }: {
   style: ShortcutStyle;
 }) {
   const key = formatKeyName(combo.key);
-  const typedOnKey = isLetter(combo.key) ? key : SHIFTED_SYMBOL_BASE_KEYS[combo.key];
-  const isShiftOnly = Boolean(combo.isShift) && !combo.isCtrl && !combo.isAlt;
+  const shiftedSymbolBaseKey = getShiftedSymbolBaseKey(combo.key);
+  const typedOnKey = isLetter(combo.key) ? key : shiftedSymbolBaseKey;
+  const isShifted = Boolean(combo.isShift) || shiftedSymbolBaseKey !== undefined;
+  const isShiftOnly = isShifted && !combo.isCtrl && !combo.isAlt;
   if (isShiftOnly && typedOnKey) {
     const shiftedKey = `${MODIFIER_NAMES.shift}+${typedOnKey}`;
     return style === ShortcutStyle.Dialog ? `${combo.key.toUpperCase()} (${shiftedKey})` : shiftedKey;
