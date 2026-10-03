@@ -68,37 +68,35 @@ export default defineConfig({
     // Added to auto-icons' default 16/32/48/128 - Firefox's add-ons manager uses 96 on high-DPI screens
     sizes: [96]
   },
-  manifest({ browser }) {
-    return {
-      name: EXTENSION_NAME,
-      description: "VLC's keyboard shortcuts for YouTube's player - click the toolbar icon to toggle",
-      homepage_url: url,
-      // No popup: the toolbar click toggles the extension (see background.ts)
-      action: {},
-      permissions: ["storage"],
-      host_permissions: ["https://www.youtube.com/*", "https://www.youtube-nocookie.com/*"],
-      // Chrome's manifest takes author as { email }; Opera and Firefox take the "Name <email>" string
-      author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
-      ...(browser === "firefox" && {
-        browser_specific_settings: {
-          gecko: {
-            id: process.env.GECKO_ID ?? FALLBACK_GECKO_ID,
-            strict_min_version: FIREFOX_MIN_VERSION,
-            data_collection_permissions: {
-              required: ["none"]
-            }
+  manifest: ({ browser }) => ({
+    name: EXTENSION_NAME,
+    description: "VLC's keyboard shortcuts for YouTube's player - click the toolbar icon to toggle",
+    homepage_url: url,
+    // No popup: the toolbar click toggles the extension (see background.ts)
+    action: {},
+    permissions: ["storage"],
+    host_permissions: ["https://www.youtube.com/*", "https://www.youtube-nocookie.com/*"],
+    // Chrome's manifest takes author as { email }; Opera and Firefox take the "Name <email>" string
+    author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
+    ...(browser === "firefox" && {
+      browser_specific_settings: {
+        gecko: {
+          id: process.env.GECKO_ID ?? FALLBACK_GECKO_ID,
+          strict_min_version: FIREFOX_MIN_VERSION,
+          data_collection_permissions: {
+            required: ["none"]
           }
-        },
-        developer: {
-          name: author,
-          url
         }
-      }),
-      ...(browser !== "firefox" && {
-        minimum_chrome_version: CHROMIUM_MIN_VERSION
-      })
-    };
-  },
+      },
+      developer: {
+        name: author,
+        url
+      }
+    }),
+    ...(browser !== "firefox" && {
+      minimum_chrome_version: CHROMIUM_MIN_VERSION
+    })
+  }),
   outDir: "build",
   outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",
   zip: {
