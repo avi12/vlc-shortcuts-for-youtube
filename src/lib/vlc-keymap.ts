@@ -205,7 +205,8 @@ export const VLC_BINDINGS: VlcBinding[] = [
     section: KeymapSection.Playback,
     label: "Next frame",
     combos: [{ key: "e" }],
-    isRepeatable: true
+    isRepeatable: true,
+    youtubeEquivalent: YOUTUBE_HOTKEYS.nextFrame
   },
   {
     action: VlcAction.Slower,
