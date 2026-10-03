@@ -112,21 +112,6 @@ export default defineConfig({
     }
   }),
   hooks: {
-    "build:manifestGenerated"(wxt, manifest) {
-      // `use_dynamic_url` is a Chrome MV3 web_accessible_resources privacy feature WXT auto-adds
-      // to the content-script WAR entry; Firefox doesn't recognize it and logs an "unexpected
-      // property" warning on sideload. Strip it on Firefox only - Chromium keeps it.
-      const isFirefox = wxt.config.browser === "firefox";
-      if (!isFirefox || !Array.isArray(manifest.web_accessible_resources)) {
-        return;
-      }
-
-      for (const resource of manifest.web_accessible_resources) {
-        if (typeof resource === "object") {
-          delete resource.use_dynamic_url;
-        }
-      }
-    },
     "zip:start"(wxt) {
       // Only a production build ships to stores, so only then is a reviewable source zip worth making
       const isStoreBuild = wxt.config.mode === "production" && BROWSERS_REQUIRING_SOURCES.has(wxt.config.browser);
