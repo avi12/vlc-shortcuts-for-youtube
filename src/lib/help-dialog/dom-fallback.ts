@@ -4,6 +4,7 @@ import {
   findSectionByHotkeys,
   type HotkeyGroup
 } from "@/lib/help-dialog/hotkey-groups";
+import { toHotkeySignature } from "@/lib/help-dialog/hotkey-signature";
 
 const SECTION_SELECTOR = "ytd-hotkey-dialog-section-renderer";
 const SECTION_TITLE_SELECTOR = "#sub-title";
@@ -26,7 +27,7 @@ function readDomText(elDialog: Element) {
       }
 
       hotkeys.push(hotkey);
-      dialogText.labelByHotkey.set(hotkey, label);
+      dialogText.labelByHotkeySignature.set(toHotkeySignature(hotkey), label);
     }
     const section = findSectionByHotkeys(hotkeys);
     const title = elSection.querySelector(SECTION_TITLE_SELECTOR)?.textContent.trim();

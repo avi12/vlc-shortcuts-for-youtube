@@ -1,3 +1,4 @@
+import { toHotkeySignature } from "@/lib/help-dialog/hotkey-signature";
 import { formatCombos, KeymapSection, ShortcutStyle } from "@/lib/shortcut";
 import { VLC_BINDINGS, VLC_WHEEL_SHORTCUTS, type VlcBinding } from "@/lib/vlc-keymap";
 import {
@@ -19,41 +20,45 @@ export interface HotkeyGroup {
 
 // The text YouTube's own dialog shows, already in the viewer's language
 interface YoutubeDialogText {
-  labelByHotkey: Map<string, string>;
+  labelByHotkeySignature: Map<string, string>;
   titleBySection: Map<KeymapSection, string>;
 }
 
 export function createEmptyDialogText(): YoutubeDialogText {
   return {
-    labelByHotkey: new Map(),
+    labelByHotkeySignature: new Map(),
     titleBySection: new Map()
   };
 }
 
 export function findSectionByHotkeys(hotkeys: string[]) {
-  return Object.values(KeymapSection).find(section => hotkeys.includes(YOUTUBE_SECTION_ANCHOR_KEYS[section]));
+  const signatures = hotkeys.map(toHotkeySignature);
+  return Object.values(KeymapSection).find(section => {
+    const anchorSignature = toHotkeySignature(YOUTUBE_SECTION_ANCHOR_KEYS[section]);
+    return signatures.includes(anchorSignature);
+  });
 }
 
 // A VLC row that does exactly what a YouTube key does takes YouTube's own (localized) label for that key
-function findYoutubeLabel({ binding, labelByHotkey }: {
+function findYoutubeLabel({ binding, labelByHotkeySignature }: {
   binding: VlcBinding;
-  labelByHotkey: Map<string, string>;
+  labelByHotkeySignature: Map<string, string>;
 }) {
   if (!binding.youtubeEquivalent) {
     return;
   }
 
-  return labelByHotkey.get(formatYoutubeHotkey(binding.youtubeEquivalent));
+  return labelByHotkeySignature.get(toHotkeySignature(formatYoutubeHotkey(binding.youtubeEquivalent)));
 }
 
-function buildRows({ section, labelByHotkey }: {
+function buildRows({ section, labelByHotkeySignature }: {
   section: KeymapSection;
-  labelByHotkey: Map<string, string>;
+  labelByHotkeySignature: Map<string, string>;
 }) {
   const vlcRows = VLC_BINDINGS.filter(binding => binding.section === section).map(binding => ({
     label: findYoutubeLabel({
       binding,
-      labelByHotkey
+      labelByHotkeySignature
     }) ?? binding.label,
     hotkey: formatCombos({
       combos: binding.combos,
@@ -67,7 +72,7 @@ function buildRows({ section, labelByHotkey }: {
   const youtubeRows = YOUTUBE_NATIVE_SHORTCUTS.filter(shortcut => shortcut.section === section).map(shortcut => {
     const hotkey = formatYoutubeShortcut(shortcut);
     return {
-      label: labelByHotkey.get(hotkey) ?? shortcut.label,
+      label: labelByHotkeySignature.get(toHotkeySignature(hotkey)) ?? shortcut.label,
       hotkey
     };
   });
@@ -75,12 +80,12 @@ function buildRows({ section, labelByHotkey }: {
 }
 
 // Section titles and YouTube-only rows reuse YouTube's own (localized) text when its dialog has them
-export function buildGroups({ labelByHotkey, titleBySection }: YoutubeDialogText): HotkeyGroup[] {
+export function buildGroups({ labelByHotkeySignature, titleBySection }: YoutubeDialogText): HotkeyGroup[] {
   return Object.values(KeymapSection).map(section => ({
     title: titleBySection.get(section) ?? section,
     rows: buildRows({
       section,
-      labelByHotkey
+      labelByHotkeySignature
     })
   }));
 }

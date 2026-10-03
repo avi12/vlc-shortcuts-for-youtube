@@ -5,6 +5,7 @@ import {
   findSectionByHotkeys,
   type HotkeyGroup
 } from "@/lib/help-dialog/hotkey-groups";
+import { toHotkeySignature } from "@/lib/help-dialog/hotkey-signature";
 import { z } from "@/lib/zod";
 
 const DATA_PROPERTY = "data";
@@ -88,7 +89,7 @@ function readDataText(sections: HotkeySection[]) {
         continue;
       }
 
-      dialogText.labelByHotkey.set(option.hotkey, label);
+      dialogText.labelByHotkeySignature.set(toHotkeySignature(option.hotkey), label);
     }
     const section = findSectionByHotkeys(options.map(option => option.hotkey));
     const title = readText(youtubeSection.title);
