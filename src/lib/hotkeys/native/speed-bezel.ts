@@ -1,4 +1,4 @@
-import { BEZEL_SELECTOR, BEZEL_TEXT_SELECTOR, showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
+import { rewriteNativeBezelText, showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import type { YoutubePlayer } from "@/lib/player";
 import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
@@ -32,12 +32,9 @@ export function showRateInNativeBezel({ player, applyRate }: {
   }
 
   const rate = applyRate();
-  requestAnimationFrame(() => {
-    const elText = player.querySelector(BEZEL_TEXT_SELECTOR);
-    if (elText) {
-      elText.textContent = formatRate(rate);
-    }
-
-    player.querySelector(BEZEL_SELECTOR)?.setAttribute("aria-label", `${SPEED_LABEL_PREFIX}${rate}`);
+  rewriteNativeBezelText({
+    player,
+    title: formatRate(rate),
+    label: `${SPEED_LABEL_PREFIX}${rate}`
   });
 }

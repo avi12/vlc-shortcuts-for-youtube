@@ -57,7 +57,7 @@ function isFunctionValue(value: unknown) {
   return typeof value === "function";
 }
 
-const functionSchema = z.custom<(...parameters: unknown[]) => unknown>(isFunctionValue);
+export const functionSchema = z.custom<(...parameters: unknown[]) => unknown>(isFunctionValue);
 
 const playerApiSchema = z.object({
   playVideo: functionSchema,

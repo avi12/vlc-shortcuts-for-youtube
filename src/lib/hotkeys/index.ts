@@ -2,6 +2,7 @@ import { isVlcControlsEnabled, onEnabledChange } from "@/lib/enabled-flag";
 import { installAspectRatioReset, resetAspectRatio } from "@/lib/hotkeys/actions/aspect-ratio";
 import { showAllControls } from "@/lib/hotkeys/actions/controls-visibility";
 import { isKeyForPage } from "@/lib/hotkeys/event-targets";
+import { installBezelRegistry } from "@/lib/hotkeys/native/bezel-component";
 import { runAction } from "@/lib/hotkeys/run-action";
 import { installWheelVolume } from "@/lib/hotkeys/wheel-volume";
 import { isDispatchedYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
@@ -81,6 +82,7 @@ function undoSideEffects(isEnabled: boolean) {
 }
 
 export function installHotkeys() {
+  installBezelRegistry();
   window.addEventListener("keydown", onKeyDown, true);
   window.addEventListener("keypress", onKeyPress, true);
   window.addEventListener("keyup", onKeyUp, true);
