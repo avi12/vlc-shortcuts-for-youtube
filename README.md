@@ -68,7 +68,8 @@ percentage, <kbd>,</kbd> previous frame, <kbd>Ctrl</kbd> + <kbd>‚Üê</kbd>/<kbd>‚
 
 ## Requirements for setting up
 
-Install [Node.js](https://nodejs.org) 22+ and [pnpm](https://pnpm.io/installation)
+Install [Node.js](https://nodejs.org) 22+ and [pnpm](https://pnpm.io/installation) (the exact version is pinned in
+`package.json`'s `packageManager` field, run `corepack enable` to use it)
 
 ## Install dependencies
 
@@ -101,11 +102,38 @@ pnpm dev:opera
 
 ## Build
 
+These are also the build instructions for store reviewers. Run them from the repo root (or the source archive's root)
+after installing the dependencies.
+
+### Chrome
+
+```shell
+pnpm build
+```
+
+The unpacked extension is written to `build/chrome-mv3-production/`.
+
+### Firefox
+
+```shell
+pnpm build:firefox
+```
+
+The unpacked extension is written to `build/firefox-mv3-production/`.
+
+### Opera
+
+```shell
+pnpm build:opera
+```
+
+The unpacked extension is written to `build/opera-mv3-production/`.
+
+### All browsers at once
+
 ```shell
 pnpm build:all
 ```
-
-The unpacked builds are written to `build/<browser>-mv3-production/`.
 
 ## License
 
