@@ -30,7 +30,7 @@ The extension replaces YouTube's player keyboard controls with VLC's hotkeys, re
 - Use DRY with separation of concerns, prioritizing readability
 - Tree-shaking friendly modules: named exports only, no barrel files with side effects, no namespace imports (`import * as`)
 - Minimize indentations
-- An arrow's body follows its role (`local/arrow-body-by-role`): an object property's value or a callback that only hands back a value is expression-bodied - `manifest: ({ browser }) => ({ ... })`, `.filter(binding => binding.isSphericalOnly)` - while a closure handed back by `return` always takes braces and its own `return` (`return player => { return seekNatively(...); };`). Standalone functions stay `function` declarations (oxlint `func-style` forbids `const f = () => ...`)
+- An arrow that only hands back a value is expression-bodied, never braces around a lone `return` - an object property's value (`manifest: ({ browser }) => ({ ... })`, never a method), a callback, or a returned closure (`return player => seekNatively({ ... });`). A long body is broken over lines and indented the way ESLint/oxlint format it, not wrapped in braces. Standalone functions stay `function` declarations (oxlint `func-style` forbids `const f = () => ...`)
 - A callback that gets hard to read on one line is broken over properly indented lines rather than crammed in
 - Use `for-of` instead of `.forEach`, and a plain `for` loop instead of `.reduce()`
 - Use modern browser and CSS features

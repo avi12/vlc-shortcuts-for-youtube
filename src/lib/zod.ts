@@ -7,7 +7,5 @@ z.config({ jitless: true });
 export { z };
 
 export function createTypeGuard<T>(schema: z.ZodType) {
-  return (value: unknown): value is T => {
-    return schema.safeParse(value).success;
-  };
+  return (value: unknown): value is T => schema.safeParse(value).success;
 }

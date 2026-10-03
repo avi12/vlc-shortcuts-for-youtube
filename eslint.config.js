@@ -1,4 +1,3 @@
-import arrowBodyByRole from "./eslint-rules/arrow-body-by-role.js";
 import expandNestedObjectExpression from "./eslint-rules/expand-nested-object-expression.js";
 import expandNestedTypeLiteral from "./eslint-rules/expand-nested-type-literal.js";
 import multilineArgParenNewline from "./eslint-rules/multiline-arg-paren-newline.js";
@@ -188,7 +187,6 @@ const tsStyleRules = {
   ],
   "@stylistic/function-call-argument-newline": ["error", "consistent"],
   "@stylistic/function-paren-newline": ["error", "consistent"],
-  "local/arrow-body-by-role": "error",
   "local/expand-nested-object-expression": "error",
   "local/expand-nested-type-literal": "error",
   "local/multiline-arg-paren-newline": "error",
@@ -231,7 +229,6 @@ const sharedPlugins = {
   perfectionist,
   local: {
     rules: {
-      "arrow-body-by-role": arrowBodyByRole,
       "expand-nested-object-expression": expandNestedObjectExpression,
       "expand-nested-type-literal": expandNestedTypeLiteral,
       "multiline-arg-paren-newline": multilineArgParenNewline

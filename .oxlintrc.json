@@ -29,6 +29,7 @@
       "properties": "never"
     }],
     "func-style": ["error", "declaration", { "allowArrowFunctions": false }],
+    "arrow-body-style": ["error", "as-needed"],
     "no-control-regex": "off",
     "typescript/no-explicit-any": "error",
     "typescript/ban-ts-comment": "error",
