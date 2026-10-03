@@ -6,7 +6,7 @@ import {
   KeymapSection,
   type ShortcutStyle
 } from "@/lib/shortcut";
-import { YOUTUBE_HOTKEYS, type YoutubeHotkey } from "@/lib/youtube-keymap";
+import { YOUTUBE_360_HOTKEYS, YOUTUBE_HOTKEYS, type YoutubeHotkey } from "@/lib/youtube-keymap";
 
 export enum VlcAction {
   PlayPause = "play-pause",
@@ -40,8 +40,13 @@ export enum VlcAction {
   ToggleLoop = "toggle-loop",
   Snapshot = "snapshot",
   ToggleControls = "toggle-controls",
+  ToggleMiniplayer = "toggle-miniplayer",
   ZoomIn360 = "zoom-in-360",
-  ZoomOut360 = "zoom-out-360"
+  ZoomOut360 = "zoom-out-360",
+  PanUp360 = "pan-up-360",
+  PanLeft360 = "pan-left-360",
+  PanDown360 = "pan-down-360",
+  PanRight360 = "pan-right-360"
 }
 
 export interface VlcBinding {
@@ -50,7 +55,8 @@ export interface VlcBinding {
   label: string;
   combos: KeyCombo[];
   isRepeatable?: boolean;
-  // Acts only on 360° videos, as VLC's viewpoint keys do; on any other video the key stays the page's
+  // Acts only on 360° videos, as VLC's viewpoint keys do, and there takes over the key from any other binding (l
+  // loops other videos). On any other video the key is left to its other binding, or to the page
   isSphericalOnly?: boolean;
   // A page scroll key, so like YouTube's volume keys it acts only while focus is inside the player
   isPlayerFocusOnly?: boolean;
@@ -193,6 +199,13 @@ for (const { seconds, backwardAction, forwardAction } of JUMP_SIZES) {
   JUMP_SECONDS_BY_ACTION.set(forwardAction, JumpDirection.Forward * seconds);
 }
 
+// YouTube moves a 360° view for as long as its key is held, so these keep moving while held too
+const VIEW_360_BINDING_BASE = {
+  section: KeymapSection.General,
+  isRepeatable: true,
+  isSphericalOnly: true
+} as const satisfies Partial<VlcBinding>;
+
 export const VLC_BINDINGS: VlcBinding[] = [
   {
     action: VlcAction.PlayPause,
@@ -288,6 +301,16 @@ export const VLC_BINDINGS: VlcBinding[] = [
     youtubeEquivalent: YOUTUBE_HOTKEYS.fullscreen
   },
   {
+    action: VlcAction.ToggleMiniplayer,
+    section: KeymapSection.General,
+    label: "Toggle miniplayer",
+    combos: [{
+      key: "i",
+      isShift: true
+    }],
+    youtubeEquivalent: YOUTUBE_HOTKEYS.miniplayer
+  },
+  {
     action: VlcAction.ToggleMute,
     section: KeymapSection.General,
     label: "Mute/unmute",
@@ -327,24 +350,48 @@ export const VLC_BINDINGS: VlcBinding[] = [
     combos: [{ key: "a" }]
   },
   {
+    ...VIEW_360_BINDING_BASE,
     action: VlcAction.ZoomIn360,
-    section: KeymapSection.General,
-    label: "Zoom in (360° videos)",
+    label: "Zoom in",
     combos: [{ key: "PageUp" }],
-    isRepeatable: true,
-    isSphericalOnly: true,
     isPlayerFocusOnly: true,
-    youtubeEquivalent: YOUTUBE_HOTKEYS.zoomIn360
+    youtubeEquivalent: YOUTUBE_360_HOTKEYS.zoomIn
   },
   {
+    ...VIEW_360_BINDING_BASE,
     action: VlcAction.ZoomOut360,
-    section: KeymapSection.General,
-    label: "Zoom out (360° videos)",
+    label: "Zoom out",
     combos: [{ key: "PageDown" }],
-    isRepeatable: true,
-    isSphericalOnly: true,
     isPlayerFocusOnly: true,
-    youtubeEquivalent: YOUTUBE_HOTKEYS.zoomOut360
+    youtubeEquivalent: YOUTUBE_360_HOTKEYS.zoomOut
+  },
+  {
+    ...VIEW_360_BINDING_BASE,
+    action: VlcAction.PanUp360,
+    label: "Pan up",
+    combos: [{ key: "i" }],
+    youtubeEquivalent: YOUTUBE_360_HOTKEYS.lookUp
+  },
+  {
+    ...VIEW_360_BINDING_BASE,
+    action: VlcAction.PanLeft360,
+    label: "Pan left",
+    combos: [{ key: "j" }],
+    youtubeEquivalent: YOUTUBE_360_HOTKEYS.lookLeft
+  },
+  {
+    ...VIEW_360_BINDING_BASE,
+    action: VlcAction.PanDown360,
+    label: "Pan down",
+    combos: [{ key: "k" }],
+    youtubeEquivalent: YOUTUBE_360_HOTKEYS.lookDown
+  },
+  {
+    ...VIEW_360_BINDING_BASE,
+    action: VlcAction.PanRight360,
+    label: "Pan right",
+    combos: [{ key: "l" }],
+    youtubeEquivalent: YOUTUBE_360_HOTKEYS.lookRight
   },
   {
     action: VlcAction.Snapshot,
@@ -395,8 +442,8 @@ export const VLC_WHEEL_VOLUME = {
 
 export const VLC_WHEEL_SHORTCUTS = [VLC_WHEEL_VOLUME];
 
-export function findBinding(e: KeyboardEvent) {
-  return VLC_BINDINGS.find(binding => binding.combos.some(combo => isComboMatch({
+export function findBindings(e: KeyboardEvent) {
+  return VLC_BINDINGS.filter(binding => binding.combos.some(combo => isComboMatch({
     combo,
     e
   })));

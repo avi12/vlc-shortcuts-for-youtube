@@ -53,6 +53,10 @@ const SHORTCUT_BUTTONS: ShortcutButton[] = [
     action: VlcAction.ToggleFullscreen
   },
   {
+    selector: ".ytp-miniplayer-button",
+    action: VlcAction.ToggleMiniplayer
+  },
+  {
     selector: ".ytp-jump-button",
     action: null
   },

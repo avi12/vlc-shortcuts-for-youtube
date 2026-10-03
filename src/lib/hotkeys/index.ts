@@ -8,7 +8,7 @@ import { resetVolumeBoost } from "@/lib/hotkeys/volume-boost";
 import { installWheelVolume } from "@/lib/hotkeys/wheel-volume";
 import { isDispatchedYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import { getPlayer, isShortsPlayer, isSphericalVideo, type YoutubePlayer } from "@/lib/player";
-import { findBinding, type VlcBinding } from "@/lib/vlc-keymap";
+import { findBindings, type VlcBinding } from "@/lib/vlc-keymap";
 import { isReplacedYoutubeKey, isShortsNavigationKey } from "@/lib/youtube-keymap";
 
 // Swallowed on keydown, so the matching keypress/keyup never reach YouTube either. Each keydown decides afresh,
@@ -59,6 +59,18 @@ function isBindingActive({ binding, player, e }: {
   return isVideoSupported && isFocusSupported;
 }
 
+function findActiveBinding({ e, player }: {
+  e: KeyboardEvent;
+  player: YoutubePlayer;
+}) {
+  const activeBindings = findBindings(e).filter(binding => isBindingActive({
+    binding,
+    player,
+    e
+  }));
+  return activeBindings.find(binding => binding.isSphericalOnly) ?? activeBindings[0];
+}
+
 function onKeyDown(e: KeyboardEvent) {
   if (isDispatchedYoutubeHotkey(e)) {
     return;
@@ -71,12 +83,11 @@ function onKeyDown(e: KeyboardEvent) {
     return;
   }
 
-  const binding = findBinding(e);
-  if (binding && isBindingActive({
-    binding,
-    player,
-    e
-  })) {
+  const binding = findActiveBinding({
+    e,
+    player
+  });
+  if (binding) {
     e.preventDefault();
     swallow(e);
     const release = runAction({

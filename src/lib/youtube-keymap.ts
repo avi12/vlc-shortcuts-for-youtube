@@ -33,10 +33,6 @@ export const YOUTUBE_NATIVE_SHORTCUTS = {
     section: KeymapSection.General,
     combos: [{ key: "t" }]
   },
-  miniplayer: {
-    section: KeymapSection.General,
-    combos: [{ key: "i" }]
-  },
   closeMiniplayerOrDialog: {
     section: KeymapSection.General,
     combos: [{ key: "Escape" }]
@@ -149,15 +145,46 @@ export const YOUTUBE_HOTKEYS = {
     code: "KeyC",
     keyCode: 67
   },
-  zoomIn360: {
+  // I is VLC's look up on 360° videos, so the miniplayer moved to Shift+I
+  miniplayer: {
+    key: "i",
+    code: "KeyI",
+    keyCode: 73
+  }
+} as const satisfies Record<string, YoutubeHotkey>;
+
+// YouTube's keys for moving around a 360° video, each acting for as long as it is held. They are not swallowed: W
+// is also a caption styling key on other videos
+export const YOUTUBE_360_HOTKEYS = {
+  zoomIn: {
     key: "]",
     code: "BracketRight",
     keyCode: 221
   },
-  zoomOut360: {
+  zoomOut: {
     key: "[",
     code: "BracketLeft",
     keyCode: 219
+  },
+  lookUp: {
+    key: "w",
+    code: "KeyW",
+    keyCode: 87
+  },
+  lookLeft: {
+    key: "a",
+    code: "KeyA",
+    keyCode: 65
+  },
+  lookDown: {
+    key: "s",
+    code: "KeyS",
+    keyCode: 83
+  },
+  lookRight: {
+    key: "d",
+    code: "KeyD",
+    keyCode: 68
   }
 } as const satisfies Record<string, YoutubeHotkey>;
 

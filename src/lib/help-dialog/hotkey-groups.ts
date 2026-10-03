@@ -11,6 +11,8 @@ import {
   type YoutubeHotkey
 } from "@/lib/youtube-keymap";
 
+const SPHERICAL_VIDEOS_NOTE = "360° videos";
+
 // A row YouTube's own dialog lists carries YouTube's original entry, handed back untouched (badges included)
 interface HotkeyRow<TYoutubeOption> {
   label: string;
@@ -85,6 +87,18 @@ function findYoutubeLabel({ binding, youtubeRowsBySignature }: {
   return label && `${label} (${step})`;
 }
 
+// 360° keys reuse keys other videos bind (l loops them), so their rows say where they apply
+function labelBinding({ binding, youtubeRowsBySignature }: {
+  binding: VlcBinding;
+  youtubeRowsBySignature: Map<string, HotkeyRow<unknown>[]>;
+}) {
+  const label = findYoutubeLabel({
+    binding,
+    youtubeRowsBySignature
+  }) ?? binding.label;
+  return binding.isSphericalOnly ? `${label} (${SPHERICAL_VIDEOS_NOTE})` : label;
+}
+
 function buildRows<TYoutubeOption>({ section, youtubeRowsBySignature }: {
   section: KeymapSection;
   youtubeRowsBySignature: Map<string, HotkeyRow<TYoutubeOption>[]>;
@@ -92,10 +106,10 @@ function buildRows<TYoutubeOption>({ section, youtubeRowsBySignature }: {
   const notation = learnNotation(youtubeRowsBySignature);
   const vlcRows = VLC_BINDINGS.filter(binding => binding.section === section).map(binding => ({
     rank: getDialogRowRank(binding.action),
-    label: findYoutubeLabel({
+    label: labelBinding({
       binding,
       youtubeRowsBySignature
-    }) ?? binding.label,
+    }),
     hotkey: formatDialogCombos({
       combos: binding.combos,
       notation

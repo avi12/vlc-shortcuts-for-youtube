@@ -81,3 +81,10 @@ export function toggleFullscreen(player: YoutubePlayer) {
     hotkey: YOUTUBE_HOTKEYS.fullscreen
   });
 }
+
+export function toggleMiniplayer(player: YoutubePlayer) {
+  dispatchYoutubeHotkey({
+    player,
+    hotkey: YOUTUBE_HOTKEYS.miniplayer
+  });
+}

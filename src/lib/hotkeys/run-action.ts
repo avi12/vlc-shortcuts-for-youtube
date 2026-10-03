@@ -8,20 +8,30 @@ import {
   stop,
   toggleFullscreen,
   toggleLoop,
+  toggleMiniplayer,
   togglePlayPause
 } from "@/lib/hotkeys/actions/playback";
 import { takeSnapshot } from "@/lib/hotkeys/actions/snapshot";
 import { resetSpeed, SpeedDirection, stepFineSpeed, stepPresetSpeed } from "@/lib/hotkeys/actions/speed";
 import { CycleDirection, cycleSubtitles } from "@/lib/hotkeys/actions/subtitles";
 import { stepVolume, toggleMute, VolumeDirection } from "@/lib/hotkeys/actions/volume";
-import { zoomIn360, zoomOut360 } from "@/lib/hotkeys/actions/zoom-360";
 import { seekNatively } from "@/lib/hotkeys/native/seek";
+import { holdYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import type { YoutubePlayer } from "@/lib/player";
-import { JUMP_SECONDS_BY_ACTION, VlcAction, type VlcBinding } from "@/lib/vlc-keymap";
+import { JUMP_SECONDS_BY_ACTION, VLC_BINDINGS, VlcAction, type VlcBinding } from "@/lib/vlc-keymap";
 
 // An action YouTube performs for as long as its key is held hands back the release of that key
 type ReleaseKey = () => void;
 type ActionHandler = (player: YoutubePlayer) => ReleaseKey | void;
+
+// Holds the binding's YouTube key down until the viewer lets go of the VLC key
+function createHoldHandler(action: VlcAction): ActionHandler {
+  const hotkey = VLC_BINDINGS.find(binding => binding.action === action)?.youtubeEquivalent;
+  return player => hotkey && holdYoutubeHotkey({
+    player,
+    hotkey
+  });
+}
 
 function createJumpHandler(action: VlcAction): ActionHandler {
   return player => seekNatively({
@@ -98,8 +108,13 @@ const ACTION_HANDLERS: Record<VlcAction, ActionHandler> = {
   [VlcAction.ToggleLoop]: toggleLoop,
   [VlcAction.Snapshot]: takeSnapshot,
   [VlcAction.ToggleControls]: toggleControls,
-  [VlcAction.ZoomIn360]: zoomIn360,
-  [VlcAction.ZoomOut360]: zoomOut360
+  [VlcAction.ToggleMiniplayer]: toggleMiniplayer,
+  [VlcAction.ZoomIn360]: createHoldHandler(VlcAction.ZoomIn360),
+  [VlcAction.ZoomOut360]: createHoldHandler(VlcAction.ZoomOut360),
+  [VlcAction.PanUp360]: createHoldHandler(VlcAction.PanUp360),
+  [VlcAction.PanLeft360]: createHoldHandler(VlcAction.PanLeft360),
+  [VlcAction.PanDown360]: createHoldHandler(VlcAction.PanDown360),
+  [VlcAction.PanRight360]: createHoldHandler(VlcAction.PanRight360)
 };
 
 // Held keys keep stepping like VLC; toggles fire once per press
