@@ -65,12 +65,6 @@ const ignoreDevProfilesInWatcher = {
 export default defineConfig({
   srcDir: "src",
   publicDir: "src/public",
-  modules: ["@wxt-dev/auto-icons"],
-  autoIcons: {
-    baseIconPath: "assets/icon.svg",
-    // Added to auto-icons' default 16/32/48/128 - Firefox's add-ons manager uses 96 on high-DPI screens
-    sizes: [96]
-  },
   manifest: ({ browser, mode }) => ({
     name: EXTENSION_NAME,
     description: "VLC's keyboard shortcuts for YouTube's player - click the toolbar icon to toggle",

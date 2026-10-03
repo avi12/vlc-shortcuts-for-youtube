@@ -36,7 +36,6 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^26.1.0",
-    "@wxt-dev/auto-icons": "^1.1.2",
     "chokidar": "^5.0.0",
     "crx3": "2.0.0",
     "eslint": "^10.6.0",
