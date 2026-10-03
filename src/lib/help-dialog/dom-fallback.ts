@@ -13,7 +13,6 @@ const OPTION_LABEL_SELECTOR = "#label";
 const OPTION_HOTKEY_SELECTOR = "#hotkey";
 const FALLBACK_ATTRIBUTE = "data-vlc-hotkeys";
 const HIDDEN_BY_FALLBACK_ATTRIBUTE = "data-vlc-hidden";
-const FALLBACK_CSS = `[${FALLBACK_ATTRIBUTE}] dl > div { display: flex; justify-content: space-between; gap: 24px; }`;
 
 function readDomText(elDialog: Element) {
   const dialogText = createEmptyDialogText();
@@ -71,10 +70,8 @@ export function applyDomFallback(elDialog: Element) {
 
   const elFallback = document.createElement("div");
   elFallback.setAttribute(FALLBACK_ATTRIBUTE, "");
-  const elStyle = document.createElement("style");
-  elStyle.textContent = FALLBACK_CSS;
   const groups = buildGroups(readDomText(elDialog));
-  elFallback.append(elStyle, ...groups.map(createGroupElement));
+  elFallback.append(...groups.map(createGroupElement));
   elSections.after(elFallback);
   elSections.setAttribute(HIDDEN_BY_FALLBACK_ATTRIBUTE, "");
   elSections.style.setProperty("display", "none");

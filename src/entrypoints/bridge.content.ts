@@ -1,4 +1,5 @@
 import { ENABLED_ATTRIBUTE, EnabledState } from "@/lib/enabled-flag";
+import "@/lib/help-dialog/help-dialog.css";
 import "@/lib/hotkeys/player-effects.css";
 import { isEnabledItem } from "@/lib/storage";
 import { defineContentScript } from "#imports";
@@ -8,8 +9,8 @@ function mirrorEnabledState(isEnabled: boolean) {
 }
 
 // Isolated world: the MAIN-world script has no extension APIs, so the stored toggle reaches it
-// through an attribute on <html> (see enabled-flag.ts). The player-effect stylesheet rides along here because
-// only manifest-declared content scripts can inject CSS
+// through an attribute on <html> (see enabled-flag.ts). The player-effect and help-dialog stylesheets ride along
+// here because only manifest-declared content scripts can inject CSS
 export default defineContentScript({
   matches: ["https://www.youtube.com/*", "https://www.youtube-nocookie.com/embed/*"],
   allFrames: true,

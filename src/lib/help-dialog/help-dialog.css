@@ -1,0 +1,21 @@
+/* Every row in a section shares one key column sized to its widest combo, so the keys line up even when a
+   VLC combo outgrows the fixed width YouTube gives its own keys */
+:root:not([data-vlc-controls="off"]) {
+  & ytd-hotkey-dialog-section-renderer #options,
+  & [data-vlc-hotkeys] dl {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  & ytd-hotkey-dialog-section-option-renderer,
+  & [data-vlc-hotkeys] dl > div {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    column-gap: 24px;
+  }
+
+  & ytd-hotkey-dialog-section-option-renderer #hotkey {
+    margin-inline-start: 0;
+  }
+}
