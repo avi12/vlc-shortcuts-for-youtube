@@ -177,13 +177,7 @@ function toCombo({ key, shiftKey }: YoutubeHotkey): KeyCombo {
 }
 
 // YouTube's shortcuts for controls VLC also has - VLC's keys replace them, so these are swallowed
-const YOUTUBE_REPLACED_COMBOS: KeyCombo[] = [
-  ...Object.values(YOUTUBE_HOTKEYS).map(toCombo),
-  { key: " " },
-  { key: "b" },
-  { key: "+" },
-  { key: "-" }
-];
+const YOUTUBE_REPLACED_COMBOS = Object.values(YOUTUBE_HOTKEYS).map(toCombo);
 
 export function isReplacedYoutubeKey(e: KeyboardEvent) {
   return YOUTUBE_REPLACED_COMBOS.some(combo => isComboMatch({
