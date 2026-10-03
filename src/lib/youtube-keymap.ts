@@ -1,3 +1,4 @@
+import { PlayerKind } from "@/lib/player";
 import {
   formatCombos,
   isComboMatch,
@@ -180,15 +181,29 @@ export const YOUTUBE_VOLUME_STEP = 5;
 // Shorts moves between shorts on the keys the watch page uses for volume, so there they stay YouTube's
 const YOUTUBE_SHORTS_NAVIGATION_HOTKEYS = [YOUTUBE_HOTKEYS.volumeUp, YOUTUBE_HOTKEYS.volumeDown];
 
-// The only YouTube keys Shorts' player honors; it ignores the rest (seek, speed, frame, captions...)
-const SHORTS_HONORED_HOTKEYS: ReadonlySet<YoutubeHotkey> = new Set([
-  YOUTUBE_HOTKEYS.playPause,
-  YOUTUBE_HOTKEYS.mute,
-  YOUTUBE_HOTKEYS.fullscreen
-]);
+// The YouTube keys each player variant honors. Shorts ignores seek, speed, frame and caption keys (its Up/Down
+// change the short); the embed ignores volume, speed and frame keys and seeks 10s on the arrows. The watch
+// page honors every key
+const HONORED_HOTKEYS_BY_PLAYER_KIND: Record<PlayerKind, ReadonlySet<YoutubeHotkey> | null> = {
+  [PlayerKind.Watch]: null,
+  [PlayerKind.Shorts]: new Set([YOUTUBE_HOTKEYS.playPause, YOUTUBE_HOTKEYS.mute, YOUTUBE_HOTKEYS.fullscreen]),
+  [PlayerKind.Embed]: new Set([
+    YOUTUBE_HOTKEYS.playPause,
+    YOUTUBE_HOTKEYS.mute,
+    YOUTUBE_HOTKEYS.fullscreen,
+    YOUTUBE_HOTKEYS.next,
+    YOUTUBE_HOTKEYS.previous,
+    YOUTUBE_HOTKEYS.seekBackwardLong,
+    YOUTUBE_HOTKEYS.seekForwardLong,
+    YOUTUBE_HOTKEYS.captions
+  ])
+};
 
-export function isHonoredOnShorts(hotkey: YoutubeHotkey) {
-  return SHORTS_HONORED_HOTKEYS.has(hotkey);
+export function isHotkeyHonored({ playerKind, hotkey }: {
+  playerKind: PlayerKind;
+  hotkey: YoutubeHotkey;
+}) {
+  return HONORED_HOTKEYS_BY_PLAYER_KIND[playerKind]?.has(hotkey) ?? true;
 }
 
 function toCombo({ key, shiftKey }: YoutubeHotkey): KeyCombo {

@@ -1,5 +1,5 @@
-import { isShortsPlayer, type YoutubePlayer } from "@/lib/player";
-import { isHonoredOnShorts, type YoutubeHotkey } from "@/lib/youtube-keymap";
+import { getPlayerKind, type YoutubePlayer } from "@/lib/player";
+import { isHotkeyHonored, type YoutubeHotkey } from "@/lib/youtube-keymap";
 
 const dispatchedEvents = new WeakSet<Event>();
 
@@ -8,15 +8,8 @@ export function isDispatchedYoutubeHotkey(e: Event) {
   return dispatchedEvents.has(e);
 }
 
-function isHotkeyHonored({ player, hotkey }: {
-  player: YoutubePlayer;
-  hotkey: YoutubeHotkey;
-}) {
-  return !isShortsPlayer(player) || isHonoredOnShorts(hotkey);
-}
-
 // Dispatched on the player, since YouTube only takes the arrow keys there; it bubbles to the
-// document-level handler for the rest. A player that ignores the key (Shorts) gets the action's silent
+// document-level handler for the rest. A player that ignores the key (Shorts, the embed) gets the action's silent
 // fallback instead - never the key, which can mean something else there. Tells whether the key was pressed
 export function dispatchYoutubeHotkey({ player, hotkey, count = 1, fallback }: {
   player: YoutubePlayer;
@@ -25,7 +18,7 @@ export function dispatchYoutubeHotkey({ player, hotkey, count = 1, fallback }: {
   fallback?: () => void;
 }) {
   if (!isHotkeyHonored({
-    player,
+    playerKind: getPlayerKind(player),
     hotkey
   })) {
     fallback?.();

@@ -4,6 +4,14 @@ import { createTypeGuard, z } from "@/lib/zod";
 export const PLAYER_SELECTOR = ".html5-video-player";
 const MAIN_VIDEO_SELECTOR = "video.html5-main-video";
 const SHORTS_PLAYER_ID = "shorts-player";
+const EMBED_PATH_PREFIX = "/embed/";
+
+// YouTube's player variants differ in which of YouTube's own keys they honor
+export enum PlayerKind {
+  Watch = "watch",
+  Shorts = "shorts",
+  Embed = "embed"
+}
 
 enum PlayerState {
   Unstarted = -1,
@@ -92,8 +100,16 @@ export function getVideo(player: YoutubePlayer) {
   return elVideo instanceof HTMLVideoElement ? elVideo : null;
 }
 
+export function getPlayerKind(player: YoutubePlayer) {
+  if (player.id === SHORTS_PLAYER_ID) {
+    return PlayerKind.Shorts;
+  }
+
+  return location.pathname.startsWith(EMBED_PATH_PREFIX) ? PlayerKind.Embed : PlayerKind.Watch;
+}
+
 export function isShortsPlayer(player: YoutubePlayer) {
-  return player.id === SHORTS_PLAYER_ID;
+  return getPlayerKind(player) === PlayerKind.Shorts;
 }
 
 export function isMainVideo(target: EventTarget | null) {
