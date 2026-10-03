@@ -4,7 +4,7 @@ import {
   type KeyCombo,
   KeymapSection,
   ShortcutStyle
-} from "@/lib/vlc-keymap";
+} from "@/lib/shortcut";
 
 interface YoutubeShortcut {
   section: KeymapSection;

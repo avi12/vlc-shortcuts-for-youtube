@@ -1,12 +1,7 @@
 import { applyOverride, createOverrideRecords, type OverrideSlot, restoreOverride } from "@/lib/dom-overrides";
 import { isVlcControlsEnabled, onEnabledChange } from "@/lib/enabled-flag";
-import {
-  formatActionShortcut,
-  KeymapSection,
-  ShortcutStyle,
-  VLC_BINDINGS,
-  VLC_WHEEL_SHORTCUTS
-} from "@/lib/vlc-keymap";
+import { KeymapSection, ShortcutStyle } from "@/lib/shortcut";
+import { formatActionShortcut, VLC_BINDINGS, VLC_WHEEL_SHORTCUTS } from "@/lib/vlc-keymap";
 import { formatYoutubeShortcut, YOUTUBE_NATIVE_SHORTCUTS, YOUTUBE_SECTION_ANCHOR_KEYS } from "@/lib/youtube-keymap";
 import { z } from "@/lib/zod";
 

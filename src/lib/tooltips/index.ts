@@ -1,6 +1,7 @@
 import { applyOverride, createOverrideRecords, type OverrideSlot, restoreOverride } from "@/lib/dom-overrides";
 import { isVlcControlsEnabled, onEnabledChange } from "@/lib/enabled-flag";
-import { formatActionShortcut, ShortcutStyle, VlcAction } from "@/lib/vlc-keymap";
+import { ShortcutStyle } from "@/lib/shortcut";
+import { formatActionShortcut, VlcAction } from "@/lib/vlc-keymap";
 
 // aria-keyshortcuts goes first so the label attributes are rewritten against YouTube's own key
 enum TooltipAttribute {
