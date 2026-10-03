@@ -46,6 +46,12 @@ function isActivatableOutsidePlayer({ element, elPlayer }: {
   return element.closest(ACTIVATABLE_SELECTOR) !== null && !elPlayer.contains(element);
 }
 
+// Ctrl/Alt combos double as browser shortcuts (Ctrl+H history, Alt+Left back), so they stay the browser's unless
+// the viewer is in the player
+function isBrowserShortcut(e: KeyboardEvent) {
+  return e.ctrlKey || e.altKey || e.metaKey;
+}
+
 export function isKeyForPage({ e, elPlayer }: {
   e: KeyboardEvent;
   elPlayer: HTMLElement;
@@ -60,6 +66,7 @@ export function isKeyForPage({ e, elPlayer }: {
   return isTypingInTextBox(e) ||
     element.closest(OVERLAY_SELECTOR) !== null ||
     isPlayerFocusKey(e) && isOutsidePlayer ||
+    isBrowserShortcut(e) && isOutsidePlayer ||
     isSpace && isActivatableOutsidePlayer({
       element,
       elPlayer
