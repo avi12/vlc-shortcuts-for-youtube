@@ -121,19 +121,25 @@ const SERVICE_WORKER_POLL_MS = 250;
 const SERVICE_WORKER_POLL_ATTEMPTS = 20;
 // A service worker announces itself with events before it replies, so the reply is told apart by its id
 const EVALUATE_REQUEST_ID = 1;
+// A service worker the extension reload replaces mid-request never replies and its socket stays open
+const EVALUATE_TIMEOUT_MS = 5000;
 
 interface CdpTarget {
   type?: string;
   webSocketDebuggerUrl?: string;
 }
 
-// Resolves to the expression's value, or undefined if it threw or the target went away
+// Resolves to the expression's value, or undefined if it threw, the target went away or it never replied
 function evaluateOverCdp({ webSocketUrl, expression }: {
   webSocketUrl: string;
   expression: string;
 }) {
   return new Promise<unknown>(resolvePromise => {
     const webSocket = new WebSocket(webSocketUrl);
+    AbortSignal.timeout(EVALUATE_TIMEOUT_MS).addEventListener("abort", () => {
+      webSocket.close();
+      resolvePromise(undefined);
+    });
     webSocket.onopen = () => webSocket.send(
       JSON.stringify({
         id: EVALUATE_REQUEST_ID,
