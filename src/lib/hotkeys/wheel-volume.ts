@@ -59,7 +59,7 @@ function onWheel(e: WheelEvent) {
 }
 
 export function installWheelVolume() {
-  window.addEventListener("wheel", onWheel, {
+  addEventListener("wheel", onWheel, {
     capture: true,
     passive: false
   });

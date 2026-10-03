@@ -32,7 +32,8 @@ The extension replaces YouTube's player keyboard controls with VLC's hotkeys, re
 - Use `for-of` instead of `.forEach`, and a plain `for` loop instead of `.reduce()`
 - Use modern browser and CSS features
 - Prefer semantic HTML elements (`button`, `nav`, `ul`/`li`, `section`, `header`, `footer`, `dialog`, `menu`, `output`, etc.) over `div`/`span` with a `role`; only add ARIA when no native element carries the semantics or state, and never add ARIA that merely restates what the element already means
-- Avoid `window.` prefixes unless it increases readability
+- Never use `window.` prefixes - call globals bare (`addEventListener(...)`, not `window.addEventListener(...)`)
+- Pass event listener options as an object (`{ capture: true }`), never the positional boolean `true`
 - Avoid `setTimeout` unless absolutely necessary
 - Avoid comments unless absolutely necessary - prefer descriptive names; default to zero comments and rename variables/functions until they read like the comment would
 - Don't use em dashes - use regular hyphens

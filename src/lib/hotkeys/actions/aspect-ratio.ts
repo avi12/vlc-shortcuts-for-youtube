@@ -129,6 +129,8 @@ export function installAspectRatioReset() {
     if (isMainVideo(e.target)) {
       resetAspectRatio();
     }
-  }, true);
+  }, {
+    capture: true
+  });
   document.addEventListener("yt-navigate-finish", resetAspectRatio);
 }

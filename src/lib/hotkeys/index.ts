@@ -85,9 +85,15 @@ function undoSideEffects(isEnabled: boolean) {
 
 export function installHotkeys() {
   installBezelRegistry();
-  window.addEventListener("keydown", onKeyDown, true);
-  window.addEventListener("keypress", onKeyPress, true);
-  window.addEventListener("keyup", onKeyUp, true);
+  addEventListener("keydown", onKeyDown, {
+    capture: true
+  });
+  addEventListener("keypress", onKeyPress, {
+    capture: true
+  });
+  addEventListener("keyup", onKeyUp, {
+    capture: true
+  });
   installWheelVolume();
   installAspectRatioReset();
   onEnabledChange(undoSideEffects);
