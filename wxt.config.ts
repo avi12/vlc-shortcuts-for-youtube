@@ -102,7 +102,18 @@ export default defineConfig({
   outDir: "build",
   outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",
   zip: {
-    excludeSources: ["build/**", ".output/**", "*.env", ".env*", ".idea/**", ".claude/**"],
+    // user-profiles/ holds the dev browsers' cloned profiles (cookies, tokens) and is locked while they run
+    excludeSources: [
+      "build/**",
+      ".output/**",
+      "*.env",
+      ".env*",
+      ".idea/**",
+      ".claude/**",
+      "user-profiles/**",
+      ".dev-logs/**",
+      ".fallow/**"
+    ],
     artifactTemplate: "{{name}}-{{version}}-{{browser}}-{{mode}}.zip",
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
   },
