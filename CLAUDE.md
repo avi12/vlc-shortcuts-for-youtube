@@ -83,7 +83,7 @@ The extension replaces YouTube's player keyboard controls with VLC's hotkeys, re
 
 # Linting
 After each modification, lint with oxlint, ESLint and Stylelint, and typecheck:
-- `pnpm lint` runs `oxlint --type-aware --fix -c .oxlintrc.fix.json && eslint --fix && oxlint --type-aware` - oxlint owns the logic and type-aware rules, ESLint owns the stylistic ones (plus the local rules in `eslint-rules/`)
+- `pnpm lint` runs `pnpm fallow && oxlint --type-aware --fix -c .oxlintrc.fix.json && eslint --fix && oxlint --type-aware` - the fallow dead-code audit gates first (as in youtube-time-manager), then oxlint owns the logic and type-aware rules, ESLint owns the stylistic ones (plus the local rules in `eslint-rules/`)
 - `pnpm stylelint` runs stylelint over `src/**/*.css` with `--fix`
 - `pnpm typecheck`
 - After every bug fix, feature, or refactor - anything that removes or rewires code - run a fallow dead-code audit and clean up what it flags as newly unused (imports, helpers, exports, whole files) so changes never leave orphans behind. Act on the audit by hand - never run `fallow fix`

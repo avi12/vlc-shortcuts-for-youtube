@@ -24,7 +24,7 @@
     "zip:opera": "wxt zip -b opera",
     "zip:all": "pnpx concurrently \"pnpm zip\" \"pnpm zip:firefox\" \"pnpm zip:opera\" --names \"Chrome ,Firefox,Opera  \"",
     "crx": "pnpm zip && tsx scripts/pack-crx.ts",
-    "lint":"oxlint --type-aware --fix -c .oxlintrc.fix.json && eslint --fix && oxlint --type-aware",
+    "lint": "pnpm fallow && oxlint --type-aware --fix -c .oxlintrc.fix.json && eslint --fix && oxlint --type-aware",
     "stylelint": "stylelint \"src/**/*.css\" --fix --allow-empty-input",
     "typecheck": "tsc --noEmit",
     "fallow": "fallow audit --base HEAD",
