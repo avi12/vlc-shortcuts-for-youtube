@@ -30,6 +30,7 @@ The extension replaces YouTube's player keyboard controls with VLC's hotkeys, re
 - Use DRY with separation of concerns, prioritizing readability
 - Tree-shaking friendly modules: named exports only, no barrel files with side effects, no namespace imports (`import * as`)
 - Minimize indentations
+- An object property whose function only hands back a value is an expression-bodied arrow - `manifest: ({ browser }) => ({ ... })`, `create: context => ({ ... })` - never a method with a lone `return`. Standalone functions stay `function` declarations (oxlint `func-style` forbids `const f = () => ...`)
 - Use `for-of` instead of `.forEach`, and a plain `for` loop instead of `.reduce()`
 - Use modern browser and CSS features
 - Prefer semantic HTML elements (`button`, `nav`, `ul`/`li`, `section`, `header`, `footer`, `dialog`, `menu`, `output`, etc.) over `div`/`span` with a `role`; only add ARIA when no native element carries the semantics or state, and never add ARIA that merely restates what the element already means

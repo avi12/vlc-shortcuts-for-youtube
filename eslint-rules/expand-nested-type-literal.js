@@ -45,18 +45,16 @@ export default {
       expectedNewlineBetweenMembers: "Expected each member to be on its own line."
     }
   },
-  create(context) {
-    return {
-      TSTypeLiteral: createExpandBlockVisitor({
-        context,
-        getItems: node => node.members,
-        requiresMultiline,
-        messageIds: {
-          afterOpenBrace: "expectedNewlineAfterOpenBrace",
-          betweenItems: "expectedNewlineBetweenMembers",
-          beforeCloseBrace: "expectedNewlineBeforeCloseBrace"
-        }
-      })
-    };
-  }
+  create: context => ({
+    TSTypeLiteral: createExpandBlockVisitor({
+      context,
+      getItems: node => node.members,
+      requiresMultiline,
+      messageIds: {
+        afterOpenBrace: "expectedNewlineAfterOpenBrace",
+        betweenItems: "expectedNewlineBetweenMembers",
+        beforeCloseBrace: "expectedNewlineBeforeCloseBrace"
+      }
+    })
+  })
 };

@@ -77,18 +77,16 @@ export default {
       expectedNewlineBetweenProperties: "Expected each property to be on its own line."
     }
   },
-  create(context) {
-    return {
-      ObjectExpression: createExpandBlockVisitor({
-        context,
-        getItems: node => node.properties,
-        requiresMultiline,
-        messageIds: {
-          afterOpenBrace: "expectedNewlineAfterOpenBrace",
-          betweenItems: "expectedNewlineBetweenProperties",
-          beforeCloseBrace: "expectedNewlineBeforeCloseBrace"
-        }
-      })
-    };
-  }
+  create: context => ({
+    ObjectExpression: createExpandBlockVisitor({
+      context,
+      getItems: node => node.properties,
+      requiresMultiline,
+      messageIds: {
+        afterOpenBrace: "expectedNewlineAfterOpenBrace",
+        betweenItems: "expectedNewlineBetweenProperties",
+        beforeCloseBrace: "expectedNewlineBeforeCloseBrace"
+      }
+    })
+  })
 };

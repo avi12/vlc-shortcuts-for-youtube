@@ -76,12 +76,10 @@ export default {
               context.report({
                 node,
                 messageId: "inlineArgumentOnNewLine",
-                fix(fixer) {
-                  return fixer.replaceTextRange(
-                    [openParen.range[1], firstArg.range[0]],
-                    ""
-                  );
-                }
+                fix: fixer => fixer.replaceTextRange(
+                  [openParen.range[1], firstArg.range[0]],
+                  ""
+                )
               });
             }
           }
