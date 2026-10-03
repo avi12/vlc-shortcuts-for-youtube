@@ -1,4 +1,12 @@
-const EDITABLE_SELECTOR = "input, textarea, select, [contenteditable]:not([contenteditable='false'])";
+const EDITABLE_SELECTOR = [
+  "input",
+  "textarea",
+  "select",
+  "[contenteditable]:not([contenteditable='false'])",
+  "[role='textbox']",
+  "[role='searchbox']",
+  "[role='combobox']"
+].join(", ");
 const OVERLAY_SELECTOR = "dialog, [role='dialog'], [role='menu'], [role='listbox'], .ytp-popup, tp-yt-iron-dropdown";
 const ACTIVATABLE_SELECTOR = "button, a[href], summary, [role='button'], [role='link'], [role='checkbox'], [role='tab'], [role='option']";
 
@@ -9,7 +17,23 @@ function getEventElement(e: Event) {
 
 function isEditableElement(element: Element) {
   const isContentEditable = element instanceof HTMLElement && element.isContentEditable;
-  return isContentEditable || element.closest(EDITABLE_SELECTOR) !== null;
+  return isContentEditable || element.matches(EDITABLE_SELECTOR);
+}
+
+function getFocusedElement() {
+  let elFocused = document.activeElement;
+  while (elFocused?.shadowRoot?.activeElement) {
+    elFocused = elFocused.shadowRoot.activeElement;
+  }
+  return elFocused;
+}
+
+// Keys typed into a text box (search, comments, live chat) stay the text box's. The whole event path is checked,
+// since a field inside a web component's shadow root is invisible to closest() from the event's target
+function isTypingInTextBox(e: KeyboardEvent) {
+  const isPathEditable = e.composedPath().some(target => target instanceof Element && isEditableElement(target));
+  const elFocused = getFocusedElement();
+  return isPathEditable || elFocused !== null && isEditableElement(elFocused);
 }
 
 // Space on a focused page control (Subscribe, a link) keeps activating it, as on YouTube
@@ -30,7 +54,7 @@ export function isKeyForPage({ e, elPlayer }: {
   }
 
   const isSpace = e.key === " ";
-  return isEditableElement(element) ||
+  return isTypingInTextBox(e) ||
     element.closest(OVERLAY_SELECTOR) !== null ||
     isSpace && isActivatableOutsidePlayer({
       element,
