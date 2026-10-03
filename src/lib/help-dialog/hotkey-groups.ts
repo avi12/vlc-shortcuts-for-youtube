@@ -69,7 +69,10 @@ function buildRows({ section, youtubeRowBySignature }: {
   }));
   const wheelRows = VLC_WHEEL_SHORTCUTS.filter(shortcut => shortcut.section === section).map(shortcut => ({
     label: shortcut.label,
-    hotkey: shortcut.hotkey
+    hotkey: formatDialogCombos({
+      combos: shortcut.combos,
+      notation
+    })
   }));
   const youtubeRows = Object.values(YOUTUBE_NATIVE_SHORTCUTS)
     .filter(shortcut => shortcut.section === section)

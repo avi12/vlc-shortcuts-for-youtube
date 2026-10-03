@@ -2,6 +2,8 @@ import { isVlcControlsEnabled } from "@/lib/enabled-flag";
 import { stepVolume, VolumeDirection } from "@/lib/hotkeys/actions/volume";
 import { isEventInside } from "@/lib/hotkeys/event-targets";
 import { getPlayer, isShortsPlayer } from "@/lib/player";
+import { isWheelComboMatch } from "@/lib/shortcut";
+import { VLC_WHEEL_VOLUME } from "@/lib/vlc-keymap";
 
 const PIXELS_PER_WHEEL_NOTCH = 100;
 const PIXELS_PER_LINE = 40;
@@ -14,10 +16,14 @@ function toPixels(e: WheelEvent) {
   return e.deltaMode === WheelEvent.DOM_DELTA_LINE ? delta * PIXELS_PER_LINE : delta;
 }
 
-// VLC's default wheel action is volume, claimed anywhere over the player (with or without Shift). On Shorts
+// Shift+wheel anywhere over the player changes the volume; the plain wheel keeps scrolling the page. On Shorts
 // the wheel moves between shorts, so it stays YouTube's there
 function getWheelVolumePlayer(e: WheelEvent) {
-  const player = getPlayer();
+  const isVolumeWheel = VLC_WHEEL_VOLUME.combos.some(combo => isWheelComboMatch({
+    combo,
+    e
+  }));
+  const player = isVolumeWheel ? getPlayer() : null;
   if (!player || isShortsPlayer(player) || !isEventInside({
     e,
     elContainer: player

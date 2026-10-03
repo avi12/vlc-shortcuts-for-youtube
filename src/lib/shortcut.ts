@@ -52,17 +52,34 @@ function isShiftSignificant(key: string) {
   return key.length > 1 || key.toLowerCase() !== key.toUpperCase();
 }
 
+function isCtrlAltMatch({ combo, e }: {
+  combo: KeyCombo;
+  e: KeyboardEvent | WheelEvent;
+}) {
+  return e.ctrlKey === Boolean(combo.isCtrl) && e.altKey === Boolean(combo.isAlt) && !e.metaKey;
+}
+
 export function isComboMatch({ combo, e }: {
   combo: KeyCombo;
   e: KeyboardEvent;
 }) {
   const isSameKey = e.key.toLowerCase() === combo.key.toLowerCase();
   const isShiftMatch = !isShiftSignificant(combo.key) || e.shiftKey === Boolean(combo.isShift);
-  return isSameKey &&
-    isShiftMatch &&
-    e.ctrlKey === Boolean(combo.isCtrl) &&
-    e.altKey === Boolean(combo.isAlt) &&
-    !e.metaKey;
+  return isSameKey && isShiftMatch && isCtrlAltMatch({
+    combo,
+    e
+  });
+}
+
+// A wheel combo's key is the wheel itself, so only its modifiers need matching
+export function isWheelComboMatch({ combo, e }: {
+  combo: KeyCombo;
+  e: WheelEvent;
+}) {
+  return e.shiftKey === Boolean(combo.isShift) && isCtrlAltMatch({
+    combo,
+    e
+  });
 }
 
 export function isLetter(key: string) {

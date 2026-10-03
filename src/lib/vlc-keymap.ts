@@ -336,14 +336,19 @@ export const VLC_BINDINGS: VlcBinding[] = [
   }
 ];
 
-// Wheel gestures have no key combo, so they carry their own display text
-export const VLC_WHEEL_SHORTCUTS = [
-  {
-    section: KeymapSection.General,
-    label: "Volume up/down",
-    hotkey: "wheel"
-  }
-] as const;
+const WHEEL_KEY = "wheel";
+
+// Shift keeps the plain wheel scrolling the page
+export const VLC_WHEEL_VOLUME = {
+  section: KeymapSection.General,
+  label: "Volume up/down",
+  combos: [{
+    key: WHEEL_KEY,
+    isShift: true
+  }]
+} as const satisfies Pick<VlcBinding, "section" | "label" | "combos">;
+
+export const VLC_WHEEL_SHORTCUTS = [VLC_WHEEL_VOLUME];
 
 export function findBinding(e: KeyboardEvent) {
   return VLC_BINDINGS.find(binding => binding.combos.some(combo => isComboMatch({
