@@ -4,7 +4,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { defineConfig } from "wxt";
 
 const EXTENSION_NAME = "VLC Controls for YouTube";
-export const FALLBACK_GECKO_ID = "vlc-controls-in-youtube@avi12";
+export const FALLBACK_GECKO_ID = "vlc-controls-in-youtube@avi12.com";
 // MAIN-world content scripts landed in Firefox 128 and Chromium 111
 const FIREFOX_MIN_VERSION = "128.0";
 const CHROMIUM_MIN_VERSION = "111";
