@@ -1,3 +1,4 @@
+import { installHelpDialogOverride } from "@/lib/help-dialog";
 import { installHotkeys } from "@/lib/hotkeys";
 import { installTooltipOverrides } from "@/lib/tooltips";
 import { defineContentScript } from "#imports";
@@ -10,5 +11,6 @@ export default defineContentScript({
   main() {
     installHotkeys();
     installTooltipOverrides();
+    installHelpDialogOverride();
   }
 });
