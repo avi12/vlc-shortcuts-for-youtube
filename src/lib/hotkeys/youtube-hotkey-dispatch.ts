@@ -1,11 +1,30 @@
 import { getPlayerKind, type YoutubePlayer } from "@/lib/player";
 import { isHotkeyHonored, type YoutubeHotkey } from "@/lib/youtube-keymap";
 
+enum KeyEventType {
+  Press = "keydown",
+  Release = "keyup"
+}
+
 const dispatchedEvents = new WeakSet<Event>();
 
 // Our own synthetic presses must reach YouTube's handler instead of being swallowed as a replaced key
 export function isDispatchedYoutubeHotkey(e: Event) {
   return dispatchedEvents.has(e);
+}
+
+function dispatchKey({ player, hotkey, eventType }: {
+  player: YoutubePlayer;
+  hotkey: YoutubeHotkey;
+  eventType: KeyEventType;
+}) {
+  const e = new KeyboardEvent(eventType, {
+    ...hotkey,
+    bubbles: true,
+    cancelable: true
+  });
+  dispatchedEvents.add(e);
+  player.dispatchEvent(e);
 }
 
 // Dispatched on the player, since YouTube only takes the arrow keys there; it bubbles to the
@@ -26,13 +45,32 @@ export function dispatchYoutubeHotkey({ player, hotkey, count = 1, fallback }: {
   }
 
   for (let i = 0; i < count; i++) {
-    const e = new KeyboardEvent("keydown", {
-      ...hotkey,
-      bubbles: true,
-      cancelable: true
+    dispatchKey({
+      player,
+      hotkey,
+      eventType: KeyEventType.Press
     });
-    dispatchedEvents.add(e);
-    player.dispatchEvent(e);
   }
   return true;
+}
+
+// For a YouTube key that acts for as long as it is held (360° zoom): pressed now, and released by the returned
+// function once the viewer lets go of the VLC key
+export function holdYoutubeHotkey({ player, hotkey }: {
+  player: YoutubePlayer;
+  hotkey: YoutubeHotkey;
+}) {
+  const isPressed = dispatchYoutubeHotkey({
+    player,
+    hotkey
+  });
+  if (!isPressed) {
+    return;
+  }
+
+  return () => dispatchKey({
+    player,
+    hotkey,
+    eventType: KeyEventType.Release
+  });
 }

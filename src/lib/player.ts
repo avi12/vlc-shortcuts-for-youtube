@@ -51,6 +51,7 @@ export interface YoutubePlayer extends HTMLElement {
   getPlayerResponse?(): unknown;
   hideControls?(): void;
   showControls?(): void;
+  getSphericalProperties?(): unknown;
 }
 
 function isFunctionValue(value: unknown) {
@@ -83,6 +84,9 @@ function isYoutubePlayer(element: Element | null): element is YoutubePlayer {
 }
 
 const videoDataSchema = z.object({ title: z.string() });
+
+// A 360° video reports its view; any other video reports an empty object
+const sphericalPropertiesSchema = z.object({ fov: z.number() });
 
 // Re-queried on every call: YouTube's SPA swaps players and <video> sources without a reload, and keeps the
 // watch page's player mounted but hidden while Shorts plays in its own
@@ -119,6 +123,10 @@ export function isMainVideo(target: EventTarget | null) {
 export function getVideoTitle(player: YoutubePlayer) {
   const parsed = videoDataSchema.safeParse(player.getVideoData?.());
   return parsed.success && parsed.data.title ? parsed.data.title : document.title;
+}
+
+export function isSphericalVideo(player: YoutubePlayer) {
+  return sphericalPropertiesSchema.safeParse(player.getSphericalProperties?.()).success;
 }
 
 export function isPlaying(player: YoutubePlayer) {

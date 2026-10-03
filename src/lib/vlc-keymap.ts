@@ -39,7 +39,9 @@ export enum VlcAction {
   CycleAspectRatio = "cycle-aspect-ratio",
   ToggleLoop = "toggle-loop",
   Snapshot = "snapshot",
-  ToggleControls = "toggle-controls"
+  ToggleControls = "toggle-controls",
+  ZoomIn360 = "zoom-in-360",
+  ZoomOut360 = "zoom-out-360"
 }
 
 export interface VlcBinding {
@@ -48,6 +50,10 @@ export interface VlcBinding {
   label: string;
   combos: KeyCombo[];
   isRepeatable?: boolean;
+  // Acts only on 360° videos, as VLC's viewpoint keys do; on any other video the key stays the page's
+  isSphericalOnly?: boolean;
+  // A page scroll key, so like YouTube's volume keys it acts only while focus is inside the player
+  isPlayerFocusOnly?: boolean;
   // A YouTube key that does exactly the same, so YouTube's own (localized) label describes this binding too
   youtubeEquivalent?: YoutubeHotkey;
   // A YouTube key that does the same in bigger steps: YouTube's own (localized) label plus this binding's step
@@ -319,6 +325,26 @@ export const VLC_BINDINGS: VlcBinding[] = [
     section: KeymapSection.General,
     label: "Cycle aspect ratio",
     combos: [{ key: "a" }]
+  },
+  {
+    action: VlcAction.ZoomIn360,
+    section: KeymapSection.General,
+    label: "Zoom in (360° videos)",
+    combos: [{ key: "PageUp" }],
+    isRepeatable: true,
+    isSphericalOnly: true,
+    isPlayerFocusOnly: true,
+    youtubeEquivalent: YOUTUBE_HOTKEYS.zoomIn360
+  },
+  {
+    action: VlcAction.ZoomOut360,
+    section: KeymapSection.General,
+    label: "Zoom out (360° videos)",
+    combos: [{ key: "PageDown" }],
+    isRepeatable: true,
+    isSphericalOnly: true,
+    isPlayerFocusOnly: true,
+    youtubeEquivalent: YOUTUBE_HOTKEYS.zoomOut360
   },
   {
     action: VlcAction.Snapshot,

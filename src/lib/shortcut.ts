@@ -27,7 +27,9 @@ const KEY_DISPLAY_NAMES: Record<string, string> = {
   ArrowDown: "↓",
   Escape: "ESCAPE",
   Home: "HOME",
-  End: "END"
+  End: "END",
+  PageUp: "PAGE UP",
+  PageDown: "PAGE DOWN"
 };
 
 // YouTube writes a shifted symbol next to the key it is typed on (US layout): "< (SHIFT+,)". "+" is also matched

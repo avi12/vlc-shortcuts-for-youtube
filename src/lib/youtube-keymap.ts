@@ -148,6 +148,16 @@ export const YOUTUBE_HOTKEYS = {
     key: "c",
     code: "KeyC",
     keyCode: 67
+  },
+  zoomIn360: {
+    key: "]",
+    code: "BracketRight",
+    keyCode: 221
+  },
+  zoomOut360: {
+    key: "[",
+    code: "BracketLeft",
+    keyCode: 219
   }
 } as const satisfies Record<string, YoutubeHotkey>;
 

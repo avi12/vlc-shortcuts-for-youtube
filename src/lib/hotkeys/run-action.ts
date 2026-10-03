@@ -14,11 +14,14 @@ import { takeSnapshot } from "@/lib/hotkeys/actions/snapshot";
 import { resetSpeed, SpeedDirection, stepFineSpeed, stepPresetSpeed } from "@/lib/hotkeys/actions/speed";
 import { CycleDirection, cycleSubtitles } from "@/lib/hotkeys/actions/subtitles";
 import { stepVolume, toggleMute, VolumeDirection } from "@/lib/hotkeys/actions/volume";
+import { zoomIn360, zoomOut360 } from "@/lib/hotkeys/actions/zoom-360";
 import { seekNatively } from "@/lib/hotkeys/native/seek";
 import type { YoutubePlayer } from "@/lib/player";
 import { JUMP_SECONDS_BY_ACTION, VlcAction, type VlcBinding } from "@/lib/vlc-keymap";
 
-type ActionHandler = (player: YoutubePlayer) => void;
+// An action YouTube performs for as long as its key is held hands back the release of that key
+type ReleaseKey = () => void;
+type ActionHandler = (player: YoutubePlayer) => ReleaseKey | void;
 
 function createJumpHandler(action: VlcAction): ActionHandler {
   return player => seekNatively({
@@ -94,7 +97,9 @@ const ACTION_HANDLERS: Record<VlcAction, ActionHandler> = {
   [VlcAction.CycleAspectRatio]: cycleAspectRatio,
   [VlcAction.ToggleLoop]: toggleLoop,
   [VlcAction.Snapshot]: takeSnapshot,
-  [VlcAction.ToggleControls]: toggleControls
+  [VlcAction.ToggleControls]: toggleControls,
+  [VlcAction.ZoomIn360]: zoomIn360,
+  [VlcAction.ZoomOut360]: zoomOut360
 };
 
 // Held keys keep stepping like VLC; toggles fire once per press
@@ -107,5 +112,5 @@ export function runAction({ binding, player, isRepeat }: {
     return;
   }
 
-  ACTION_HANDLERS[binding.action](player);
+  return ACTION_HANDLERS[binding.action](player);
 }

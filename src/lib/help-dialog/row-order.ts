@@ -41,6 +41,8 @@ const DIALOG_ROW_ORDER: DialogRowSource[] = [
   VLC_WHEEL_VOLUME,
   VlcAction.CycleAudioTrack,
   VlcAction.CycleAspectRatio,
+  VlcAction.ZoomIn360,
+  VlcAction.ZoomOut360,
   VlcAction.Snapshot,
   VlcAction.ToggleControls,
   VlcAction.CycleSubtitles,
