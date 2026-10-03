@@ -7,7 +7,8 @@ import {
   formatYoutubeHotkey,
   formatYoutubeShortcut,
   YOUTUBE_NATIVE_SHORTCUTS,
-  YOUTUBE_SECTION_ANCHOR_KEYS
+  YOUTUBE_SECTION_ANCHOR_KEYS,
+  type YoutubeHotkey
 } from "@/lib/youtube-keymap";
 
 // A row YouTube's own dialog lists carries YouTube's original entry, handed back untouched (badges included)
@@ -53,16 +54,35 @@ export function findSectionByHotkeys(hotkeys: string[]) {
   });
 }
 
-// A VLC row that does exactly what a YouTube key does takes YouTube's own (localized) label for that key
+function findYoutubeRowLabel({ hotkey, youtubeRowsBySignature }: {
+  hotkey: YoutubeHotkey;
+  youtubeRowsBySignature: Map<string, HotkeyRow<unknown>[]>;
+}) {
+  return youtubeRowsBySignature.get(toHotkeySignature(formatYoutubeHotkey(hotkey)))?.[0]?.label;
+}
+
+// A VLC row matching a YouTube key takes YouTube's own (localized) label for that key - with its step when finer
 function findYoutubeLabel({ binding, youtubeRowsBySignature }: {
   binding: VlcBinding;
   youtubeRowsBySignature: Map<string, HotkeyRow<unknown>[]>;
 }) {
-  if (!binding.youtubeEquivalent) {
+  if (binding.youtubeEquivalent) {
+    return findYoutubeRowLabel({
+      hotkey: binding.youtubeEquivalent,
+      youtubeRowsBySignature
+    });
+  }
+
+  if (!binding.youtubeCoarserEquivalent) {
     return;
   }
 
-  return youtubeRowsBySignature.get(toHotkeySignature(formatYoutubeHotkey(binding.youtubeEquivalent)))?.[0]?.label;
+  const { hotkey, step } = binding.youtubeCoarserEquivalent;
+  const label = findYoutubeRowLabel({
+    hotkey,
+    youtubeRowsBySignature
+  });
+  return label && `${label} (${step})`;
 }
 
 function buildRows<TYoutubeOption>({ section, youtubeRowsBySignature }: {

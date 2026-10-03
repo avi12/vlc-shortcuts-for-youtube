@@ -1,3 +1,4 @@
+import { formatRate } from "@/lib/hotkeys/native/speed-bezel";
 import {
   formatCombos,
   isComboMatch,
@@ -49,6 +50,11 @@ export interface VlcBinding {
   isRepeatable?: boolean;
   // A YouTube key that does exactly the same, so YouTube's own (localized) label describes this binding too
   youtubeEquivalent?: YoutubeHotkey;
+  // A YouTube key that does the same in bigger steps: YouTube's own (localized) label plus this binding's step
+  youtubeCoarserEquivalent?: {
+    hotkey: YoutubeHotkey;
+    step: string;
+  };
 }
 
 enum JumpDirection {
@@ -140,6 +146,10 @@ const JUMP_DIRECTION_WORDS: Record<JumpDirection, string> = {
 
 export const FINE_SPEED_STEP = 0.1;
 export const NORMAL_SPEED = 1;
+// YouTube's English labels for its speed keys, used until its own (localized) dialog is read
+const SLOWER_LABEL = "Decrease playback rate";
+const FASTER_LABEL = "Increase playback rate";
+const FINE_SPEED_STEP_LABEL = formatRate(FINE_SPEED_STEP);
 
 function formatDuration(seconds: number) {
   const isWholeMinutes = seconds >= SECONDS_PER_MINUTE && seconds % SECONDS_PER_MINUTE === 0;
@@ -211,7 +221,7 @@ export const VLC_BINDINGS: VlcBinding[] = [
   {
     action: VlcAction.Slower,
     section: KeymapSection.Playback,
-    label: "Slower",
+    label: SLOWER_LABEL,
     combos: [{ key: "-" }],
     isRepeatable: true,
     youtubeEquivalent: YOUTUBE_HOTKEYS.slower
@@ -219,7 +229,7 @@ export const VLC_BINDINGS: VlcBinding[] = [
   {
     action: VlcAction.Faster,
     section: KeymapSection.Playback,
-    label: "Faster",
+    label: FASTER_LABEL,
     combos: [{ key: "+" }],
     isRepeatable: true,
     youtubeEquivalent: YOUTUBE_HOTKEYS.faster
@@ -227,16 +237,24 @@ export const VLC_BINDINGS: VlcBinding[] = [
   {
     action: VlcAction.SlowerFine,
     section: KeymapSection.Playback,
-    label: "Slower (fine)",
+    label: `${SLOWER_LABEL} (${FINE_SPEED_STEP_LABEL})`,
     combos: [{ key: "[" }],
-    isRepeatable: true
+    isRepeatable: true,
+    youtubeCoarserEquivalent: {
+      hotkey: YOUTUBE_HOTKEYS.slower,
+      step: FINE_SPEED_STEP_LABEL
+    }
   },
   {
     action: VlcAction.FasterFine,
     section: KeymapSection.Playback,
-    label: "Faster (fine)",
+    label: `${FASTER_LABEL} (${FINE_SPEED_STEP_LABEL})`,
     combos: [{ key: "]" }],
-    isRepeatable: true
+    isRepeatable: true,
+    youtubeCoarserEquivalent: {
+      hotkey: YOUTUBE_HOTKEYS.faster,
+      step: FINE_SPEED_STEP_LABEL
+    }
   },
   {
     action: VlcAction.NormalSpeed,
