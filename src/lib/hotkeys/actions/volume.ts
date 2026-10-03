@@ -33,7 +33,7 @@ function stepVolumeSilently({ player, direction }: {
 }
 
 // Past 100% YouTube's volume-up key still brings up its volume bezel (it stays at 100%), which then shows the
-// boosted volume. Tells whether the boost took
+// boosted volume. Changing the volume unmutes, as in VLC. Tells whether the boost took
 function stepBoostedVolume({ player, direction }: {
   player: YoutubePlayer;
   direction: VolumeDirection;
@@ -45,6 +45,8 @@ function stepBoostedVolume({ player, direction }: {
   if (volume === null) {
     return false;
   }
+
+  player.unMute();
 
   const text = formatVolume(volume);
   const isPressed = dispatchYoutubeHotkey({
@@ -70,7 +72,7 @@ function isBoostStep({ player, direction }: {
   player: YoutubePlayer;
   direction: VolumeDirection;
 }) {
-  const isAtFullVolume = !player.isMuted() && player.getVolume() >= MAX_PLAYER_VOLUME;
+  const isAtFullVolume = player.getVolume() >= MAX_PLAYER_VOLUME;
   const isBoosted = getBoostedVolume(player) > MAX_PLAYER_VOLUME;
   return isAtFullVolume && (direction === VolumeDirection.Louder || isBoosted);
 }
