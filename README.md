@@ -1,0 +1,112 @@
+# VLC Controls for YouTube
+
+A browser extension that gives YouTube's player VLC's keyboard shortcuts. YouTube's player tooltips and its
+<kbd>Shift</kbd> + <kbd>/</kbd> shortcuts dialog are rewritten to match, and every action shows YouTube's own on-screen
+feedback.  
+Click the toolbar icon to turn it off and on (it's on by default).
+
+Works on the watch page, Shorts and embedded players.
+
+Made by [Avi](https://avi12.com)
+
+Powered by [WXT](https://github.com/wxt-dev/wxt)
+
+## Shortcuts
+
+Press <kbd>Shift</kbd> + <kbd>/</kbd> on YouTube for the full list in your own language.
+
+### Playback
+
+|                                                 Key | Action                                       |
+|----------------------------------------------------:|----------------------------------------------|
+|                                    <kbd>Space</kbd> | Play/pause                                   |
+|                                        <kbd>S</kbd> | Stop                                         |
+|                     <kbd>Shift</kbd> + <kbd>←</kbd> | Jump back 3 seconds                          |
+|                     <kbd>Shift</kbd> + <kbd>→</kbd> | Jump forward 3 seconds                       |
+|                                  <kbd>←</kbd>/<kbd>→</kbd> | Jump back/forward 5 seconds           |
+|                <kbd>Alt</kbd> + <kbd>←</kbd>/<kbd>→</kbd> | Jump back/forward 10 seconds          |
+| <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>←</kbd>/<kbd>→</kbd> | Jump back/forward 1 minute        |
+|   <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>←</kbd>/<kbd>→</kbd> | Jump back/forward 5 minutes       |
+|                           <kbd>P</kbd>/<kbd>N</kbd> | Previous/next video                          |
+|                                        <kbd>E</kbd> | Next frame (while paused)                    |
+|                           <kbd>-</kbd>/<kbd>+</kbd> | Slower/faster                                |
+|                           <kbd>[</kbd>/<kbd>]</kbd> | Slower/faster by 0.1x                        |
+|                                        <kbd>=</kbd> | Normal speed                                 |
+|                                        <kbd>L</kbd> | Toggle loop                                  |
+
+### General
+
+|                                         Key | Action                                     |
+|--------------------------------------------:|--------------------------------------------|
+|                                <kbd>F</kbd> | Toggle fullscreen                          |
+|                                <kbd>M</kbd> | Mute/unmute                                |
+|                   <kbd>↑</kbd>/<kbd>↓</kbd> | Volume up/down, up to 200% like VLC        |
+|              <kbd>Shift</kbd> + mouse wheel | Volume up/down                             |
+|                                <kbd>B</kbd> | Cycle audio track                          |
+|                                <kbd>A</kbd> | Cycle aspect ratio                         |
+|             <kbd>Shift</kbd> + <kbd>S</kbd> | Take snapshot                              |
+|              <kbd>Ctrl</kbd> + <kbd>H</kbd> | Hide/show controls                         |
+|                                <kbd>I</kbd> | Toggle miniplayer (<kbd>Shift</kbd> + <kbd>I</kbd> on 360° videos) |
+
+### Subtitles
+
+|                           Key | Action                          |
+|------------------------------:|---------------------------------|
+|                  <kbd>V</kbd> | Cycle subtitle track            |
+| <kbd>Alt</kbd> + <kbd>V</kbd> | Cycle subtitle track in reverse |
+
+### 360° videos
+
+|                                                 Key | Action               |
+|----------------------------------------------------:|----------------------|
+|              <kbd>Page Up</kbd>/<kbd>Page Down</kbd> | Zoom in/out          |
+| <kbd>I</kbd>/<kbd>J</kbd>/<kbd>K</kbd>/<kbd>L</kbd> | Pan up/left/down/right |
+
+YouTube keeps its own keys for what VLC doesn't have: <kbd>T</kbd> theater mode, <kbd>0</kbd>-<kbd>9</kbd> seek to a
+percentage, <kbd>,</kbd> previous frame, <kbd>Ctrl</kbd> + <kbd>←</kbd>/<kbd>→</kbd> previous/next chapter and
+<kbd>Esc</kbd> to close the miniplayer.
+
+## Requirements for setting up
+
+Install [Node.js](https://nodejs.org) 22+ and [pnpm](https://pnpm.io/installation)
+
+## Install dependencies
+
+```shell
+pnpm i
+```
+
+## Start the dev server & run in a test browser
+
+Each command builds the extension, loads it into a separate copy of your browser profile and reloads it (and the open
+YouTube tabs) on every change.
+
+### Chrome
+
+```shell
+pnpm dev
+```
+
+### Firefox
+
+```shell
+pnpm dev:firefox
+```
+
+### Opera
+
+```shell
+pnpm dev:opera
+```
+
+## Build
+
+```shell
+pnpm build:all
+```
+
+The unpacked builds are written to `build/<browser>-mv3-production/`.
+
+## License
+
+[GPL-3.0-or-later](LICENSE)
