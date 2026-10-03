@@ -57,6 +57,10 @@ export const YOUTUBE_NATIVE_SHORTCUTS = {
   nextChapter: {
     section: KeymapSection.Playback,
     combos: [YOUTUBE_CHAPTER_COMBOS.next]
+  },
+  lookAround360: {
+    section: KeymapSection.General,
+    combos: [{ key: "w" }, { key: "a" }, { key: "s" }, { key: "d" }]
   }
 } as const satisfies Record<string, YoutubeShortcut>;
 
@@ -227,6 +231,13 @@ export function isPlayerFocusKey(e: KeyboardEvent) {
 export function isShortsNavigationKey(e: KeyboardEvent) {
   return YOUTUBE_SHORTS_NAVIGATION_HOTKEYS.some(hotkey => isComboMatch({
     combo: toCombo(hotkey),
+    e
+  }));
+}
+
+export function isLookAround360Key(e: KeyboardEvent) {
+  return YOUTUBE_NATIVE_SHORTCUTS.lookAround360.combos.some(combo => isComboMatch({
+    combo,
     e
   }));
 }

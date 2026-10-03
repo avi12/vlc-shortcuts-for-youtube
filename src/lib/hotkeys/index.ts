@@ -9,7 +9,7 @@ import { installWheelVolume } from "@/lib/hotkeys/wheel-volume";
 import { isDispatchedYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import { getPlayer, isShortsPlayer, isSphericalVideo, type YoutubePlayer } from "@/lib/player";
 import { findBinding, type VlcBinding } from "@/lib/vlc-keymap";
-import { isReplacedYoutubeKey, isShortsNavigationKey } from "@/lib/youtube-keymap";
+import { isLookAround360Key, isReplacedYoutubeKey, isShortsNavigationKey } from "@/lib/youtube-keymap";
 
 // Swallowed on keydown, so the matching keypress/keyup never reach YouTube either. Each keydown decides afresh,
 // since a keyup can be lost (Ctrl+H opening the history tab) and the key may next be typed into a text box
@@ -59,6 +59,17 @@ function isBindingActive({ binding, player, e }: {
   return isVideoSupported && isFocusSupported;
 }
 
+// Shorts moves between shorts on its own keys, and a 360° video looks around on YouTube's W/A/S/D - VLC has no keys
+// for either, so YouTube keeps them there
+function isKeyLeftToYoutube({ e, player }: {
+  e: KeyboardEvent;
+  player: YoutubePlayer;
+}) {
+  const isShortsNavigation = isShortsPlayer(player) && isShortsNavigationKey(e);
+  const isLookAround = isSphericalVideo(player) && isLookAround360Key(e);
+  return isShortsNavigation || isLookAround;
+}
+
 function onKeyDown(e: KeyboardEvent) {
   if (isDispatchedYoutubeHotkey(e)) {
     return;
@@ -66,8 +77,10 @@ function onKeyDown(e: KeyboardEvent) {
 
   swallowedKeyCodes.delete(e.code);
   const player = getTargetPlayer(e);
-  const isShortsNavigation = player !== null && isShortsPlayer(player) && isShortsNavigationKey(e);
-  if (!player || isShortsNavigation) {
+  if (!player || isKeyLeftToYoutube({
+    e,
+    player
+  })) {
     return;
   }
 
