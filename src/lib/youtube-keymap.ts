@@ -145,7 +145,7 @@ export const YOUTUBE_HOTKEYS = {
     code: "KeyC",
     keyCode: 67
   },
-  // I is VLC's look up on 360° videos, so the miniplayer moved to Shift+I
+  // I pans up on 360° videos, so there the miniplayer is on Shift+I
   miniplayer: {
     key: "i",
     code: "KeyI",

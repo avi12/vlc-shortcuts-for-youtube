@@ -304,7 +304,7 @@ export const VLC_BINDINGS: VlcBinding[] = [
     action: VlcAction.ToggleMiniplayer,
     section: KeymapSection.General,
     label: "Toggle miniplayer",
-    combos: [{
+    combos: [{ key: "i" }, {
       key: "i",
       isShift: true
     }],
