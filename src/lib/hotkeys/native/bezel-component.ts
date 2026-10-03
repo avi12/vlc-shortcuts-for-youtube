@@ -5,9 +5,16 @@ import { createTypeGuard, z } from "@/lib/zod";
 // `var _yt_player={};(function(g){...})(_yt_player)`
 const YOUTUBE_PLAYER_NAMESPACE = "_yt_player";
 
+interface BezelRegistry {
+  bezelsByLayer: WeakMap<Element, BezelComponent>;
+  bezelPrototype: BezelComponent | null;
+}
+
 declare global {
 
   var _yt_player: unknown;
+
+  var vlcControlsBezelRegistry: BezelRegistry | undefined;
 }
 // Methods only YouTube's bezel class declares itself - how it is told apart from its minified siblings
 const BEZEL_OWN_METHODS = ["show", "hide", "showPlaybackIcon"] as const;
@@ -58,8 +65,13 @@ const isBezelClass = createTypeGuard<BezelClass>(
   })
 );
 
-const bezelsByLayer = new WeakMap<Element, BezelComponent>();
-let bezelPrototype: BezelComponent | null = null;
+// Kept on the page rather than in this script: a newer copy of the script (the extension reloaded or updated into an
+// open tab) inherits the bezels YouTube has already shown, and never wraps YouTube's bezel methods a second time
+const registry = globalThis.vlcControlsBezelRegistry ??= {
+  bezelsByLayer: new WeakMap(),
+  bezelPrototype: null
+};
+const { bezelsByLayer } = registry;
 
 function rememberBezel(bezel: unknown) {
   if (isBezelComponent(bezel)) {
@@ -97,12 +109,16 @@ function recordBezelInstances(namespace: unknown) {
     endTextOnlyStatus(this);
     hide.call(this);
   };
-  bezelPrototype = prototype;
+  registry.bezelPrototype = prototype;
 }
 
 // Runs at document_start, before base.js: the accessor catches base.js assigning the namespace, hands it
 // straight back as a plain value, and records the bezel class once base.js has finished filling it in
 export function installBezelRegistry() {
+  if (registry.bezelPrototype) {
+    return;
+  }
+
   if (globalThis._yt_player) {
     recordBezelInstances(globalThis._yt_player);
     return;
@@ -135,6 +151,7 @@ export function getBezel(player: HTMLElement) {
 
 // The bezel's own timers: one shows it a beat after a change, the other hides it once it has been up long enough
 export function getBezelTimers(bezel: BezelComponent) {
+  const { bezelPrototype } = registry;
   if (!bezelPrototype) {
     return null;
   }
