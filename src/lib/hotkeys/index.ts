@@ -11,7 +11,7 @@ import { getPlayer, isShortsPlayer, isSphericalVideo, type YoutubePlayer } from 
 import { getSite, isMusicSite } from "@/lib/site";
 import { findBindings, type VlcBinding } from "@/lib/vlc-keymap";
 import { isReplacedYoutubeKey, isShortsNavigationKey } from "@/lib/youtube-keymap";
-import { isMusicNavigationPrefix, isReplacedMusicKey } from "@/lib/youtube-music-keymap";
+import { isMusicNavigationPrefix } from "@/lib/youtube-music-keymap";
 
 // Swallowed on keydown, so the matching keypress/keyup never reach YouTube either. Each keydown decides afresh,
 // since a keyup can be lost (Ctrl+H opening the history tab) and the key may next be typed into a text box
@@ -109,7 +109,8 @@ function onKeyDown(e: KeyboardEvent) {
     return;
   }
 
-  const isReplacedKey = isMusicSite() ? isReplacedMusicKey(e) : isReplacedYoutubeKey(e);
+  // YouTube Music's own keys that VLC doesn't bind keep working there
+  const isReplacedKey = !isMusicSite() && isReplacedYoutubeKey(e);
   if (isReplacedKey) {
     swallow(e);
   }

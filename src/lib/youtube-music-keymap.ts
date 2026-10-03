@@ -86,49 +86,6 @@ export function findMusicHotkey(hotkey: YoutubeHotkey) {
   return MUSIC_HOTKEY_BY_YOUTUBE_HOTKEY.get(hotkey);
 }
 
-// Music's second key for the same controls, plus its 1-second seeks - VLC's keys replace these too
-const MUSIC_ALIAS_COMBOS: KeyCombo[] = [
-  { key: " " },
-  { key: "j" },
-  { key: "k" },
-  {
-    key: "ArrowRight",
-    isShift: true
-  },
-  {
-    key: "ArrowLeft",
-    isShift: true
-  },
-  {
-    key: "l",
-    isShift: true
-  },
-  {
-    key: "h",
-    isShift: true
-  },
-  {
-    key: "ArrowRight",
-    isCtrl: true,
-    isShift: true
-  },
-  {
-    key: "ArrowLeft",
-    isCtrl: true,
-    isShift: true
-  }
-];
-
-// Music's shortcuts for controls VLC also has - VLC's keys replace them, so these are swallowed
-const MUSIC_REPLACED_COMBOS = [...Object.values(YOUTUBE_MUSIC_HOTKEYS).map(toHotkeyCombo), ...MUSIC_ALIAS_COMBOS];
-
-export function isReplacedMusicKey(e: KeyboardEvent) {
-  return MUSIC_REPLACED_COMBOS.some(combo => isComboMatch({
-    combo,
-    e
-  }));
-}
-
 // Controls only Music has - VLC has no equivalent, so Music keeps handling its own keys. The help dialog keeps
 // Music's own rows for these, in Music's (localized) wording
 export const YOUTUBE_MUSIC_NATIVE_SHORTCUTS = {
