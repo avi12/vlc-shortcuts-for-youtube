@@ -4,6 +4,7 @@ import { showAllControls } from "@/lib/hotkeys/actions/controls-visibility";
 import { isKeyForPage } from "@/lib/hotkeys/event-targets";
 import { installBezelRegistry } from "@/lib/hotkeys/native/bezel-component";
 import { runAction } from "@/lib/hotkeys/run-action";
+import { resetVolumeBoost } from "@/lib/hotkeys/volume-boost";
 import { installWheelVolume } from "@/lib/hotkeys/wheel-volume";
 import { isDispatchedYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import { getPlayer, isShortsPlayer } from "@/lib/player";
@@ -79,6 +80,7 @@ function undoSideEffects(isEnabled: boolean) {
 
   resetAspectRatio();
   showAllControls();
+  resetVolumeBoost();
 }
 
 export function installHotkeys() {
