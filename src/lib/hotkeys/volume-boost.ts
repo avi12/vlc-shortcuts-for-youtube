@@ -21,8 +21,37 @@ function endBoostWhenYoutubeLowersVolume({ player, gain }: {
   };
 }
 
-// A media element can be routed through audio processing only once, and an audio context created outside a user
-// gesture (a wheel turn isn't one) never starts - routing the video into it would silence it, so none is created
+// The video is routed into the audio context only once the context is running: routed into a context the browser
+// keeps suspended, it would go silent. Firefox starts a context a beat after creating it, Chrome right away
+function routeVideoWhenRunning({ context, elVideo, gain }: {
+  context: AudioContext;
+  elVideo: HTMLVideoElement;
+  gain: GainNode;
+}) {
+  function routeVideo() {
+    context.createMediaElementSource(elVideo).connect(gain).connect(context.destination);
+  }
+
+  if (context.state === "running") {
+    routeVideo();
+    return;
+  }
+
+  function routeVideoOnStart() {
+    if (context.state !== "running") {
+      return;
+    }
+
+    context.removeEventListener("statechange", routeVideoOnStart);
+    routeVideo();
+  }
+
+  context.addEventListener("statechange", routeVideoOnStart);
+  void context.resume();
+}
+
+// A media element can be routed through audio processing only once. Browsers start an audio context only on a page
+// the viewer has interacted with - once they have, the wheel (not a user gesture by itself) can boost too
 function connectGain({ player, elVideo }: {
   player: YoutubePlayer;
   elVideo: HTMLVideoElement;
@@ -32,13 +61,17 @@ function connectGain({ player, elVideo }: {
     return existingGain;
   }
 
-  if (!navigator.userActivation.isActive) {
+  if (!navigator.userActivation.hasBeenActive) {
     return null;
   }
 
   const context = new AudioContext();
   const gain = context.createGain();
-  context.createMediaElementSource(elVideo).connect(gain).connect(context.destination);
+  routeVideoWhenRunning({
+    context,
+    elVideo,
+    gain
+  });
   gainsByVideo.set(elVideo, gain);
   elVideo.addEventListener(
     "volumechange", endBoostWhenYoutubeLowersVolume({
