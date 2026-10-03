@@ -40,37 +40,129 @@ export enum VlcAction {
   ToggleControls = "toggle-controls"
 }
 
-interface VlcBinding {
+export interface VlcBinding {
   action: VlcAction;
   section: KeymapSection;
   label: string;
   combos: KeyCombo[];
+  isRepeatable?: boolean;
 }
 
-// VLC 3.x defaults (Windows/Linux key-jump-* and volume-step)
+enum JumpDirection {
+  Backward = -1,
+  Forward = 1
+}
+
+interface JumpSize {
+  seconds: number;
+  modifiers: Omit<KeyCombo, "key">;
+  backwardAction: VlcAction;
+  forwardAction: VlcAction;
+}
+
+const SECONDS_PER_MINUTE = 60;
+
+// VLC 3.x jump lengths (key-jump-*)
 const JUMP_SECONDS = {
   extraShort: 3,
   arrow: 5,
   short: 10,
-  medium: 60,
-  long: 300
+  medium: SECONDS_PER_MINUTE,
+  long: 5 * SECONDS_PER_MINUTE
 } as const;
+
+// Each jump length sits on the arrow keys under its own modifier. Ctrl alone stays YouTube's chapter
+// navigation, so VLC's 1-minute jump moved to Ctrl+Shift
+const JUMP_SIZES: JumpSize[] = [
+  {
+    seconds: JUMP_SECONDS.extraShort,
+    modifiers: {
+      isShift: true
+    },
+    backwardAction: VlcAction.JumpBackwardExtraShort,
+    forwardAction: VlcAction.JumpForwardExtraShort
+  },
+  {
+    seconds: JUMP_SECONDS.arrow,
+    modifiers: {},
+    backwardAction: VlcAction.JumpBackwardArrow,
+    forwardAction: VlcAction.JumpForwardArrow
+  },
+  {
+    seconds: JUMP_SECONDS.short,
+    modifiers: {
+      isAlt: true
+    },
+    backwardAction: VlcAction.JumpBackwardShort,
+    forwardAction: VlcAction.JumpForwardShort
+  },
+  {
+    seconds: JUMP_SECONDS.medium,
+    modifiers: {
+      isCtrl: true,
+      isShift: true
+    },
+    backwardAction: VlcAction.JumpBackwardMedium,
+    forwardAction: VlcAction.JumpForwardMedium
+  },
+  {
+    seconds: JUMP_SECONDS.long,
+    modifiers: {
+      isCtrl: true,
+      isAlt: true
+    },
+    backwardAction: VlcAction.JumpBackwardLong,
+    forwardAction: VlcAction.JumpForwardLong
+  }
+];
+
+const JUMP_DIRECTION_KEYS: Record<JumpDirection, string> = {
+  [JumpDirection.Backward]: "ArrowLeft",
+  [JumpDirection.Forward]: "ArrowRight"
+};
+
+const JUMP_DIRECTION_WORDS: Record<JumpDirection, string> = {
+  [JumpDirection.Backward]: "back",
+  [JumpDirection.Forward]: "forward"
+};
 
 export const FINE_SPEED_STEP = 0.1;
 export const NORMAL_SPEED = 1;
 
-export const JUMP_SECONDS_BY_ACTION: Partial<Record<VlcAction, number>> = {
-  [VlcAction.JumpBackwardExtraShort]: -JUMP_SECONDS.extraShort,
-  [VlcAction.JumpForwardExtraShort]: JUMP_SECONDS.extraShort,
-  [VlcAction.JumpBackwardArrow]: -JUMP_SECONDS.arrow,
-  [VlcAction.JumpForwardArrow]: JUMP_SECONDS.arrow,
-  [VlcAction.JumpBackwardShort]: -JUMP_SECONDS.short,
-  [VlcAction.JumpForwardShort]: JUMP_SECONDS.short,
-  [VlcAction.JumpBackwardMedium]: -JUMP_SECONDS.medium,
-  [VlcAction.JumpForwardMedium]: JUMP_SECONDS.medium,
-  [VlcAction.JumpBackwardLong]: -JUMP_SECONDS.long,
-  [VlcAction.JumpForwardLong]: JUMP_SECONDS.long
-};
+function formatDuration(seconds: number) {
+  const isWholeMinutes = seconds >= SECONDS_PER_MINUTE && seconds % SECONDS_PER_MINUTE === 0;
+  const [amount, unit] = isWholeMinutes ? [seconds / SECONDS_PER_MINUTE, "minute"] : [seconds, "second"];
+  return `${amount} ${unit}${amount === 1 ? "" : "s"}`;
+}
+
+function createJumpBinding({ jumpSize, direction }: {
+  jumpSize: JumpSize;
+  direction: JumpDirection;
+}): VlcBinding {
+  return {
+    action: direction === JumpDirection.Forward ? jumpSize.forwardAction : jumpSize.backwardAction,
+    section: KeymapSection.Playback,
+    label: `Jump ${JUMP_DIRECTION_WORDS[direction]} ${formatDuration(jumpSize.seconds)}`,
+    combos: [{
+      key: JUMP_DIRECTION_KEYS[direction],
+      ...jumpSize.modifiers
+    }],
+    isRepeatable: true
+  };
+}
+
+const JUMP_DIRECTIONS = [JumpDirection.Backward, JumpDirection.Forward];
+
+const JUMP_BINDINGS = JUMP_SIZES.flatMap(jumpSize => JUMP_DIRECTIONS.map(direction => createJumpBinding({
+  jumpSize,
+  direction
+})));
+
+export const JUMP_SECONDS_BY_ACTION = new Map<VlcAction, number>();
+for (const { seconds, backwardAction, forwardAction } of JUMP_SIZES) {
+  JUMP_SECONDS_BY_ACTION.set(backwardAction, JumpDirection.Backward * seconds);
+  JUMP_SECONDS_BY_ACTION.set(forwardAction, JumpDirection.Forward * seconds);
+}
 
 export const VLC_BINDINGS: VlcBinding[] = [
   {
@@ -79,94 +171,7 @@ export const VLC_BINDINGS: VlcBinding[] = [
     label: "Play/pause",
     combos: [{ key: " " }]
   },
-  {
-    action: VlcAction.JumpBackwardExtraShort,
-    section: KeymapSection.Playback,
-    label: `Jump back ${JUMP_SECONDS.extraShort} seconds`,
-    combos: [{
-      key: "ArrowLeft",
-      isShift: true
-    }]
-  },
-  {
-    action: VlcAction.JumpForwardExtraShort,
-    section: KeymapSection.Playback,
-    label: `Jump forward ${JUMP_SECONDS.extraShort} seconds`,
-    combos: [{
-      key: "ArrowRight",
-      isShift: true
-    }]
-  },
-  {
-    action: VlcAction.JumpBackwardArrow,
-    section: KeymapSection.Playback,
-    label: `Jump back ${JUMP_SECONDS.arrow} seconds`,
-    combos: [{ key: "ArrowLeft" }]
-  },
-  {
-    action: VlcAction.JumpForwardArrow,
-    section: KeymapSection.Playback,
-    label: `Jump forward ${JUMP_SECONDS.arrow} seconds`,
-    combos: [{ key: "ArrowRight" }]
-  },
-  {
-    action: VlcAction.JumpBackwardShort,
-    section: KeymapSection.Playback,
-    label: `Jump back ${JUMP_SECONDS.short} seconds`,
-    combos: [{
-      key: "ArrowLeft",
-      isAlt: true
-    }]
-  },
-  {
-    action: VlcAction.JumpForwardShort,
-    section: KeymapSection.Playback,
-    label: `Jump forward ${JUMP_SECONDS.short} seconds`,
-    combos: [{
-      key: "ArrowRight",
-      isAlt: true
-    }]
-  },
-  {
-    action: VlcAction.JumpBackwardMedium,
-    section: KeymapSection.Playback,
-    label: "Jump back 1 minute",
-    combos: [{
-      key: "ArrowLeft",
-      isCtrl: true,
-      isShift: true
-    }]
-  },
-  {
-    action: VlcAction.JumpForwardMedium,
-    section: KeymapSection.Playback,
-    label: "Jump forward 1 minute",
-    combos: [{
-      key: "ArrowRight",
-      isCtrl: true,
-      isShift: true
-    }]
-  },
-  {
-    action: VlcAction.JumpBackwardLong,
-    section: KeymapSection.Playback,
-    label: "Jump back 5 minutes",
-    combos: [{
-      key: "ArrowLeft",
-      isCtrl: true,
-      isAlt: true
-    }]
-  },
-  {
-    action: VlcAction.JumpForwardLong,
-    section: KeymapSection.Playback,
-    label: "Jump forward 5 minutes",
-    combos: [{
-      key: "ArrowRight",
-      isCtrl: true,
-      isAlt: true
-    }]
-  },
+  ...JUMP_BINDINGS,
   {
     action: VlcAction.Previous,
     section: KeymapSection.Playback,
@@ -183,31 +188,36 @@ export const VLC_BINDINGS: VlcBinding[] = [
     action: VlcAction.NextFrame,
     section: KeymapSection.Playback,
     label: "Next frame",
-    combos: [{ key: "e" }]
+    combos: [{ key: "e" }],
+    isRepeatable: true
   },
   {
     action: VlcAction.Slower,
     section: KeymapSection.Playback,
     label: "Slower",
-    combos: [{ key: "[" }]
+    combos: [{ key: "[" }],
+    isRepeatable: true
   },
   {
     action: VlcAction.Faster,
     section: KeymapSection.Playback,
     label: "Faster",
-    combos: [{ key: "]" }]
+    combos: [{ key: "]" }],
+    isRepeatable: true
   },
   {
     action: VlcAction.SlowerFine,
     section: KeymapSection.Playback,
     label: "Slower (fine)",
-    combos: [{ key: "-" }]
+    combos: [{ key: "-" }],
+    isRepeatable: true
   },
   {
     action: VlcAction.FasterFine,
     section: KeymapSection.Playback,
     label: "Faster (fine)",
-    combos: [{ key: "+" }]
+    combos: [{ key: "+" }],
+    isRepeatable: true
   },
   {
     action: VlcAction.NormalSpeed,
@@ -246,7 +256,8 @@ export const VLC_BINDINGS: VlcBinding[] = [
     combos: [{ key: "ArrowUp" }, {
       key: "ArrowUp",
       isCtrl: true
-    }]
+    }],
+    isRepeatable: true
   },
   {
     action: VlcAction.VolumeDown,
@@ -255,7 +266,8 @@ export const VLC_BINDINGS: VlcBinding[] = [
     combos: [{ key: "ArrowDown" }, {
       key: "ArrowDown",
       isCtrl: true
-    }]
+    }],
+    isRepeatable: true
   },
   {
     action: VlcAction.CycleAudioTrack,

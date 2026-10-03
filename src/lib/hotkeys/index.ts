@@ -44,7 +44,7 @@ function onKeyDown(e: KeyboardEvent) {
     e.preventDefault();
     swallow(e);
     runAction({
-      action: binding.action,
+      binding,
       player,
       isRepeat: e.repeat
     });

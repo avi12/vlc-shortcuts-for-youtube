@@ -16,14 +16,14 @@ import { resetSpeed, SpeedDirection, stepFineSpeed, stepPresetSpeed } from "@/li
 import { CycleDirection, cycleSubtitles } from "@/lib/hotkeys/actions/subtitles";
 import { stepVolume, toggleMute, VolumeDirection } from "@/lib/hotkeys/actions/volume";
 import type { YoutubePlayer } from "@/lib/player";
-import { JUMP_SECONDS_BY_ACTION, VlcAction } from "@/lib/vlc-keymap";
+import { JUMP_SECONDS_BY_ACTION, VlcAction, type VlcBinding } from "@/lib/vlc-keymap";
 
 type ActionHandler = (player: YoutubePlayer) => void;
 
 function createJumpHandler(action: VlcAction): ActionHandler {
   return player => jump({
     player,
-    seconds: JUMP_SECONDS_BY_ACTION[action] ?? 0
+    seconds: JUMP_SECONDS_BY_ACTION.get(action) ?? 0
   });
 }
 
@@ -98,34 +98,14 @@ const ACTION_HANDLERS: Record<VlcAction, ActionHandler> = {
 };
 
 // Held keys keep stepping like VLC; toggles fire once per press
-const REPEATABLE_ACTIONS: ReadonlySet<VlcAction> = new Set([
-  VlcAction.JumpBackwardExtraShort,
-  VlcAction.JumpForwardExtraShort,
-  VlcAction.JumpBackwardArrow,
-  VlcAction.JumpForwardArrow,
-  VlcAction.JumpBackwardShort,
-  VlcAction.JumpForwardShort,
-  VlcAction.JumpBackwardMedium,
-  VlcAction.JumpForwardMedium,
-  VlcAction.JumpBackwardLong,
-  VlcAction.JumpForwardLong,
-  VlcAction.NextFrame,
-  VlcAction.VolumeUp,
-  VlcAction.VolumeDown,
-  VlcAction.Faster,
-  VlcAction.Slower,
-  VlcAction.FasterFine,
-  VlcAction.SlowerFine
-]);
-
-export function runAction({ action, player, isRepeat }: {
-  action: VlcAction;
+export function runAction({ binding, player, isRepeat }: {
+  binding: VlcBinding;
   player: YoutubePlayer;
   isRepeat: boolean;
 }) {
-  if (isRepeat && !REPEATABLE_ACTIONS.has(action)) {
+  if (isRepeat && !binding.isRepeatable) {
     return;
   }
 
-  ACTION_HANDLERS[action](player);
+  ACTION_HANDLERS[binding.action](player);
 }
