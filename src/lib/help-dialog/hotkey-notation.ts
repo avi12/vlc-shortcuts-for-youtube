@@ -101,9 +101,9 @@ function matchCasing({ name, sample }: {
   return isUppercase ? name.toUpperCase() : name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 }
 
-export function learnNotation(youtubeRowBySignature: Map<string, { hotkey: string }>): HotkeyNotation {
-  const shiftedLetterSample = youtubeRowBySignature.get(SHIFTED_LETTER_SIGNATURE)?.hotkey;
-  const controlSample = youtubeRowBySignature.get(CONTROL_SIGNATURE)?.hotkey;
+export function learnNotation(youtubeRowsBySignature: Map<string, { hotkey: string }[]>): HotkeyNotation {
+  const shiftedLetterSample = youtubeRowsBySignature.get(SHIFTED_LETTER_SIGNATURE)?.[0]?.hotkey;
+  const controlSample = youtubeRowsBySignature.get(CONTROL_SIGNATURE)?.[0]?.hotkey;
   const shiftName = shiftedLetterSample?.normalize("NFKC").match(SHIFT_NAME_PATTERN)?.[1] ?? ENGLISH_NOTATION.shiftName;
   return {
     ...ENGLISH_NOTATION,

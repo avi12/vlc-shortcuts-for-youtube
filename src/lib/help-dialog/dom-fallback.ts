@@ -1,10 +1,10 @@
 import {
+  addYoutubeRow,
   buildGroups,
   createEmptyDialogText,
   findSectionByHotkeys,
   type HotkeyGroup
 } from "@/lib/help-dialog/hotkey-groups";
-import { toHotkeySignature } from "@/lib/help-dialog/hotkey-signature";
 
 const SECTION_SELECTOR = "ytd-hotkey-dialog-section-renderer";
 const SECTION_TITLE_SELECTOR = "#sub-title";
@@ -15,7 +15,7 @@ const FALLBACK_ATTRIBUTE = "data-vlc-hotkeys";
 const HIDDEN_BY_FALLBACK_ATTRIBUTE = "data-vlc-hidden";
 
 function readDomText(elDialog: Element) {
-  const dialogText = createEmptyDialogText();
+  const dialogText = createEmptyDialogText<never>();
   for (const elSection of elDialog.querySelectorAll(SECTION_SELECTOR)) {
     const hotkeys: string[] = [];
     for (const elOption of elSection.querySelectorAll(OPTION_SELECTOR)) {
@@ -26,9 +26,12 @@ function readDomText(elDialog: Element) {
       }
 
       hotkeys.push(hotkey);
-      dialogText.youtubeRowBySignature.set(toHotkeySignature(hotkey), {
-        label,
-        hotkey
+      addYoutubeRow({
+        dialogText,
+        row: {
+          label,
+          hotkey
+        }
       });
     }
     const section = findSectionByHotkeys(hotkeys);
@@ -42,7 +45,7 @@ function readDomText(elDialog: Element) {
   return dialogText;
 }
 
-function createGroupElement({ title, rows }: HotkeyGroup) {
+function createGroupElement({ title, rows }: HotkeyGroup<never>) {
   const elSection = document.createElement("section");
   const elTitle = document.createElement("h2");
   elTitle.textContent = title;

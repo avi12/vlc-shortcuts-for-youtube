@@ -10,27 +10,39 @@ import {
   YOUTUBE_SECTION_ANCHOR_KEYS
 } from "@/lib/youtube-keymap";
 
-interface HotkeyRow {
+// A row YouTube's own dialog lists carries YouTube's original entry, handed back untouched (badges included)
+interface HotkeyRow<TYoutubeOption> {
   label: string;
   hotkey: string;
+  youtubeOption?: TYoutubeOption;
 }
 
-export interface HotkeyGroup {
+export interface HotkeyGroup<TYoutubeOption> {
   title: string;
-  rows: HotkeyRow[];
+  rows: HotkeyRow<TYoutubeOption>[];
 }
 
-// The rows and titles YouTube's own dialog shows, already in the viewer's language
-interface YoutubeDialogText {
-  youtubeRowBySignature: Map<string, HotkeyRow>;
+// The rows and titles YouTube's own dialog shows, already in the viewer's language. One key can have several
+// rows, such as Ctrl+Right's chapter seek and Premium's "Jump ahead"
+interface YoutubeDialogText<TYoutubeOption> {
+  youtubeRowsBySignature: Map<string, HotkeyRow<TYoutubeOption>[]>;
   titleBySection: Map<KeymapSection, string>;
 }
 
-export function createEmptyDialogText(): YoutubeDialogText {
+export function createEmptyDialogText<TYoutubeOption>(): YoutubeDialogText<TYoutubeOption> {
   return {
-    youtubeRowBySignature: new Map(),
+    youtubeRowsBySignature: new Map(),
     titleBySection: new Map()
   };
+}
+
+export function addYoutubeRow<TYoutubeOption>({ dialogText, row }: {
+  dialogText: YoutubeDialogText<TYoutubeOption>;
+  row: HotkeyRow<TYoutubeOption>;
+}) {
+  const signature = toHotkeySignature(row.hotkey);
+  const rows = dialogText.youtubeRowsBySignature.get(signature) ?? [];
+  dialogText.youtubeRowsBySignature.set(signature, [...rows, row]);
 }
 
 export function findSectionByHotkeys(hotkeys: string[]) {
@@ -42,27 +54,27 @@ export function findSectionByHotkeys(hotkeys: string[]) {
 }
 
 // A VLC row that does exactly what a YouTube key does takes YouTube's own (localized) label for that key
-function findYoutubeLabel({ binding, youtubeRowBySignature }: {
+function findYoutubeLabel({ binding, youtubeRowsBySignature }: {
   binding: VlcBinding;
-  youtubeRowBySignature: Map<string, HotkeyRow>;
+  youtubeRowsBySignature: Map<string, HotkeyRow<unknown>[]>;
 }) {
   if (!binding.youtubeEquivalent) {
     return;
   }
 
-  return youtubeRowBySignature.get(toHotkeySignature(formatYoutubeHotkey(binding.youtubeEquivalent)))?.label;
+  return youtubeRowsBySignature.get(toHotkeySignature(formatYoutubeHotkey(binding.youtubeEquivalent)))?.[0]?.label;
 }
 
-function buildRows({ section, youtubeRowBySignature }: {
+function buildRows<TYoutubeOption>({ section, youtubeRowsBySignature }: {
   section: KeymapSection;
-  youtubeRowBySignature: Map<string, HotkeyRow>;
-}) {
-  const notation = learnNotation(youtubeRowBySignature);
+  youtubeRowsBySignature: Map<string, HotkeyRow<TYoutubeOption>[]>;
+}): HotkeyRow<TYoutubeOption>[] {
+  const notation = learnNotation(youtubeRowsBySignature);
   const vlcRows = VLC_BINDINGS.filter(binding => binding.section === section).map(binding => ({
     rank: getDialogRowRank(binding.action),
     label: findYoutubeLabel({
       binding,
-      youtubeRowBySignature
+      youtubeRowsBySignature
     }) ?? binding.label,
     hotkey: formatDialogCombos({
       combos: binding.combos,
@@ -80,27 +92,25 @@ function buildRows({ section, youtubeRowBySignature }: {
   const youtubeRows = Object.values(YOUTUBE_NATIVE_SHORTCUTS)
     .filter(shortcut => shortcut.section === section)
     .flatMap(shortcut => {
-      const row = youtubeRowBySignature.get(toHotkeySignature(formatYoutubeShortcut(shortcut)));
-      return row ? [{
+      const rows = youtubeRowsBySignature.get(toHotkeySignature(formatYoutubeShortcut(shortcut))) ?? [];
+      return rows.map(row => ({
         ...row,
         rank: getDialogRowRank(shortcut)
-      }] : [];
+      }));
     });
   return [...vlcRows, ...wheelRows, ...youtubeRows]
     .toSorted((first, second) => first.rank - second.rank)
-    .map(({ label, hotkey }) => ({
-      label,
-      hotkey
-    }));
+    .map(({ rank: _rank, ...row }) => row);
 }
 
 // Section titles, YouTube-only rows and the way keys are written all follow YouTube's own (localized) dialog
-export function buildGroups({ youtubeRowBySignature, titleBySection }: YoutubeDialogText): HotkeyGroup[] {
+export function buildGroups<TYoutubeOption>(dialogText: YoutubeDialogText<TYoutubeOption>) {
+  const { youtubeRowsBySignature, titleBySection } = dialogText;
   return Object.values(KeymapSection).map(section => ({
     title: titleBySection.get(section) ?? section,
     rows: buildRows({
       section,
-      youtubeRowBySignature
+      youtubeRowsBySignature
     })
   }));
 }

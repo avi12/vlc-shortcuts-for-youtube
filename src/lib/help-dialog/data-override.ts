@@ -1,11 +1,11 @@
 import { applyOverride, createOverrideRecords, type OverrideSlot, restoreOverride } from "@/lib/dom-overrides";
 import {
+  addYoutubeRow,
   buildGroups,
   createEmptyDialogText,
   findSectionByHotkeys,
   type HotkeyGroup
 } from "@/lib/help-dialog/hotkey-groups";
-import { toHotkeySignature } from "@/lib/help-dialog/hotkey-signature";
 import { z } from "@/lib/zod";
 
 const DATA_PROPERTY = "data";
@@ -35,6 +35,7 @@ const DIALOG_DATA_SCHEMA = z.looseObject({
 });
 
 type HotkeySection = z.infer<typeof SECTION_SCHEMA>;
+type HotkeyOption = z.infer<typeof OPTION_SCHEMA>;
 
 type RendererDialog = Element & Record<typeof DATA_PROPERTY, unknown>;
 
@@ -65,36 +66,47 @@ function appendTitleSuffix(title: unknown) {
   };
 }
 
-function toSection({ title, rows }: HotkeyGroup): HotkeySection {
+// YouTube's own rows go back exactly as YouTube sent them; only VLC's rows are built
+function toOption({ label, hotkey, youtubeOption }: HotkeyGroup<HotkeyOption>["rows"][number]): HotkeyOption {
+  return youtubeOption ?? {
+    hotkeyDialogSectionOptionRenderer: {
+      label: createText(label),
+      hotkey
+    }
+  };
+}
+
+function toSection({ title, rows }: HotkeyGroup<HotkeyOption>): HotkeySection {
   return {
     hotkeyDialogSectionRenderer: {
       title: createText(title),
-      options: rows.map(row => ({
-        hotkeyDialogSectionOptionRenderer: {
-          label: createText(row.label),
-          hotkey: row.hotkey
-        }
-      }))
+      options: rows.map(toOption)
     }
   };
 }
 
 function readDataText(sections: HotkeySection[]) {
-  const dialogText = createEmptyDialogText();
+  const dialogText = createEmptyDialogText<HotkeyOption>();
   for (const { hotkeyDialogSectionRenderer: youtubeSection } of sections) {
-    const options = youtubeSection.options.map(option => option.hotkeyDialogSectionOptionRenderer);
-    for (const option of options) {
-      const label = readText(option.label);
-      if (!label) {
+    const hotkeys: string[] = [];
+    for (const youtubeOption of youtubeSection.options) {
+      const { label, hotkey } = youtubeOption.hotkeyDialogSectionOptionRenderer;
+      const labelText = readText(label);
+      if (!labelText) {
         continue;
       }
 
-      dialogText.youtubeRowBySignature.set(toHotkeySignature(option.hotkey), {
-        label,
-        hotkey: option.hotkey
+      hotkeys.push(hotkey);
+      addYoutubeRow({
+        dialogText,
+        row: {
+          label: labelText,
+          hotkey,
+          youtubeOption
+        }
       });
     }
-    const section = findSectionByHotkeys(options.map(option => option.hotkey));
+    const section = findSectionByHotkeys(hotkeys);
     const title = readText(youtubeSection.title);
     if (!section || !title) {
       continue;
