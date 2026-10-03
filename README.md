@@ -5,7 +5,7 @@ A browser extension that gives YouTube's player VLC's keyboard shortcuts. YouTub
 feedback.  
 Click the toolbar icon to turn it off and on (it's on by default).
 
-Works on the watch page, Shorts and embedded players.
+Works on the watch page, Shorts, embedded players and YouTube Music.
 
 [![Chrome Web Store users](https://img.shields.io/chrome-web-store/users/ccfncalinmelfdbodiediojhddcljnpl?color=white&label=Chrome&style=flat-square&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ccfncalinmelfdbodiediojhddcljnpl)  
 [![Firefox Add-on users](https://img.shields.io/amo/users/vlc-controls-in-youtube@avi12.com?color=white&label=Firefox&style=flat-square&logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/firefox/addon/vlc-controls-in-youtube@avi12.com)
@@ -69,6 +69,21 @@ YouTube keeps its own keys for what VLC doesn't have: <kbd>T</kbd> theater mode,
 percentage, <kbd>,</kbd> previous frame, <kbd>Ctrl</kbd> + <kbd>←</kbd>/<kbd>→</kbd> previous/next chapter and
 <kbd>Esc</kbd> to close the miniplayer.
 
+### YouTube Music
+
+The same keys work on YouTube Music, riding Music's own keys, with a few differences:
+
+|                                    Key | Action                                     |
+|---------------------------------------:|--------------------------------------------|
+|                           <kbd>L</kbd> | Cycle repeat (off, all, one)               |
+|                           <kbd>R</kbd> | Shuffle the queue                          |
+|                           <kbd>+</kbd> | Like, as on Music (use <kbd>]</kbd> to speed up) |
+|          <kbd>Shift</kbd> + <kbd>-</kbd> | Dislike, as on Music                       |
+|                           <kbd>Q</kbd> | Show/hide the queue, as on Music           |
+
+Music has no miniplayer or 360° videos, and keeps its own <kbd>G</kbd> navigation keys (<kbd>G</kbd> then
+<kbd>L</kbd> opens the library).
+
 ## Requirements for setting up
 
 Install [Node.js](https://nodejs.org) 22+ and [pnpm](https://pnpm.io/installation)
@@ -81,8 +96,8 @@ pnpm i
 
 ## Start the dev server & run in a test browser
 
-Each command builds the extension, loads it into a separate copy of your browser profile and reloads it (and the open
-YouTube tabs) on every change.
+Each command builds the extension, loads it into a separate copy of your browser profile and reloads it on every change,
+swapping the new code into the open YouTube tabs without reloading them.
 
 ### Chrome
 
