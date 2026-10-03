@@ -71,13 +71,10 @@ function buildRows({ section, youtubeRowBySignature }: {
     label: shortcut.label,
     hotkey: shortcut.hotkey
   }));
-  const youtubeRows = YOUTUBE_NATIVE_SHORTCUTS.filter(shortcut => shortcut.section === section).map(shortcut => {
-    const englishHotkey = formatYoutubeShortcut(shortcut);
-    return youtubeRowBySignature.get(toHotkeySignature(englishHotkey)) ?? {
-      label: shortcut.label,
-      hotkey: englishHotkey
-    };
-  });
+  const youtubeRows = Object.values(YOUTUBE_NATIVE_SHORTCUTS)
+    .filter(shortcut => shortcut.section === section)
+    .map(shortcut => youtubeRowBySignature.get(toHotkeySignature(formatYoutubeShortcut(shortcut))))
+    .filter(row => row !== undefined);
   return [...vlcRows, ...wheelRows, ...youtubeRows];
 }
 

@@ -9,8 +9,7 @@ import {
 
 interface YoutubeShortcut {
   section: KeymapSection;
-  label: string;
-  combos: KeyCombo[];
+  combos: readonly KeyCombo[];
   hotkeyLabel?: string;
 }
 
@@ -27,56 +26,39 @@ export const YOUTUBE_CHAPTER_COMBOS = {
 
 const DIGIT_COMBOS = Array.from({ length: 10 }, (_, digit) => ({ key: String(digit) }));
 
-// Controls only YouTube's player has - VLC has no equivalent, so YouTube keeps handling its own keys.
-// Labels are YouTube's English wording, used only when YouTube's own (localized) row is missing
-export const YOUTUBE_NATIVE_SHORTCUTS: YoutubeShortcut[] = [
-  {
+// Controls only YouTube's player has - VLC has no equivalent, so YouTube keeps handling its own keys. The help
+// dialog lists one only where YouTube's own dialog does, in YouTube's (localized) wording
+export const YOUTUBE_NATIVE_SHORTCUTS = {
+  theaterMode: {
     section: KeymapSection.General,
-    label: "Toggle theater mode",
     combos: [{ key: "t" }]
   },
-  {
+  miniplayer: {
     section: KeymapSection.General,
-    label: "Toggle miniplayer",
     combos: [{ key: "i" }]
   },
-  {
+  closeMiniplayerOrDialog: {
+    section: KeymapSection.General,
+    combos: [{ key: "Escape" }]
+  },
+  previousFrame: {
     section: KeymapSection.Playback,
-    label: "Previous frame (while paused)",
     combos: [{ key: "," }]
   },
-  {
+  seekToPercentage: {
     section: KeymapSection.Playback,
-    label: "Seek to specific point in the video (7 advances to 70% of duration)",
     combos: DIGIT_COMBOS,
     hotkeyLabel: "0..9"
   },
-  {
+  previousChapter: {
     section: KeymapSection.Playback,
-    label: "Seek to previous chapter",
     combos: [YOUTUBE_CHAPTER_COMBOS.previous]
   },
-  {
+  nextChapter: {
     section: KeymapSection.Playback,
-    label: "Seek to next chapter",
     combos: [YOUTUBE_CHAPTER_COMBOS.next]
-  },
-  {
-    section: KeymapSection.Playback,
-    label: "Seek to the beginning",
-    combos: [{ key: "Home" }]
-  },
-  {
-    section: KeymapSection.Playback,
-    label: "Seek to the end",
-    combos: [{ key: "End" }]
-  },
-  {
-    section: KeymapSection.General,
-    label: "Close miniplayer or current dialog",
-    combos: [{ key: "Escape" }]
   }
-];
+} as const satisfies Record<string, YoutubeShortcut>;
 
 export interface YoutubeHotkey {
   key: string;

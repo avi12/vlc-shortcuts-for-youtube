@@ -94,7 +94,7 @@ function formatCombo({ combo, style }: {
 }
 
 export function formatCombos({ combos, style }: {
-  combos: KeyCombo[];
+  combos: readonly KeyCombo[];
   style: ShortcutStyle;
 }) {
   return combos.map(combo => formatCombo({
