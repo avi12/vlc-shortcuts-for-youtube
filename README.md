@@ -68,8 +68,7 @@ percentage, <kbd>,</kbd> previous frame, <kbd>Ctrl</kbd> + <kbd>‚Üê</kbd>/<kbd>‚
 
 ## Requirements for setting up
 
-Install [Node.js](https://nodejs.org) 22+ and [pnpm](https://pnpm.io/installation) (the exact version is pinned in
-`package.json`'s `packageManager` field, run `corepack enable` to use it)
+Install [Node.js](https://nodejs.org) 22+ and [pnpm](https://pnpm.io/installation)
 
 ## Install dependencies
 

@@ -20,7 +20,7 @@ ${EXTENSION_NAME} is built with the WXT framework (https://wxt.dev).
 
 ## Requirements
 - Node.js 22 or newer
-- pnpm (the exact version is pinned in package.json "packageManager"; run \`corepack enable\` to use it)
+- pnpm (https://pnpm.io/installation)
 
 ## Steps
 1. Extract this source archive
