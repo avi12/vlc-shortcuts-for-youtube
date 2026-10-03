@@ -2,24 +2,47 @@ import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import type { YoutubePlayer } from "@/lib/player";
 import { YOUTUBE_HOTKEYS, YOUTUBE_SEEK_SECONDS } from "@/lib/youtube-keymap";
 
-const SEEK_OVERLAY_DURATION_SELECTOR = ".ytp-seek-overlay-duration";
+// YouTube keeps both direction overlays laid out and fades the idle one to opacity 0
+enum SeekOverlayDurationSelector {
+  Forward = ".ytp-seek-overlay-animation-forward .ytp-seek-overlay-duration",
+  Backward = ".ytp-seek-overlay-animation-back .ytp-seek-overlay-duration"
+}
+
 const SIGNED_SECONDS_PATTERN = /^([+−-])\s*(\d+)$/;
 const MINUS_SIGN = "−";
 
 let pendingCorrectionSeconds = 0;
 
-function findVisibleOverlayDuration(player: YoutubePlayer) {
-  for (const elDuration of player.querySelectorAll(SEEK_OVERLAY_DURATION_SELECTOR)) {
-    const isShowingSeconds = elDuration.checkVisibility() && SIGNED_SECONDS_PATTERN.test(elDuration.textContent.trim());
-    if (isShowingSeconds) {
-      return elDuration;
-    }
-  }
-  return null;
+function findOverlayDuration({ player, isForward }: {
+  player: YoutubePlayer;
+  isForward: boolean;
+}) {
+  return player.querySelector(isForward ? SeekOverlayDurationSelector.Forward : SeekOverlayDurationSelector.Backward);
 }
 
-function correctOverlayText(player: YoutubePlayer) {
-  const elDuration = findVisibleOverlayDuration(player);
+function isOverlayShowing({ player, isForward }: {
+  player: YoutubePlayer;
+  isForward: boolean;
+}) {
+  const elDuration = findOverlayDuration({
+    player,
+    isForward
+  });
+  return elDuration !== null
+    && elDuration.checkVisibility({
+      opacityProperty: true
+    })
+    && SIGNED_SECONDS_PATTERN.test(elDuration.textContent.trim());
+}
+
+function correctOverlayText({ player, isForward }: {
+  player: YoutubePlayer;
+  isForward: boolean;
+}) {
+  const elDuration = findOverlayDuration({
+    player,
+    isForward
+  });
   const match = elDuration?.textContent.trim().match(SIGNED_SECONDS_PATTERN);
   if (!elDuration || !match) {
     return;
@@ -57,7 +80,11 @@ export function seekNatively({ player, seconds }: {
   player: YoutubePlayer;
   seconds: number;
 }) {
-  const isBurstStart = findVisibleOverlayDuration(player) === null;
+  const isForward = seconds > 0;
+  const isBurstStart = !isOverlayShowing({
+    player,
+    isForward
+  });
   if (isBurstStart) {
     pendingCorrectionSeconds = 0;
   }
@@ -76,6 +103,9 @@ export function seekNatively({ player, seconds }: {
   }
 
   if (pendingCorrectionSeconds !== 0) {
-    requestAnimationFrame(() => correctOverlayText(player));
+    requestAnimationFrame(() => correctOverlayText({
+      player,
+      isForward
+    }));
   }
 }
