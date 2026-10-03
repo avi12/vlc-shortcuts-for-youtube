@@ -1,18 +1,13 @@
 import type { YoutubePlayer } from "@/lib/player";
 import { z } from "@/lib/zod";
 
-const audioTrackLabelSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().optional(),
-  displayName: z.string().optional(),
-  audioTrack: z.object({ displayName: z.string().optional() }).optional()
-});
+const AUDIO_TRACK_SCHEMA = z.looseObject({ id: z.string() });
 
 const MULTIPLE_TRACKS_MIN = 2;
 
-function parseTrackLabel(track: unknown) {
-  const parsed = audioTrackLabelSchema.safeParse(track);
-  return parsed.success ? parsed.data : {};
+function readTrackId(track: unknown) {
+  const parsed = AUDIO_TRACK_SCHEMA.safeParse(track);
+  return parsed.success ? parsed.data.id : undefined;
 }
 
 function isSameTrack({ track, activeTrack }: {
@@ -23,8 +18,8 @@ function isSameTrack({ track, activeTrack }: {
     return true;
   }
 
-  const trackId = parseTrackLabel(track).id;
-  return trackId !== undefined && trackId === parseTrackLabel(activeTrack).id;
+  const trackId = readTrackId(track);
+  return trackId !== undefined && trackId === readTrackId(activeTrack);
 }
 
 export function cycleAudioTrack(player: YoutubePlayer) {
