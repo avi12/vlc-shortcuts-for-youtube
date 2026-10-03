@@ -7,7 +7,8 @@ Click the toolbar icon to turn it off and on (it's on by default).
 
 Works on the watch page, Shorts and embedded players.
 
-[![Chrome Web Store users](https://img.shields.io/chrome-web-store/users/ccfncalinmelfdbodiediojhddcljnpl?color=white&label=Chrome%20users&style=flat-square&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ccfncalinmelfdbodiediojhddcljnpl)
+[![Chrome Web Store users](https://img.shields.io/chrome-web-store/users/ccfncalinmelfdbodiediojhddcljnpl?color=white&label=Chrome%20users&style=flat-square&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ccfncalinmelfdbodiediojhddcljnpl)  
+[![Firefox Add-on users](https://img.shields.io/amo/users/vlc-controls-in-youtube@avi12.com?color=white&label=Firefox%20users&style=flat-square&logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/firefox/addon/vlc-controls-in-youtube@avi12.com)
 
 Made by [Avi](https://avi12.com)
 
