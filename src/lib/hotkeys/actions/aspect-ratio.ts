@@ -1,8 +1,9 @@
 import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
-import { getVideo, isMainVideo, type YoutubePlayer } from "@/lib/player";
+import { getVideo, isMainVideo, isSphericalVideo, type YoutubePlayer } from "@/lib/player";
 
 const ASPECT_RATIO_CLASS = "vlc-controls-aspect-ratio";
 const ASPECT_RATIO_STATUS_PREFIX = "Aspect ratio: ";
+const SPHERICAL_UNAVAILABLE_LABEL = "not available on 360° videos";
 
 enum VideoBoxProperty {
   Top = "--vlc-controls-video-top",
@@ -102,7 +103,17 @@ export function resetAspectRatio() {
   }
 }
 
+// YouTube draws a 360° video onto its own canvas with no setting for the view's shape, so there the aspect ratio
+// is left alone rather than stretching the view
 export function cycleAspectRatio(player: YoutubePlayer) {
+  if (isSphericalVideo(player)) {
+    showStatusInNativeBezel({
+      player,
+      text: `${ASPECT_RATIO_STATUS_PREFIX}${SPHERICAL_UNAVAILABLE_LABEL}`
+    });
+    return;
+  }
+
   const iNext = (iAspectRatio + 1) % ASPECT_RATIOS.length;
   const { label, ratio } = ASPECT_RATIOS[iNext];
   resetAspectRatio();
