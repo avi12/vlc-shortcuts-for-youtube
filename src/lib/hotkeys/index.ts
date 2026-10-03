@@ -9,7 +9,8 @@ import { getPlayer, isShortsPlayer } from "@/lib/player";
 import { findBinding } from "@/lib/vlc-keymap";
 import { isReplacedYoutubeKey, isShortsNavigationKey } from "@/lib/youtube-keymap";
 
-// Swallowed on keydown, so the matching keypress/keyup never reach YouTube either
+// Swallowed on keydown, so the matching keypress/keyup never reach YouTube either. Each keydown decides afresh,
+// since a keyup can be lost (Ctrl+H opening the history tab) and the key may next be typed into a text box
 const swallowedKeyCodes = new Set<string>();
 
 function swallow(e: KeyboardEvent) {
@@ -34,6 +35,7 @@ function onKeyDown(e: KeyboardEvent) {
     return;
   }
 
+  swallowedKeyCodes.delete(e.code);
   const player = getTargetPlayer(e);
   const isShortsNavigation = player !== null && isShortsPlayer(player) && isShortsNavigationKey(e);
   if (!player || isShortsNavigation) {
