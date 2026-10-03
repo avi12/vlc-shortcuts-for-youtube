@@ -1,4 +1,5 @@
 import { installHotkeys } from "@/lib/hotkeys";
+import { installTooltipOverrides } from "@/lib/tooltips";
 import { defineContentScript } from "#imports";
 
 export default defineContentScript({
@@ -8,5 +9,6 @@ export default defineContentScript({
   allFrames: true,
   main() {
     installHotkeys();
+    installTooltipOverrides();
   }
 });
