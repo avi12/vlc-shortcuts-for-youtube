@@ -12,7 +12,7 @@ const CHROMIUM_MIN_VERSION = "111";
 const url = packageJson.repository;
 const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;
 
-// Firefox and Opera reviewers rebuild from the source zip, so it ships build (not install) instructions
+// Firefox reviewers rebuild from the source zip, so it ships build (not install) instructions
 function renderBuildInstructions(browser: string) {
   return `# Build instructions
 
@@ -32,6 +32,8 @@ The unpacked build is written to build/${browser}-mv3-production/
 }
 
 const BROWSERS_REQUIRING_SOURCES = new Set(["firefox", "opera"]);
+// The repo is open source, so only AMO's reviewers, who rebuild from the archive itself, get build instructions in it
+const BROWSERS_REQUIRING_BUILD_README = new Set(["firefox"]);
 
 async function addReadmeToSourcesZip({ zipPath, instructions }: {
   zipPath: string;
@@ -120,6 +122,10 @@ export default defineConfig({
       }
     },
     async "zip:sources:done"(wxt, sourcesZipPath) {
+      if (!BROWSERS_REQUIRING_BUILD_README.has(wxt.config.browser)) {
+        return;
+      }
+
       await addReadmeToSourcesZip({
         zipPath: sourcesZipPath,
         instructions: renderBuildInstructions(wxt.config.browser)
