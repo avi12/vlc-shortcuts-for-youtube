@@ -1,5 +1,6 @@
 import { formatDialogCombos, learnNotation } from "@/lib/help-dialog/hotkey-notation";
 import { toHotkeySignature } from "@/lib/help-dialog/hotkey-signature";
+import { getDialogRowRank } from "@/lib/help-dialog/row-order";
 import { KeymapSection } from "@/lib/shortcut";
 import { VLC_BINDINGS, VLC_WHEEL_SHORTCUTS, type VlcBinding } from "@/lib/vlc-keymap";
 import {
@@ -58,6 +59,7 @@ function buildRows({ section, youtubeRowBySignature }: {
 }) {
   const notation = learnNotation(youtubeRowBySignature);
   const vlcRows = VLC_BINDINGS.filter(binding => binding.section === section).map(binding => ({
+    rank: getDialogRowRank(binding.action),
     label: findYoutubeLabel({
       binding,
       youtubeRowBySignature
@@ -68,6 +70,7 @@ function buildRows({ section, youtubeRowBySignature }: {
     })
   }));
   const wheelRows = VLC_WHEEL_SHORTCUTS.filter(shortcut => shortcut.section === section).map(shortcut => ({
+    rank: getDialogRowRank(shortcut),
     label: shortcut.label,
     hotkey: formatDialogCombos({
       combos: shortcut.combos,
@@ -76,9 +79,19 @@ function buildRows({ section, youtubeRowBySignature }: {
   }));
   const youtubeRows = Object.values(YOUTUBE_NATIVE_SHORTCUTS)
     .filter(shortcut => shortcut.section === section)
-    .map(shortcut => youtubeRowBySignature.get(toHotkeySignature(formatYoutubeShortcut(shortcut))))
-    .filter(row => row !== undefined);
-  return [...vlcRows, ...wheelRows, ...youtubeRows];
+    .flatMap(shortcut => {
+      const row = youtubeRowBySignature.get(toHotkeySignature(formatYoutubeShortcut(shortcut)));
+      return row ? [{
+        ...row,
+        rank: getDialogRowRank(shortcut)
+      }] : [];
+    });
+  return [...vlcRows, ...wheelRows, ...youtubeRows]
+    .toSorted((first, second) => first.rank - second.rank)
+    .map(({ label, hotkey }) => ({
+      label,
+      hotkey
+    }));
 }
 
 // Section titles, YouTube-only rows and the way keys are written all follow YouTube's own (localized) dialog
