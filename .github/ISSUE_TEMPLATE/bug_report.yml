@@ -1,0 +1,80 @@
+name: Bug report
+description: File a bug report
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is
+      placeholder: E.g. "Shift + Right doesn't jump forward 3 seconds"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to reproduce
+      placeholder: Include the video URL and a screen recording, if possible
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      placeholder: E.g. the video should jump forward 3 seconds, like in VLC
+    validations:
+      required: true
+  - type: dropdown
+    id: players
+    attributes:
+      label: Which player(s) can you reproduce the issue on?
+      multiple: true
+      options:
+      - Watch page
+      - Shorts
+      - Embedded player
+      - Miniplayer
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browser(s) can you reproduce the issue on?
+      multiple: true
+      options:
+      - Chrome
+      - Firefox
+      - Opera
+      - Vivaldi
+      - Brave
+    validations:
+      required: true
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: What OS does it occur on?
+      options:
+      - Windows
+      - macOS
+      - Linux
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: What's the extension version you're running?
+      description: Go to the extensions page and copy the version number
+    validations:
+      required: true
+  - type: checkboxes
+    id: reported
+    attributes:
+      label: Make sure the bug wasn't reported before
+      options:
+        - label: I'm the first one to [report](https://github.com/avi12/vlc-controls-in-youtube/issues?q=is%3Aissue) it
+          required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context

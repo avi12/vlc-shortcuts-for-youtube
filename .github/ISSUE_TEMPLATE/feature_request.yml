@@ -1,0 +1,15 @@
+name: Feature request
+description: Suggest a new idea for the extension
+title: "[Feature request] "
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: Is your feature request related to a problem? Please describe
+  - type: textarea
+    attributes:
+      label: Which VLC shortcut or behavior is it about?
+      placeholder: E.g. "VLC's E key steps one frame forward"
+  - type: textarea
+    attributes:
+      label: Additional context
