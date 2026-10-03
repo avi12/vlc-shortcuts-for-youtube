@@ -1,6 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 128 128">
-  <path d="M56 10h16l30 92H26z" fill="#ff8a00"/>
-  <path d="M51.4 24h25.2l3.6 11H47.8z" fill="#ffffff"/>
-  <path d="M54 52v38l30-19z" fill="#ffffff"/>
-  <rect x="10" y="100" width="108" height="16" rx="4" fill="#e06a00"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="cone-shading" x1="44" y1="0" x2="84" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffb02e"/>
+      <stop offset="1" stop-color="#f07800"/>
+    </linearGradient>
+    <path id="cone" d="M60 38Q64 33 68 38L84 80Q64 86 44 80Z"/>
+    <rect id="cone-base" x="38" y="80" width="52" height="12" rx="4"/>
+  </defs>
+  <path transform="translate(4 22) scale(4.2)" fill="#ff0033" d="M27.9727 3.12324C27.6435 1.89323 26.6768 0.926623 25.4468 0.597366C23.2197 0 14.285 0 14.285 0C14.285 0 5.35042 0 3.12323 0.597366C1.89323 0.926623 0.926623 1.89323 0.597366 3.12324C0 5.35042 0 10 0 10C0 10 0 14.6496 0.597366 16.8768C0.926623 18.1068 1.89323 19.0734 3.12323 19.4026C5.35042 20 14.285 20 14.285 20C14.285 20 23.2197 20 25.4468 19.4026C26.6768 19.0734 27.6435 18.1068 27.9727 16.8768C28.5701 14.6496 28.5701 10 28.5701 10C28.5701 10 28.5677 5.35042 27.9727 3.12324Z"/>
+  <g transform="translate(64 64) scale(0.6154) translate(-64 -62.75)">
+    <g fill="#ffffff" stroke="#ffffff" stroke-width="6" stroke-linejoin="round">
+      <use xlink:href="#cone"/>
+      <use xlink:href="#cone-base"/>
+    </g>
+    <use xlink:href="#cone-base" fill="#d96500"/>
+    <use xlink:href="#cone" fill="url(#cone-shading)"/>
+    <g fill="#ffffff">
+      <path d="M56.2 48Q64 50.5 71.8 48L74.86 56Q64 59.5 53.14 56Z"/>
+      <path d="M50.1 64Q64 67.5 77.9 64L80.95 72Q64 76.5 47.05 72Z"/>
+    </g>
+  </g>
 </svg>
