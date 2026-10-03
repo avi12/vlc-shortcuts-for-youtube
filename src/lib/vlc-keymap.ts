@@ -212,7 +212,7 @@ export const VLC_BINDINGS: VlcBinding[] = [
     action: VlcAction.Slower,
     section: KeymapSection.Playback,
     label: "Slower",
-    combos: [{ key: "[" }],
+    combos: [{ key: "-" }],
     isRepeatable: true,
     youtubeEquivalent: YOUTUBE_HOTKEYS.slower
   },
@@ -220,7 +220,7 @@ export const VLC_BINDINGS: VlcBinding[] = [
     action: VlcAction.Faster,
     section: KeymapSection.Playback,
     label: "Faster",
-    combos: [{ key: "]" }],
+    combos: [{ key: "+" }],
     isRepeatable: true,
     youtubeEquivalent: YOUTUBE_HOTKEYS.faster
   },
@@ -228,14 +228,14 @@ export const VLC_BINDINGS: VlcBinding[] = [
     action: VlcAction.SlowerFine,
     section: KeymapSection.Playback,
     label: "Slower (fine)",
-    combos: [{ key: "-" }],
+    combos: [{ key: "[" }],
     isRepeatable: true
   },
   {
     action: VlcAction.FasterFine,
     section: KeymapSection.Playback,
     label: "Faster (fine)",
-    combos: [{ key: "+" }],
+    combos: [{ key: "]" }],
     isRepeatable: true
   },
   {
