@@ -7,6 +7,8 @@ Click the toolbar icon to turn it off and on (it's on by default).
 
 Works on the watch page, Shorts and embedded players.
 
+[![Chrome Web Store users](https://img.shields.io/chrome-web-store/users/ccfncalinmelfdbodiediojhddcljnpl?color=white&label=Chrome%20users&style=flat-square&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ccfncalinmelfdbodiediojhddcljnpl)
+
 Made by [Avi](https://avi12.com)
 
 Powered by [WXT](https://github.com/wxt-dev/wxt)
