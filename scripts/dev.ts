@@ -1,7 +1,8 @@
 /**
  * Dev-server entry, ported from youtube-time-manager's extension dev server: builds the WXT development
  * bundle (with inline source maps), sideloads it into an isolated clone of the real browser profile, and on
- * every change under src/ rebuilds and reloads the extension and/or the open YouTube tabs.
+ * every change under src/ rebuilds, reloads the extension and injects it into the open YouTube tabs, which never
+ * reload.
  *
  * Usage:
  *   tsx scripts/dev.ts                            - Chrome

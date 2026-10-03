@@ -40,7 +40,6 @@ import { build } from "wxt";
 export const PROJECT_ROOT = resolve(import.meta.dirname, "..");
 export const USER_PROFILES_DIR = resolve(PROJECT_ROOT, "user-profiles");
 export const START_URL = "https://www.youtube.com/watch?v=aqz-KE-bpKQ";
-export const YOUTUBE_HOST = "youtube.com";
 const { LANG = "en" } = process.env;
 export const LANG_ARGS = LANG === "en" ? [] : [`--lang=${LANG}`];
 const REBUILD_DEBOUNCE_MS = 800;
@@ -185,9 +184,41 @@ export function cloneFile({ source, destination }: {
   }
 }
 
-function sleep(durationMs: number) {
+export function sleep(durationMs: number) {
   return new Promise(resolvePromise => setTimeout(resolvePromise, durationMs));
 }
+
+// Evaluated in the reloaded extension's background: injects its manifest's content scripts (and their CSS) into
+// every open tab they match, as the browser would on load. Each new MAIN-world copy retires the one already running
+// (see src/entrypoints/vlc-controls.content.ts), so the tab keeps playing - reloading it would bring up YouTube
+// Music's "Leave site?" prompt, which only a click can answer. Tab URLs are hidden without the tabs permission, so
+// every tab is tried and the browser refuses the ones outside the content scripts' matches. Chrome holds an
+// injection into a hidden tab until the tab is shown, so only the visible tabs are waited on. Resolves to how many
+// visible tabs were refreshed
+export const INJECT_CONTENT_SCRIPTS_EXPRESSION = `(async () => {
+  const api = globalThis.browser ?? globalThis.chrome;
+  const contentScripts = api.runtime.getManifest().content_scripts ?? [];
+  async function inject(tabId) {
+    for (const { js = [], css = [], world = "ISOLATED", all_frames: allFrames } of contentScripts) {
+      const target = { tabId, allFrames };
+      if (css.length > 0) {
+        await api.scripting.insertCSS({ target, files: css });
+      }
+      await api.scripting.executeScript({ target, files: js, world, injectImmediately: true });
+    }
+  }
+  const visibleInjections = [];
+  for (const { id, active } of await api.tabs.query({})) {
+    const injection = inject(id);
+    if (active) {
+      visibleInjections.push(injection);
+    } else {
+      injection.catch(() => {});
+    }
+  }
+  const results = await Promise.allSettled(visibleInjections);
+  return results.filter(({ status }) => status === "fulfilled").length;
+})()`;
 
 // ── Build ────────────────────────────────────────────────────────────────────
 
@@ -275,8 +306,8 @@ export interface LaunchedBrowser {
   debugPort: number;
 }
 
-// What each browser supplies to runDevServer: its isolated profile, how it launches, how to reload the open
-// YouTube tabs (CDP on Chromium, RDP on Firefox), and optionally how to tell it is still running
+// What each browser supplies to runDevServer: its isolated profile, how it launches, how to refresh the content
+// scripts in the open YouTube tabs (CDP on Chromium, RDP on Firefox), and optionally how to tell it is still running
 export interface BrowserTarget {
   name: string;
   wxtBrowser: "chrome" | "firefox" | "opera";
@@ -286,7 +317,7 @@ export interface BrowserTarget {
   prepare?: () => void;
   setupProfile: () => string;
   launch: (profileDirectory: string) => Promise<LaunchedBrowser>;
-  reloadYoutubeTabs: (debugPort: number) => Promise<void>;
+  injectIntoYoutubeTabs: (debugPort: number) => Promise<void>;
   // web-ext's own "browser closed" callback is unreliable for Firefox on Windows, so a target can supply a
   // probe; the dev server shuts down once it keeps failing
   isBrowserAlive?: (debugPort: number) => Promise<boolean>;
@@ -294,15 +325,15 @@ export interface BrowserTarget {
 
 // Chrome caches content scripts when the extension loads, so even a MAIN-world change needs an extension reload,
 // and that reload orphans the scripts already running in open tabs (neither browser re-injects them), so the
-// tabs reload right after it
+// rebuilt scripts are injected into the tabs right after it
 async function reloadExtensionAndTabs({ target, browser, startedAt }: {
   target: BrowserTarget;
   browser: LaunchedBrowser;
   startedAt: number;
 }) {
   await browser.runner.reloadAllExtensions();
-  await target.reloadYoutubeTabs(browser.debugPort);
-  logEvent(`Reloaded the extension and the YouTube tabs (${msSince(startedAt)})`);
+  await target.injectIntoYoutubeTabs(browser.debugPort);
+  logEvent(`Reloaded the extension and injected it into the YouTube tabs (${msSince(startedAt)})`);
 }
 
 // web-ext-run's info logs are noise; surface warnings and up

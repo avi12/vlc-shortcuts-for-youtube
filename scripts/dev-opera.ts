@@ -1,6 +1,6 @@
 /**
- * Opera dev-server target. Opera is Chromium, so it reuses the Chrome machinery (profile cloning, CDP tab
- * reloads) via createChromiumTarget - only the WXT build target, the binary, the profile and the debug port
+ * Opera dev-server target. Opera is Chromium, so it reuses the Chrome machinery (profile cloning, CDP content
+ * script injection) via createChromiumTarget - only the WXT build target, the binary, the profile and the debug port
  * differ.
  */
 

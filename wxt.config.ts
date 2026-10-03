@@ -1,9 +1,10 @@
 import packageJson from "./package.json" with { type: "json" };
+import { YOUTUBE_PAGE_MATCHES } from "./src/lib/page-matches";
 import { strToU8, unzipSync, zipSync } from "fflate";
 import { readFile, writeFile } from "node:fs/promises";
 import { defineConfig } from "wxt";
 
-const EXTENSION_NAME = "VLC Controls for YouTube";
+export const EXTENSION_NAME = "VLC Controls for YouTube";
 export const FALLBACK_GECKO_ID = "vlc-controls-in-youtube@avi12.com";
 // Firefox reads the data_collection_permissions key AMO requires from 140 on. Chromium before 137 reports a held
 // key's auto-repeats as KeyboardEvent.repeat false while another key (Shift, Ctrl) is also held, so toggles like
@@ -70,13 +71,18 @@ export default defineConfig({
     // Added to auto-icons' default 16/32/48/128 - Firefox's add-ons manager uses 96 on high-DPI screens
     sizes: [96]
   },
-  manifest: ({ browser }) => ({
+  manifest: ({ browser, mode }) => ({
     name: EXTENSION_NAME,
     description: "VLC's keyboard shortcuts for YouTube's player - click the toolbar icon to toggle",
     homepage_url: url,
     // No popup: the toolbar click toggles the extension (see background.ts)
     action: {},
-    permissions: ["storage"],
+    permissions: ["storage", ...mode === "development" ? ["scripting"] : []],
+    // The dev server (scripts/dev.ts) injects each rebuild's content scripts into the open tabs, so they never
+    // reload; injecting takes host access, which the content scripts' own matches don't grant
+    ...mode === "development" && {
+      host_permissions: YOUTUBE_PAGE_MATCHES
+    },
     // Chrome's manifest takes author as { email }; Opera and Firefox take the "Name <email>" string
     author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
     ...(browser === "firefox" && {

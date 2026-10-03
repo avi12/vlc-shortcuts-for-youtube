@@ -1,6 +1,7 @@
 /**
  * Firefox dev-server target: profile cloning (re-cloned every launch), sideload launch over web-ext-run, and
- * reloading YouTube tabs over RDP (Firefox's own remote debugging protocol - its CDP endpoint is gone).
+ * injecting rebuilt content scripts into the open YouTube tabs over RDP (Firefox's own remote debugging protocol -
+ * its CDP endpoint is gone).
  *
  * Marionette and the Remote Agent are on by default so the firefox-devtools MCP can attach. Both flip
  * navigator.webdriver to true, which makes Google refuse sign-in, so `--no-marionette` drops them for a
@@ -12,12 +13,12 @@ import {
   type BrowserTarget,
   cloneFile,
   findFreeTcpPort,
+  INJECT_CONTENT_SCRIPTS_EXPRESSION,
   LANG_ARGS,
   logEvent,
   PROJECT_ROOT,
   START_URL,
-  USER_PROFILES_DIR,
-  YOUTUBE_HOST
+  USER_PROFILES_DIR
 } from "./dev-shared";
 import { spawnSync } from "node:child_process";
 import {
@@ -160,7 +161,7 @@ Start-Sleep -Milliseconds 500
   }
 }
 
-// ── Tab reload over RDP ──────────────────────────────────────────────────────
+// ── Content script injection over RDP ────────────────────────────────────────
 
 // web-ext picks its -start-debugger-server port per launch, so read it off the dev Firefox's command line.
 // -split, not -match: Windows PowerShell 5.1 silently fails -match when the script arrives over stdin
@@ -176,14 +177,18 @@ function findRdpPort() {
   return rdpPort;
 }
 
+const EVALUATION_RESULT_TYPE = "evaluationResult";
+
 interface RdpPacket {
   from?: string;
   type?: string;
-  tabs?: {
+  addons?: {
     actor: string;
-    url?: string;
+    id?: string;
   }[];
-  frame?: { consoleActor?: string };
+  form?: { consoleActor?: string };
+  resultID?: string;
+  result?: unknown;
 }
 
 // RDP frames every packet as `<byteLength>:<json>`. A reply comes from the actor the request went to and,
@@ -237,11 +242,14 @@ async function connectRdp(port: number) {
   await waitFor(packet => packet.from === "root");
   return {
     request,
+    waitFor,
     close: () => socket.end()
   };
 }
 
-async function reloadYoutubeTabsOverRdp() {
+// The reloaded add-on's background injects the rebuilt scripts (see INJECT_CONTENT_SCRIPTS_EXPRESSION). Its
+// evaluation replies at once with an id, and later with the result as an event
+async function injectIntoYoutubeTabsOverRdp() {
   const port = findRdpPort();
   if (port === undefined) {
     logEvent("Firefox's RDP port not found - reload the YouTube tabs by hand");
@@ -250,25 +258,29 @@ async function reloadYoutubeTabsOverRdp() {
 
   const rdp = await connectRdp(port);
   try {
-    const { tabs = [] } = await rdp.request({
+    const { addons = [] } = await rdp.request({
       to: "root",
-      type: "listTabs"
+      type: "listAddons"
     });
-    for (const tab of tabs.filter(candidate => candidate.url?.includes(YOUTUBE_HOST))) {
-      const { frame } = await rdp.request({
-        to: tab.actor,
-        type: "getTarget"
-      });
-      if (!frame?.consoleActor) {
-        continue;
-      }
-
-      await rdp.request({
-        to: frame.consoleActor,
-        type: "evaluateJSAsync",
-        text: "location.reload()"
-      });
+    const addon = addons.find(candidate => candidate.id === GECKO_ID);
+    const { form } = addon ? await rdp.request({
+      to: addon.actor,
+      type: "getTarget"
+    }) : {};
+    if (!form?.consoleActor) {
+      logEvent("The add-on's background wasn't found over RDP - reload the YouTube tabs by hand");
+      return;
     }
+
+    const { resultID } = await rdp.request({
+      to: form.consoleActor,
+      type: "evaluateJSAsync",
+      text: INJECT_CONTENT_SCRIPTS_EXPRESSION
+    });
+    const { result } = await rdp.waitFor(packet => (
+      packet.type === EVALUATION_RESULT_TYPE && packet.resultID === resultID
+    ));
+    logEvent(`Injected the rebuilt content scripts into ${String(result)} YouTube tab(s)`);
   } finally {
     rdp.close();
   }
@@ -344,7 +356,7 @@ export function createFirefoxTarget({ isMarionetteEnabled }: {
     prepare: closeLeftoverFirefox,
     setupProfile: setupFirefoxProfile,
     launch,
-    reloadYoutubeTabs: reloadYoutubeTabsOverRdp,
+    injectIntoYoutubeTabs: injectIntoYoutubeTabsOverRdp,
     // Without marionette there is no Remote Agent to probe; web-ext's cleanup callback is the only signal
     ...isMarionetteEnabled && {
       isBrowserAlive: isRemoteAgentAlive

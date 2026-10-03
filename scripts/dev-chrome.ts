@@ -1,21 +1,25 @@
 /**
  * Chromium dev-server target factory, shared by every Chromium-family browser (Chrome here, Opera in
- * `dev-opera.ts`): profile cloning, sideload launch over web-ext-run, and reloading YouTube tabs over CDP.
+ * `dev-opera.ts`): profile cloning, sideload launch over web-ext-run, and injecting rebuilt content scripts into
+ * the open YouTube tabs over CDP.
  *
  * Every Chromium target launches against its OWN cloned `--user-data-dir` under user-profiles/, seeded once
  * from the real profile so the dev browser carries the YouTube session, while closing it never touches the
  * user's real browser.
  */
 
+import { EXTENSION_NAME } from "../wxt.config";
 import {
   type BrowserTarget,
   cloneFile,
   findFreeTcpPort,
+  INJECT_CONTENT_SCRIPTS_EXPRESSION,
   LANG_ARGS,
+  logEvent,
   PROJECT_ROOT,
+  sleep,
   START_URL,
-  USER_PROFILES_DIR,
-  YOUTUBE_HOST
+  USER_PROFILES_DIR
 } from "./dev-shared";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir, platform } from "node:os";
@@ -111,49 +115,87 @@ function setupChromiumProfile({ profileDir, sourceUserData, sourceProfileName = 
   return profileDir;
 }
 
-// ── Tab reload ───────────────────────────────────────────────────────────────
+// ── Content script injection ─────────────────────────────────────────────────
+
+const SERVICE_WORKER_POLL_MS = 250;
+const SERVICE_WORKER_POLL_ATTEMPTS = 20;
+// A service worker announces itself with events before it replies, so the reply is told apart by its id
+const EVALUATE_REQUEST_ID = 1;
 
 interface CdpTarget {
   type?: string;
-  url?: string;
   webSocketDebuggerUrl?: string;
 }
 
+// Resolves to the expression's value, or undefined if it threw or the target went away
 function evaluateOverCdp({ webSocketUrl, expression }: {
   webSocketUrl: string;
   expression: string;
 }) {
-  return new Promise<void>(resolvePromise => {
+  return new Promise<unknown>(resolvePromise => {
     const webSocket = new WebSocket(webSocketUrl);
     webSocket.onopen = () => webSocket.send(
       JSON.stringify({
-        id: 1,
+        id: EVALUATE_REQUEST_ID,
         method: "Runtime.evaluate",
         params: {
-          expression
+          expression,
+          awaitPromise: true,
+          returnByValue: true
         }
       })
     );
-    webSocket.onmessage = () => {
+    webSocket.onmessage = e => {
+      const message = JSON.parse(String(e.data));
+      if (message.id !== EVALUATE_REQUEST_ID) {
+        return;
+      }
+
       webSocket.close();
-      resolvePromise();
+      resolvePromise(message.result?.result?.value);
     };
-    webSocket.onerror = () => resolvePromise();
-    webSocket.onclose = () => resolvePromise();
+    webSocket.onerror = () => resolvePromise(undefined);
+    webSocket.onclose = () => resolvePromise(undefined);
   });
 }
 
-async function reloadYoutubeTabsOverCdp(debugPort: number) {
+async function listServiceWorkerUrls(debugPort: number) {
   const targets: CdpTarget[] = await fetch(`http://127.0.0.1:${debugPort}/json`)
     .then(response => response.json())
     .catch(() => []);
-  const youtubeTabs = targets.filter(target => target.type === "page" && target.url?.includes(YOUTUBE_HOST));
-  await Promise.all(
-    youtubeTabs.map(target => target.webSocketDebuggerUrl && evaluateOverCdp({
-      webSocketUrl: target.webSocketDebuggerUrl,
-      expression: "location.reload()"
-    }))
-  );
+  return targets.flatMap(target => target.type === "service_worker" && target.webSocketDebuggerUrl ?
+    [target.webSocketDebuggerUrl] :
+    []);
+}
+
+// The profile's other extensions run service workers too, and the reloaded one takes a moment to start, so each
+// is asked for its name until this extension's own injects the rebuilt scripts
+async function injectIntoYoutubeTabsOverCdp({ debugPort, extensionName }: {
+  debugPort: number;
+  extensionName: string;
+}) {
+  for (let attempt = 0; attempt < SERVICE_WORKER_POLL_ATTEMPTS; attempt++) {
+    for (const webSocketUrl of await listServiceWorkerUrls(debugPort)) {
+      const name = await evaluateOverCdp({
+        webSocketUrl,
+        expression: "chrome.runtime.getManifest().name"
+      });
+      if (name !== extensionName) {
+        continue;
+      }
+
+      const tabCount = await evaluateOverCdp({
+        webSocketUrl,
+        expression: INJECT_CONTENT_SCRIPTS_EXPRESSION
+      });
+      if (typeof tabCount === "number") {
+        logEvent(`Injected the rebuilt content scripts into ${tabCount} YouTube tab(s)`);
+        return;
+      }
+    }
+    await sleep(SERVICE_WORKER_POLL_MS);
+  }
+  logEvent("The extension's service worker never came up - reload the YouTube tabs by hand");
 }
 
 // ── Target factory ───────────────────────────────────────────────────────────
@@ -210,7 +252,10 @@ export function createChromiumTarget(options: ChromiumTargetOptions): BrowserTar
       sourceProfileName: options.sourceProfileName
     }),
     launch,
-    reloadYoutubeTabs: reloadYoutubeTabsOverCdp
+    injectIntoYoutubeTabs: debugPort => injectIntoYoutubeTabsOverCdp({
+      debugPort,
+      extensionName: EXTENSION_NAME
+    })
   };
 }
 
