@@ -1,0 +1,100 @@
+# Stack
+- pnpm (single package at the repo root)
+- WXT extension framework
+- TypeScript, no UI framework (100% type safety, let TypeScript infer return types - never write them explicitly)
+- Chromium (Chrome, Opera) MV3 + Firefox MV3
+  - Single shared code path; branch only when an API genuinely diverges
+  - Cross-browser parity is a hard constraint - test Firefox first, it is the strictest environment
+
+# Architecture
+The extension replaces YouTube's player keyboard controls with VLC's hotkeys, rewrites the player tooltips and the Shift+/ help dialog to match, and toggles off/on from the toolbar icon (on by default).
+- Two worlds:
+  - Isolated world - `src/entrypoints/bridge.content.ts` reads the `isEnabledItem` storage item and mirrors it onto `<html data-vlc-controls="on|off">` (`src/lib/enabled-flag.ts`), keeping it in sync via `watch`. It also injects the player-effects stylesheet (aspect ratio, hidden controls), since only manifest content scripts can inject CSS
+  - MAIN world - `src/entrypoints/vlc-controls.content.ts` owns the player API: hotkeys (`src/lib/hotkeys/`), tooltips (`src/lib/tooltips/`) and the help dialog (`src/lib/help-dialog/`). It has no extension APIs, reads the toggle from the `<html>` attribute and treats a missing attribute as enabled
+- `src/lib/vlc-keymap.ts` is the single source of truth for VLC bindings - hotkeys, tooltips and the help dialog all read from it, never restate a key
+- YouTube native UI only - never render an overlay, toast or tooltip of our own. VLC actions run through YouTube's own keys (`YOUTUBE_HOTKEYS` in `src/lib/youtube-keymap.ts`, dispatched via `src/lib/hotkeys/youtube-hotkey-dispatch.ts`) so YouTube shows its own bezel, seek overlay and caption card. Where YouTube has no exact key (3s jumps, fine speed), ride the nearest native press and correct the text inside YouTube's own element (`src/lib/hotkeys/native/`); where YouTube has no feedback at all (loop, aspect ratio, audio track, snapshot), stay silent
+- `src/lib/youtube-keymap.ts` is the single source of truth for YouTube's own keys: controls only YouTube's player has (theater, miniplayer, 0-9 seek...) keep YouTube's keys and pass through untouched; YouTube keys for controls VLC also has are swallowed. On a key clash, theater mode kept T (VLC's "show time" was dropped), while VLC kept B and +/- over YouTube's caption styling keys
+- `src/entrypoints/background.ts` toggles `isEnabledItem` on toolbar click and reflects the state on the toolbar (badge `OFF`, title)
+
+# Code style
+- WXT APIs (`storage`, `browser`, `defineBackground`, `defineContentScript`, ...) are imported explicitly from `"#imports"`
+- Use the `browser` namespace
+- Use early returns for readability and maintainability
+- Use functional programming
+- Use async/await whenever possible
+- Use DRY with separation of concerns, prioritizing readability
+- Tree-shaking friendly modules: named exports only, no barrel files with side effects, no namespace imports (`import * as`)
+- Minimize indentations
+- Use `for-of` instead of `.forEach`, and a plain `for` loop instead of `.reduce()`
+- Use modern browser and CSS features
+- Prefer semantic HTML elements (`button`, `nav`, `ul`/`li`, `section`, `header`, `footer`, `dialog`, `menu`, `output`, etc.) over `div`/`span` with a `role`; only add ARIA when no native element carries the semantics or state, and never add ARIA that merely restates what the element already means
+- Avoid `window.` prefixes unless it increases readability
+- Avoid `setTimeout` unless absolutely necessary
+- Avoid comments unless absolutely necessary - prefer descriptive names; default to zero comments and rename variables/functions until they read like the comment would
+- Don't use em dashes - use regular hyphens
+- If a callback arrow function has a typed param, don't annotate the type explicitly
+- Functions with 2+ params take a single destructured object param (`f({ a, b }: {...})`) so every argument is self-documenting at the call site. Reuse an existing/built-in type when one fits the object shape; only inline the object type when nothing fits - never invent a named type just to convert. EXEMPT (stay positional): key/value-style accessors where the first arg is a key/identifier and the second its value/operation/options, and framework/runtime-positional signatures the caller controls (HOF callbacks, `addEventListener`, Promise executors, event handlers with first param `e`, `browser.*` listener callbacks, external-library-dictated signatures)
+- Avoid nested try/catch - flatten with early returns or extracted functions
+- Validate loose data with zod, not hand-rolled checks: any multi-clause shape/range/format validation on external/storage/message payloads becomes a module-level zod schema + `safeParse`. Bounds always come from the existing `SCREAMING_SNAKE_CASE` constants via `.min()`/`.max()`; reuse an existing schema before authoring one; a schema consumed only for its inferred type stays un-exported. Import `z` from `@/lib/zod` (jitless CSP wrapper). NOT zod material: single trivial checks, TS union narrowing of already-typed values, hot-loop arithmetic guards
+- `safeParse` results take exactly two forms. Validity only: `schema.safeParse(x).success` inline in the condition or into an `is`-prefixed boolean. `.data`/`.error` consumed: store the result as `parsed` (`parsed<Subject>` when one scope holds several parses) and guard with `parsed.success` - never name it `result`/`<x>Parse`
+- Inline one-off variables (assigned once, used once) when it stays readable - but NOT when the variable names a magic number/string or documents an otherwise opaque expression
+- Extract an `if`/ternary/guard condition into a descriptive `is`-prefixed boolean variable rather than inlining the raw expression into the condition
+- Apply parallel modifications whenever possible
+- Always prefer the `@` path alias (`@/lib/foo`) over parent-relative (`../`) imports. Same-directory `./foo` stays relative
+
+# Naming conventions
+- Variables and functions: `camelCase`, full words (no abbreviations)
+- Module-level constants: `SCREAMING_SNAKE_CASE`
+- Exception: event handler first parameter is always `e`
+
+## Variable prefixes
+- Element: `el` prefix (e.g. `elButton`)
+- Index: `i` prefix (e.g. `iItem`), or bare `i` when iterating in a for loop/higher-order function
+- Boolean: `is` prefix (e.g. `isLoading`), phrased positively (e.g. `isEnabled`, not `isDisabled` or `isNotEnabled`)
+
+# Hardcoded values
+- Strings: use enums; if no enum fits, use a descriptive `SCREAMING_SNAKE_CASE` constant
+- Numbers: use a descriptive `SCREAMING_SNAKE_CASE` constant
+
+# CSS
+- Use native CSS nesting - nest child and state selectors under their parent (`&:hover`, a nested `.child`) instead of repeating the parent in flat sibling rules
+- Always respect `prefers-reduced-motion` - never ship an ungated transition/animation. Add a `@media (prefers-reduced-motion: reduce)` override that removes the motion; in JS collapse the duration to 0
+- Never the `transform` shorthand - use the individual `translate`/`rotate`/`scale` properties, and transition the individual property
+- Never hand-write vendor prefixes (`-webkit-` etc.) - author the unprefixed standard only
+
+# Storage
+- Storage goes through WXT storage only - `storage.defineItem` from `"#imports"` (see `src/lib/storage.ts`), never `browser.storage.*`
+- Don't automatically persist to storage - rely on fallback values; only write when the user has explicitly set something (e.g. `isEnabledItem` is never written on install, its default comes from `fallback: true`)
+- Only use the `local:` or `sync:` storage areas - never `session:` (Firefox doesn't support it)
+
+# UI copy
+- No full stops at end of messages
+- Informal tone
+
+# Linting
+After each modification, lint with oxlint, ESLint and Stylelint, and typecheck:
+- `pnpm lint` runs `oxlint --type-aware --fix -c .oxlintrc.fix.json && eslint --fix && oxlint --type-aware` - oxlint owns the logic and type-aware rules, ESLint owns the stylistic ones (plus the local rules in `eslint-rules/`)
+- `pnpm stylelint` runs stylelint over `src/**/*.css` with `--fix`
+- `pnpm typecheck`
+- After every bug fix, feature, or refactor - anything that removes or rewires code - run a fallow dead-code audit and clean up what it flags as newly unused (imports, helpers, exports, whole files) so changes never leave orphans behind. Act on the audit by hand - never run `fallow fix`
+  - The config is `/.fallowrc.json` (entry `src/entrypoints/**`). It carries NO ignore lists - only `health` thresholds and `unused-enum-members: warn`. Run fallow from the repo root
+  - `pnpm fallow` (= `fallow audit --base HEAD`) is the incremental gate; `pnpm exec fallow dead-code --root .` is the full sweep
+  - fallow is PINNED to 2.103.0 (devDep) - never invoke it via `pnpx`/`pnpm dlx` (that fetches latest and ignores the pin), always the local bin (`pnpm fallow` / `pnpm exec fallow`)
+  - An export used only WITHIN its own file is an over-export: drop the `export` keyword rather than adding an ignore
+
+# Dev server
+Never build - the dev server is always running. `pnpm dev` (or `pnpm dev:firefox` / `pnpm dev:opera`) auto-rebuilds and reloads the extension on any change under `src/`. Only run a build when explicitly asked.
+
+# Store deploy
+Store releases (Chrome Web Store, Opera Add-ons, Firefox AMO - no Edge) go out via `web-ext-deploy` (Avi's own tool - npm `web-ext-deploy`, source at `/c/repositories/avi/web-ext-deploy`), NOT `wxt submit`. Flow:
+1. Bump `package.json` `version` (must exceed the live store version - stores reject same-or-lower) and commit `chore(release): X.Y.Z`
+2. `pnpm zip:all` builds the production zips into `build/`: `vlc-controls-in-youtube-{version}-{chrome,firefox,opera}-production.zip` plus `-firefox-source.zip`/`-opera-source.zip` (AMO and Opera require the reviewable source zip, which carries a README with build instructions)
+3. Run `pnpx web-ext-deploy env --auto-fetch-credentials` (`web-ext-deploy` is not a project dep - always invoke it via `pnpx`) - always `--dry-run` FIRST to validate creds + inputs without uploading, then re-run without `--dry-run` to publish. It reads whichever gitignored per-store `chrome.env`/`firefox.env`/`opera.env` files are PRESENT and skips any store whose file is absent. Each file holds that store's creds + `ZIP="build/vlc-controls-in-youtube-{version}-<browser>-production.zip"` (`{version}` is replaced by the `package.json` version) and `ZIP_SOURCE` for Firefox/Opera
+- ALWAYS pass `--auto-fetch-credentials`: it fetches the volatile creds and saves them back to the `.env` (Opera `SESSIONID`/`CSRFTOKEN` via Playwright, Chrome `REFRESH_TOKEN` via OAuth). Both may open a browser for an interactive login. `--publish-only chrome firefox` narrows to a subset of the PRESENT stores; per-store changelogs via `--firefox-changelog`/`--opera-changelog`
+- The `*.env` credential files are gitignored and must never be committed
+- The Firefox add-on ID comes from the `GECKO_ID` env var, falling back to `vlc-controls-in-youtube@avi12`
+
+# Browser debugging
+Prefer the chrome-devtools MCP for driving the running Chrome. When it can't reach a target - it does not list/control the extension's service worker or `chrome-extension://` pages, so `chrome.storage`, the background console, and SW-only state are invisible to it - fall back to raw CDP on the remote-debugging port (`http://localhost:9222`). Find the service-worker target via `GET /json/list` (`type === "service_worker"`, url contains the extension id), open its `webSocketDebuggerUrl`, and `Runtime.evaluate` with `awaitPromise`+`returnByValue` to run e.g. `chrome.storage.local.get(...)` inside the background. A short Node script (global `fetch` + global `WebSocket`) is enough.
+
+For Firefox, prefer the firefox-devtools MCP. When it can't reach into something (its snapshots do NOT pierce shadow roots) fall back to raw RDP (Firefox's classic remote debugging protocol, NOT CDP). web-ext launches Firefox with `-start-debugger-server <port>`; find the port in the firefox.exe command line (`Get-CimInstance Win32_Process -Filter "name='firefox.exe'"`, the arg after `-start-debugger-server`). RDP frames packets as `<byteLength>:<JSON>`; connect via TCP, read the `{"from":"root"}` hello, then `listTabs` -> pick the tab by url -> `{to: tab.actor, type:"getTarget"}` -> `consoleActor` -> `{type:"evaluateJSAsync", text}` (it replies with a `resultID`, then a later `evaluationResult` packet carrying the value). A short Node script (`net` + a length-prefix parser) is enough.
