@@ -19,8 +19,12 @@ function normalizeKeyName(key: string) {
   return NAMED_KEY_ALIASES[lowercaseKey] ?? lowercaseKey;
 }
 
+export function stripBidiMarks(text: string) {
+  return text.replaceAll(BIDI_MARKS_PATTERN, "");
+}
+
 export function toHotkeySignature(hotkey: string) {
-  const plainText = hotkey.normalize("NFKC").replaceAll(BIDI_MARKS_PATTERN, "").replace(TYPING_HINT_PATTERN, "").trim();
+  const plainText = stripBidiMarks(hotkey.normalize("NFKC")).replace(TYPING_HINT_PATTERN, "").trim();
   const isJoinerKey = plainText === COMBO_JOINER;
   const parts = isJoinerKey ? [plainText] : plainText.split(COMBO_JOINER).map(part => part.trim());
   const modifierCount = parts.length - 1;

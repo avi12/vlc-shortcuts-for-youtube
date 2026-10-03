@@ -13,6 +13,17 @@ interface YoutubeShortcut {
   hotkeyLabel?: string;
 }
 
+export const YOUTUBE_CHAPTER_COMBOS = {
+  previous: {
+    key: "ArrowLeft",
+    isCtrl: true
+  },
+  next: {
+    key: "ArrowRight",
+    isCtrl: true
+  }
+} as const satisfies Record<string, KeyCombo>;
+
 const DIGIT_COMBOS = Array.from({ length: 10 }, (_, digit) => ({ key: String(digit) }));
 
 // Controls only YouTube's player has - VLC has no equivalent, so YouTube keeps handling its own keys.
@@ -42,18 +53,12 @@ export const YOUTUBE_NATIVE_SHORTCUTS: YoutubeShortcut[] = [
   {
     section: KeymapSection.Playback,
     label: "Seek to previous chapter",
-    combos: [{
-      key: "ArrowLeft",
-      isCtrl: true
-    }]
+    combos: [YOUTUBE_CHAPTER_COMBOS.previous]
   },
   {
     section: KeymapSection.Playback,
     label: "Seek to next chapter",
-    combos: [{
-      key: "ArrowRight",
-      isCtrl: true
-    }]
+    combos: [YOUTUBE_CHAPTER_COMBOS.next]
   },
   {
     section: KeymapSection.Playback,

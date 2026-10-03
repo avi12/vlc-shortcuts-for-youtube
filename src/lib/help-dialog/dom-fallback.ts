@@ -27,7 +27,10 @@ function readDomText(elDialog: Element) {
       }
 
       hotkeys.push(hotkey);
-      dialogText.labelByHotkeySignature.set(toHotkeySignature(hotkey), label);
+      dialogText.youtubeRowBySignature.set(toHotkeySignature(hotkey), {
+        label,
+        hotkey
+      });
     }
     const section = findSectionByHotkeys(hotkeys);
     const title = elSection.querySelector(SECTION_TITLE_SELECTOR)?.textContent.trim();

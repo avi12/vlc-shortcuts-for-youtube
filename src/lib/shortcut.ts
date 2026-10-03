@@ -36,6 +36,15 @@ const SHIFTED_SYMBOL_BASE_KEYS: Record<string, string> = {
   ">": "."
 };
 
+// The English notation of YouTube's dialog; the help dialog learns the viewer's own from YouTube's rows
+export const MODIFIER_NAMES = {
+  control: "CONTROL",
+  alt: "ALT",
+  shift: "SHIFT"
+} as const;
+
+export const MODIFIER_JOINER = " + ";
+
 const COMBO_SEPARATOR = " or ";
 
 // Shifted symbols ("+") need Shift to type, so Shift only counts for letters and named keys
@@ -56,24 +65,32 @@ export function isComboMatch({ combo, e }: {
     !e.metaKey;
 }
 
-function isLetter(key: string) {
+export function isLetter(key: string) {
   return key.length === 1 && key.toLowerCase() !== key.toUpperCase();
+}
+
+export function formatKeyName(key: string) {
+  return KEY_DISPLAY_NAMES[key] ?? key.toLowerCase();
 }
 
 function formatCombo({ combo, style }: {
   combo: KeyCombo;
   style: ShortcutStyle;
 }) {
-  const key = KEY_DISPLAY_NAMES[combo.key] ?? combo.key.toLowerCase();
+  const key = formatKeyName(combo.key);
   const typedOnKey = isLetter(combo.key) ? key : SHIFTED_SYMBOL_BASE_KEYS[combo.key];
   const isShiftOnly = Boolean(combo.isShift) && !combo.isCtrl && !combo.isAlt;
   if (isShiftOnly && typedOnKey) {
-    const shiftedKey = `SHIFT+${typedOnKey}`;
+    const shiftedKey = `${MODIFIER_NAMES.shift}+${typedOnKey}`;
     return style === ShortcutStyle.Dialog ? `${combo.key.toUpperCase()} (${shiftedKey})` : shiftedKey;
   }
 
-  const modifiers = [combo.isCtrl && "CONTROL", combo.isAlt && "ALT", combo.isShift && "SHIFT"];
-  return [...modifiers, key].filter(Boolean).join(" + ");
+  const modifiers = [
+    combo.isCtrl && MODIFIER_NAMES.control,
+    combo.isAlt && MODIFIER_NAMES.alt,
+    combo.isShift && MODIFIER_NAMES.shift
+  ];
+  return [...modifiers, key].filter(Boolean).join(MODIFIER_JOINER);
 }
 
 export function formatCombos({ combos, style }: {

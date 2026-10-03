@@ -89,7 +89,10 @@ function readDataText(sections: HotkeySection[]) {
         continue;
       }
 
-      dialogText.labelByHotkeySignature.set(toHotkeySignature(option.hotkey), label);
+      dialogText.youtubeRowBySignature.set(toHotkeySignature(option.hotkey), {
+        label,
+        hotkey: option.hotkey
+      });
     }
     const section = findSectionByHotkeys(options.map(option => option.hotkey));
     const title = readText(youtubeSection.title);
