@@ -1,0 +1,100 @@
+import { createTypeGuard, z } from "@/lib/zod";
+
+const PLAYER_SELECTOR = "#movie_player";
+const VIDEO_SELECTOR = "#movie_player video.html5-main-video";
+
+enum PlayerState {
+  Unstarted = -1,
+  Ended = 0,
+  Playing = 1,
+  Paused = 2,
+  Buffering = 3,
+  Cued = 5
+}
+
+export interface YoutubePlayer extends HTMLElement {
+  playVideo(): void;
+  pauseVideo(): void;
+  getPlayerState(): PlayerState;
+  seekTo(seconds: number, allowSeekAhead: boolean): void;
+  getCurrentTime(): number;
+  getDuration(): number;
+  getVolume(): number;
+  setVolume(volume: number): void;
+  isMuted(): boolean;
+  mute(): void;
+  unMute(): void;
+  getPlaybackRate(): number;
+  setPlaybackRate(rate: number): void;
+  getAvailablePlaybackRates(): number[];
+  nextVideo?(): void;
+  previousVideo?(): void;
+  getOption?(module: string, option: string, parameters?: Record<string, unknown>): unknown;
+  setOption?(module: string, option: string, value: unknown): void;
+  loadModule?(module: string): void;
+  unloadModule?(module: string): void;
+  getAudioTrack?(): unknown;
+  getAvailableAudioTracks?(): unknown;
+  setAudioTrack?(track: unknown): unknown;
+  setLoopVideo?(isLoop: boolean): void;
+  getVideoData?(): unknown;
+  getPlayerResponse?(): unknown;
+  hideControls?(): void;
+  showControls?(): void;
+}
+
+function isFunctionValue(value: unknown) {
+  return typeof value === "function";
+}
+
+const functionSchema = z.custom<(...parameters: unknown[]) => unknown>(isFunctionValue);
+
+const playerApiSchema = z.object({
+  playVideo: functionSchema,
+  pauseVideo: functionSchema,
+  getPlayerState: functionSchema,
+  seekTo: functionSchema,
+  getCurrentTime: functionSchema,
+  getDuration: functionSchema,
+  getVolume: functionSchema,
+  setVolume: functionSchema,
+  isMuted: functionSchema,
+  mute: functionSchema,
+  unMute: functionSchema,
+  getPlaybackRate: functionSchema,
+  setPlaybackRate: functionSchema,
+  getAvailablePlaybackRates: functionSchema
+});
+
+const isPlayerApi = createTypeGuard<Omit<YoutubePlayer, keyof HTMLElement>>(playerApiSchema);
+
+function isYoutubePlayer(element: Element | null): element is YoutubePlayer {
+  return element instanceof HTMLElement && isPlayerApi(element);
+}
+
+const videoDataSchema = z.object({ title: z.string() });
+
+// Re-queried on every call: YouTube's SPA swaps players and <video> sources without a reload
+export function getPlayer() {
+  const elPlayer = document.querySelector(PLAYER_SELECTOR);
+  if (!isYoutubePlayer(elPlayer) || !elPlayer.checkVisibility()) {
+    return null;
+  }
+
+  return elPlayer;
+}
+
+export function getVideo() {
+  const elVideo = document.querySelector(VIDEO_SELECTOR);
+  return elVideo instanceof HTMLVideoElement ? elVideo : null;
+}
+
+export function getVideoTitle(player: YoutubePlayer) {
+  const parsed = videoDataSchema.safeParse(player.getVideoData?.());
+  return parsed.success && parsed.data.title ? parsed.data.title : document.title;
+}
+
+export function isPlaying(player: YoutubePlayer) {
+  const state = player.getPlayerState();
+  return state === PlayerState.Playing || state === PlayerState.Buffering;
+}
