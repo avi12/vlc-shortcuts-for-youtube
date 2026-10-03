@@ -22,6 +22,9 @@ opera.env
 .env.*
 !.env.example
 
+# Chrome .crx signing key (scripts/pack-crx.ts) - fixes the extension ID, never commit
+keys/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
