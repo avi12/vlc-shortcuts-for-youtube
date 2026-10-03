@@ -5,9 +5,10 @@ import { defineConfig } from "wxt";
 
 const EXTENSION_NAME = "VLC Controls for YouTube";
 export const FALLBACK_GECKO_ID = "vlc-controls-in-youtube@avi12.com";
-// MAIN-world content scripts landed in Firefox 128. Chromium before 137 reports a held key's auto-repeats as
-// KeyboardEvent.repeat false while another key (Shift, Ctrl) is also held, so toggles like Shift+S would re-fire
-const FIREFOX_MIN_VERSION = "128.0";
+// Firefox reads the data_collection_permissions key AMO requires from 140 on. Chromium before 137 reports a held
+// key's auto-repeats as KeyboardEvent.repeat false while another key (Shift, Ctrl) is also held, so toggles like
+// Shift+S would re-fire
+const FIREFOX_MIN_VERSION = "140.0";
 const CHROMIUM_MIN_VERSION = "137";
 
 const url = packageJson.repository;
