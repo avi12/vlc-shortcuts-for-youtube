@@ -1,6 +1,8 @@
+import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import { getVideo, isMainVideo, type YoutubePlayer } from "@/lib/player";
 
 const ASPECT_RATIO_CLASS = "vlc-controls-aspect-ratio";
+const ASPECT_RATIO_STATUS_PREFIX = "Aspect ratio: ";
 
 enum VideoBoxProperty {
   Top = "--vlc-controls-video-top",
@@ -102,9 +104,13 @@ export function resetAspectRatio() {
 
 export function cycleAspectRatio(player: YoutubePlayer) {
   const iNext = (iAspectRatio + 1) % ASPECT_RATIOS.length;
-  const { ratio } = ASPECT_RATIOS[iNext];
+  const { label, ratio } = ASPECT_RATIOS[iNext];
   resetAspectRatio();
   iAspectRatio = iNext;
+  showStatusInNativeBezel({
+    player,
+    text: `${ASPECT_RATIO_STATUS_PREFIX}${label}`
+  });
 
   if (ratio === null) {
     return;

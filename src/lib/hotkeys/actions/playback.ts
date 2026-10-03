@@ -1,8 +1,14 @@
+import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import { getVideo, isPlaying, isShortsPlayer, type YoutubePlayer } from "@/lib/player";
 import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 
 const START_SECONDS = 0;
+
+enum LoopStatus {
+  On = "Loop on",
+  Off = "Loop off"
+}
 
 // Shorts' own next/previous buttons; its player swallows the arrow keys Shorts otherwise moves with
 enum ShortsNavigationButton {
@@ -63,6 +69,10 @@ export function toggleLoop(player: YoutubePlayer) {
 
   elVideo.loop = !elVideo.loop;
   player.setLoopVideo?.(elVideo.loop);
+  showStatusInNativeBezel({
+    player,
+    text: elVideo.loop ? LoopStatus.On : LoopStatus.Off
+  });
 }
 
 export function toggleFullscreen(player: YoutubePlayer) {

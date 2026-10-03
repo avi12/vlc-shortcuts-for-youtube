@@ -1,8 +1,10 @@
+import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import { formatFileTimestamp } from "@/lib/hotkeys/time-format";
 import { getVideo, getVideoTitle, type YoutubePlayer } from "@/lib/player";
 
 const FORBIDDEN_FILENAME_CHARACTERS = /[/\\:*?"<>|]/g;
 const SNAPSHOT_MIME_TYPE = "image/png";
+const SNAPSHOT_SAVED_STATUS = "Snapshot saved";
 
 function captureFrame(elVideo: HTMLVideoElement) {
   const elCanvas = document.createElement("canvas");
@@ -42,5 +44,9 @@ export function takeSnapshot(player: YoutubePlayer) {
   downloadFile({
     url: frameUrl,
     filename: `${title} - ${formatFileTimestamp(player.getCurrentTime())}.png`
+  });
+  showStatusInNativeBezel({
+    player,
+    text: SNAPSHOT_SAVED_STATUS
   });
 }

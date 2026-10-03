@@ -5,3 +5,7 @@
   width: var(--vlc-controls-video-width) !important;
   height: var(--vlc-controls-video-height) !important;
 }
+
+.vlc-controls-text-bezel .ytp-bezel {
+  display: none;
+}

@@ -1,9 +1,15 @@
+import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import type { YoutubePlayer } from "@/lib/player";
 
 // YouTube fades its controls by putting the player into its own autohide state, styled and
 // animated by YouTube's stylesheet. Ctrl+H holds the player in that state: any mouse movement makes
 // YouTube leave it, so it is re-entered before the next paint until Ctrl+H is pressed again
 const YOUTUBE_AUTOHIDE_CLASS = "ytp-autohide";
+
+enum ControlsStatus {
+  Hidden = "Controls hidden",
+  Shown = "Controls shown"
+}
 
 const observerByPlayer = new Map<YoutubePlayer, MutationObserver>();
 
@@ -34,12 +40,17 @@ function showControls(player: YoutubePlayer) {
 }
 
 export function toggleControls(player: YoutubePlayer) {
-  if (observerByPlayer.has(player)) {
+  const isHidden = observerByPlayer.has(player);
+  if (isHidden) {
     showControls(player);
-    return;
+  } else {
+    hideControls(player);
   }
 
-  hideControls(player);
+  showStatusInNativeBezel({
+    player,
+    text: isHidden ? ControlsStatus.Shown : ControlsStatus.Hidden
+  });
 }
 
 export function showAllControls() {

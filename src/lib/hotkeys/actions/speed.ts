@@ -1,4 +1,5 @@
-import { showRateInNativeBezel } from "@/lib/hotkeys/native/speed-bezel";
+import { formatRate, showRateInNativeBezel } from "@/lib/hotkeys/native/speed-bezel";
+import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import { getVideo, type YoutubePlayer } from "@/lib/player";
 import { FINE_SPEED_STEP, NORMAL_SPEED } from "@/lib/vlc-keymap";
@@ -49,6 +50,10 @@ function stepPresetSpeedSilently({ player, direction }: {
   }
 
   player.setPlaybackRate(nextRate);
+  showStatusInNativeBezel({
+    player,
+    text: formatRate(nextRate)
+  });
 }
 
 // VLC's preset steps map onto YouTube's own speed keys, which walk the same preset list

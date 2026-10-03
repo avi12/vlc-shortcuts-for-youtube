@@ -1,3 +1,4 @@
+import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import type { YoutubePlayer } from "@/lib/player";
 import { YOUTUBE_HOTKEYS, YOUTUBE_VOLUME_STEP } from "@/lib/youtube-keymap";
@@ -14,9 +15,13 @@ function stepVolumeSilently({ player, direction }: {
   player: YoutubePlayer;
   direction: VolumeDirection;
 }) {
-  const volume = player.getVolume() + direction * YOUTUBE_VOLUME_STEP;
+  const volume = Math.min(Math.max(player.getVolume() + direction * YOUTUBE_VOLUME_STEP, MIN_VOLUME), MAX_VOLUME);
   player.unMute();
-  player.setVolume(Math.min(Math.max(volume, MIN_VOLUME), MAX_VOLUME));
+  player.setVolume(volume);
+  showStatusInNativeBezel({
+    player,
+    text: `${volume}%`
+  });
 }
 
 // YouTube's own volume keys step by the same 5% as VLC and show YouTube's volume bezel
