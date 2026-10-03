@@ -30,6 +30,12 @@ const KEY_DISPLAY_NAMES: Record<string, string> = {
   End: "END"
 };
 
+// YouTube writes a shifted symbol next to the key it is typed on: "< (SHIFT+,)"
+const SHIFTED_SYMBOL_BASE_KEYS: Record<string, string> = {
+  "<": ",",
+  ">": "."
+};
+
 const COMBO_SEPARATOR = " or ";
 
 // Shifted symbols ("+") need Shift to type, so Shift only counts for letters and named keys
@@ -59,10 +65,11 @@ function formatCombo({ combo, style }: {
   style: ShortcutStyle;
 }) {
   const key = KEY_DISPLAY_NAMES[combo.key] ?? combo.key.toLowerCase();
-  const isShiftedLetter = Boolean(combo.isShift) && !combo.isCtrl && !combo.isAlt && isLetter(combo.key);
-  if (isShiftedLetter) {
-    const shiftedKey = `SHIFT+${key}`;
-    return style === ShortcutStyle.Dialog ? `${key.toUpperCase()} (${shiftedKey})` : shiftedKey;
+  const typedOnKey = isLetter(combo.key) ? key : SHIFTED_SYMBOL_BASE_KEYS[combo.key];
+  const isShiftOnly = Boolean(combo.isShift) && !combo.isCtrl && !combo.isAlt;
+  if (isShiftOnly && typedOnKey) {
+    const shiftedKey = `SHIFT+${typedOnKey}`;
+    return style === ShortcutStyle.Dialog ? `${combo.key.toUpperCase()} (${shiftedKey})` : shiftedKey;
   }
 
   const modifiers = [combo.isCtrl && "CONTROL", combo.isAlt && "ALT", combo.isShift && "SHIFT"];

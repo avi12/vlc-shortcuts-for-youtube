@@ -5,6 +5,7 @@ import {
   KeymapSection,
   type ShortcutStyle
 } from "@/lib/shortcut";
+import { YOUTUBE_HOTKEYS, type YoutubeHotkey } from "@/lib/youtube-keymap";
 
 export enum VlcAction {
   PlayPause = "play-pause",
@@ -46,6 +47,8 @@ export interface VlcBinding {
   label: string;
   combos: KeyCombo[];
   isRepeatable?: boolean;
+  // A YouTube key that does exactly the same, so YouTube's own (localized) label describes this binding too
+  youtubeEquivalent?: YoutubeHotkey;
 }
 
 enum JumpDirection {
@@ -58,6 +61,7 @@ interface JumpSize {
   modifiers: Omit<KeyCombo, "key">;
   backwardAction: VlcAction;
   forwardAction: VlcAction;
+  youtubeEquivalents?: Record<JumpDirection, YoutubeHotkey>;
 }
 
 const SECONDS_PER_MINUTE = 60;
@@ -86,7 +90,11 @@ const JUMP_SIZES: JumpSize[] = [
     seconds: JUMP_SECONDS.arrow,
     modifiers: {},
     backwardAction: VlcAction.JumpBackwardArrow,
-    forwardAction: VlcAction.JumpForwardArrow
+    forwardAction: VlcAction.JumpForwardArrow,
+    youtubeEquivalents: {
+      [JumpDirection.Backward]: YOUTUBE_HOTKEYS.seekBackwardShort,
+      [JumpDirection.Forward]: YOUTUBE_HOTKEYS.seekForwardShort
+    }
   },
   {
     seconds: JUMP_SECONDS.short,
@@ -94,7 +102,11 @@ const JUMP_SIZES: JumpSize[] = [
       isAlt: true
     },
     backwardAction: VlcAction.JumpBackwardShort,
-    forwardAction: VlcAction.JumpForwardShort
+    forwardAction: VlcAction.JumpForwardShort,
+    youtubeEquivalents: {
+      [JumpDirection.Backward]: YOUTUBE_HOTKEYS.seekBackwardLong,
+      [JumpDirection.Forward]: YOUTUBE_HOTKEYS.seekForwardLong
+    }
   },
   {
     seconds: JUMP_SECONDS.medium,
@@ -147,7 +159,8 @@ function createJumpBinding({ jumpSize, direction }: {
       key: JUMP_DIRECTION_KEYS[direction],
       ...jumpSize.modifiers
     }],
-    isRepeatable: true
+    isRepeatable: true,
+    youtubeEquivalent: jumpSize.youtubeEquivalents?.[direction]
   };
 }
 
@@ -169,20 +182,23 @@ export const VLC_BINDINGS: VlcBinding[] = [
     action: VlcAction.PlayPause,
     section: KeymapSection.Playback,
     label: "Play/pause",
-    combos: [{ key: " " }]
+    combos: [{ key: " " }],
+    youtubeEquivalent: YOUTUBE_HOTKEYS.playPause
   },
   ...JUMP_BINDINGS,
   {
     action: VlcAction.Previous,
     section: KeymapSection.Playback,
     label: "Previous video",
-    combos: [{ key: "p" }]
+    combos: [{ key: "p" }],
+    youtubeEquivalent: YOUTUBE_HOTKEYS.previous
   },
   {
     action: VlcAction.Next,
     section: KeymapSection.Playback,
     label: "Next video",
-    combos: [{ key: "n" }]
+    combos: [{ key: "n" }],
+    youtubeEquivalent: YOUTUBE_HOTKEYS.next
   },
   {
     action: VlcAction.NextFrame,
@@ -196,14 +212,16 @@ export const VLC_BINDINGS: VlcBinding[] = [
     section: KeymapSection.Playback,
     label: "Slower",
     combos: [{ key: "[" }],
-    isRepeatable: true
+    isRepeatable: true,
+    youtubeEquivalent: YOUTUBE_HOTKEYS.slower
   },
   {
     action: VlcAction.Faster,
     section: KeymapSection.Playback,
     label: "Faster",
     combos: [{ key: "]" }],
-    isRepeatable: true
+    isRepeatable: true,
+    youtubeEquivalent: YOUTUBE_HOTKEYS.faster
   },
   {
     action: VlcAction.SlowerFine,
@@ -241,13 +259,15 @@ export const VLC_BINDINGS: VlcBinding[] = [
     action: VlcAction.ToggleFullscreen,
     section: KeymapSection.General,
     label: "Toggle fullscreen",
-    combos: [{ key: "f" }]
+    combos: [{ key: "f" }],
+    youtubeEquivalent: YOUTUBE_HOTKEYS.fullscreen
   },
   {
     action: VlcAction.ToggleMute,
     section: KeymapSection.General,
     label: "Mute/unmute",
-    combos: [{ key: "m" }]
+    combos: [{ key: "m" }],
+    youtubeEquivalent: YOUTUBE_HOTKEYS.mute
   },
   {
     action: VlcAction.VolumeUp,

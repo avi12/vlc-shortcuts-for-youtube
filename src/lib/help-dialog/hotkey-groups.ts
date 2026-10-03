@@ -1,6 +1,11 @@
 import { formatCombos, KeymapSection, ShortcutStyle } from "@/lib/shortcut";
-import { VLC_BINDINGS, VLC_WHEEL_SHORTCUTS } from "@/lib/vlc-keymap";
-import { formatYoutubeShortcut, YOUTUBE_NATIVE_SHORTCUTS, YOUTUBE_SECTION_ANCHOR_KEYS } from "@/lib/youtube-keymap";
+import { VLC_BINDINGS, VLC_WHEEL_SHORTCUTS, type VlcBinding } from "@/lib/vlc-keymap";
+import {
+  formatYoutubeHotkey,
+  formatYoutubeShortcut,
+  YOUTUBE_NATIVE_SHORTCUTS,
+  YOUTUBE_SECTION_ANCHOR_KEYS
+} from "@/lib/youtube-keymap";
 
 interface HotkeyRow {
   label: string;
@@ -29,12 +34,27 @@ export function findSectionByHotkeys(hotkeys: string[]) {
   return Object.values(KeymapSection).find(section => hotkeys.includes(YOUTUBE_SECTION_ANCHOR_KEYS[section]));
 }
 
+// A VLC row that does exactly what a YouTube key does takes YouTube's own (localized) label for that key
+function findYoutubeLabel({ binding, labelByHotkey }: {
+  binding: VlcBinding;
+  labelByHotkey: Map<string, string>;
+}) {
+  if (!binding.youtubeEquivalent) {
+    return;
+  }
+
+  return labelByHotkey.get(formatYoutubeHotkey(binding.youtubeEquivalent));
+}
+
 function buildRows({ section, labelByHotkey }: {
   section: KeymapSection;
   labelByHotkey: Map<string, string>;
 }) {
   const vlcRows = VLC_BINDINGS.filter(binding => binding.section === section).map(binding => ({
-    label: binding.label,
+    label: findYoutubeLabel({
+      binding,
+      labelByHotkey
+    }) ?? binding.label,
     hotkey: formatCombos({
       combos: binding.combos,
       style: ShortcutStyle.Dialog

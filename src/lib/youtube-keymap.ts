@@ -72,7 +72,7 @@ export const YOUTUBE_NATIVE_SHORTCUTS: YoutubeShortcut[] = [
   }
 ];
 
-interface YoutubeHotkey {
+export interface YoutubeHotkey {
   key: string;
   code: string;
   keyCode: number;
@@ -174,6 +174,14 @@ function toCombo({ key, shiftKey }: YoutubeHotkey): KeyCombo {
     key,
     isShift: shiftKey
   };
+}
+
+// In the notation of YouTube's own Shift+/ dialog, so it finds YouTube's (localized) row for that key
+export function formatYoutubeHotkey(hotkey: YoutubeHotkey) {
+  return formatCombos({
+    combos: [toCombo(hotkey)],
+    style: ShortcutStyle.Dialog
+  });
 }
 
 // YouTube's shortcuts for controls VLC also has - VLC's keys replace them, so these are swallowed
