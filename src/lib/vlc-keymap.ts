@@ -139,7 +139,8 @@ export const VLC_BINDINGS: VlcBinding[] = [
     label: "Jump back 1 minute",
     combos: [{
       key: "ArrowLeft",
-      isCtrl: true
+      isCtrl: true,
+      isShift: true
     }]
   },
   {
@@ -148,7 +149,8 @@ export const VLC_BINDINGS: VlcBinding[] = [
     label: "Jump forward 1 minute",
     combos: [{
       key: "ArrowRight",
-      isCtrl: true
+      isCtrl: true,
+      isShift: true
     }]
   },
   {

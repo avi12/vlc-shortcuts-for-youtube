@@ -41,6 +41,22 @@ export const YOUTUBE_NATIVE_SHORTCUTS: YoutubeShortcut[] = [
   },
   {
     section: KeymapSection.Playback,
+    label: "Seek to previous chapter",
+    combos: [{
+      key: "ArrowLeft",
+      isCtrl: true
+    }]
+  },
+  {
+    section: KeymapSection.Playback,
+    label: "Seek to next chapter",
+    combos: [{
+      key: "ArrowRight",
+      isCtrl: true
+    }]
+  },
+  {
+    section: KeymapSection.Playback,
     label: "Seek to the beginning",
     combos: [{ key: "Home" }]
   },
@@ -166,15 +182,7 @@ const YOUTUBE_REPLACED_COMBOS: KeyCombo[] = [
   { key: " " },
   { key: "b" },
   { key: "+" },
-  { key: "-" },
-  {
-    key: "ArrowLeft",
-    isCtrl: true
-  },
-  {
-    key: "ArrowRight",
-    isCtrl: true
-  }
+  { key: "-" }
 ];
 
 export function isReplacedYoutubeKey(e: KeyboardEvent) {
