@@ -77,7 +77,6 @@ export default defineConfig({
     // No popup: the toolbar click toggles the extension (see background.ts)
     action: {},
     permissions: ["storage"],
-    host_permissions: ["https://www.youtube.com/*", "https://www.youtube-nocookie.com/*"],
     // Chrome's manifest takes author as { email }; Opera and Firefox take the "Name <email>" string
     author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
     ...(browser === "firefox" && {
