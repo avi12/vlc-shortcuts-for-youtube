@@ -10,9 +10,10 @@
   "repository": "https://github.com/avi12/vlc-controls-in-youtube",
   "homepage": "https://github.com/avi12/vlc-controls-in-youtube",
   "scripts": {
-    "dev": "tsx scripts/clone-chrome-profile.ts && wxt",
-    "dev:firefox": "wxt -b firefox --mv3",
-    "dev:opera": "wxt -b opera",
+    "dev": "tsx scripts/dev.ts",
+    "dev:firefox": "tsx scripts/dev.ts --firefox",
+    "dev:firefox:no-marionette": "tsx scripts/dev.ts --firefox --no-marionette",
+    "dev:opera": "tsx scripts/dev.ts --opera",
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox --mv3",
     "build:opera": "wxt build -b opera",
@@ -34,6 +35,7 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^26.1.0",
     "@wxt-dev/auto-icons": "^1.1.2",
+    "chokidar": "^5.0.0",
     "eslint": "^10.6.0",
     "eslint-plugin-import-newlines": "^2.0.0",
     "eslint-plugin-perfectionist": "^5.9.1",
@@ -49,6 +51,7 @@
     "tsx": "^4.23.15",
     "typescript": "6.0.3",
     "typescript-eslint": "^8.62.1",
+    "web-ext-run": "^0.2.4",
     "wxt": "^0.20.27"
   },
   "packageManager": "pnpm@11.1.2"

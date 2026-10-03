@@ -4,7 +4,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { defineConfig } from "wxt";
 
 const EXTENSION_NAME = "VLC Controls for YouTube";
-const FALLBACK_GECKO_ID = "vlc-controls-in-youtube@avi12";
+export const FALLBACK_GECKO_ID = "vlc-controls-in-youtube@avi12";
 // MAIN-world content scripts landed in Firefox 128 and Chromium 111
 const FIREFOX_MIN_VERSION = "128.0";
 const CHROMIUM_MIN_VERSION = "111";
@@ -42,9 +42,9 @@ async function addReadmeToSourcesZip({ zipPath, instructions }: {
   await writeFile(zipPath, zipSync(entries));
 }
 
-// The dev browser's cloned profile lives in user-profiles/ (see scripts/clone-chrome-profile.ts); Vite's
-// watcher would otherwise crawl it and hit EBUSY on files the running browser holds. WXT replaces
-// server.watch wholesale, so a plugin config hook (deep-merged) is the only way to extend the ignore list
+// The dev browsers' cloned profiles live in user-profiles/ (see scripts/dev-*.ts); Vite's watcher would otherwise
+// crawl them and hit EBUSY on files the running browser holds. WXT replaces server.watch wholesale, so a plugin
+// config hook (deep-merged) is the only way to extend the ignore list
 const ignoreDevProfilesInWatcher = {
   name: "wxt:ignore-dev-profiles-watch",
   config: () => ({
@@ -105,7 +105,11 @@ export default defineConfig({
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
   },
   vite: () => ({
-    plugins: [ignoreDevProfilesInWatcher]
+    plugins: [ignoreDevProfilesInWatcher],
+    build: {
+      // Only the dev server's builds (scripts/dev.ts) carry source maps; the store build ships none
+      sourcemap: process.env.WXT_INLINE_SOURCEMAPS === "1" ? "inline" : false
+    }
   }),
   hooks: {
     "build:manifestGenerated"(wxt, manifest) {

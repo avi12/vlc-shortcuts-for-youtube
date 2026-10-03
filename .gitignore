@@ -39,5 +39,8 @@ opera.env
 # fallow cache
 .fallow/
 
-# Isolated dev browser profiles cloned by scripts/clone-chrome-profile.ts - contain cookies, tokens
+# Isolated dev browser profiles cloned by the dev server (scripts/dev-*.ts) - contain cookies, tokens
 user-profiles/
+
+# Dev-server session logs (scripts/dev-shared.ts)
+.dev-logs/
