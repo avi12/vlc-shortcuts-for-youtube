@@ -137,6 +137,44 @@ The unpacked extension is written to `build/opera-mv3-production/`.
 pnpm build:all
 ```
 
+## Zip
+
+Each command builds the extension and zips it into `build/`.
+
+### Chrome
+
+```shell
+pnpm zip
+```
+
+To also pack a signed `.crx`:
+
+```shell
+pnpm crx
+```
+
+### Firefox
+
+```shell
+pnpm zip:firefox
+```
+
+Also writes the source zip that Firefox Add-ons requires.
+
+### Opera
+
+```shell
+pnpm zip:opera
+```
+
+Also writes the source zip that Opera Add-ons requires.
+
+### All browsers at once
+
+```shell
+pnpm zip:all
+```
+
 ## License
 
 [GPL-3.0-or-later](LICENSE)
