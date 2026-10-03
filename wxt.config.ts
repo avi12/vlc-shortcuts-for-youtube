@@ -62,7 +62,9 @@ export default defineConfig({
   publicDir: "src/public",
   modules: ["@wxt-dev/auto-icons"],
   autoIcons: {
-    baseIconPath: "assets/icon.svg"
+    baseIconPath: "assets/icon.svg",
+    // Added to auto-icons' default 16/32/48/128 - Firefox's add-ons manager uses 96 on high-DPI screens
+    sizes: [96]
   },
   manifest({ browser }) {
     return {
