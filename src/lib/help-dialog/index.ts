@@ -7,7 +7,7 @@ import {
   VLC_BINDINGS,
   VLC_WHEEL_SHORTCUTS
 } from "@/lib/vlc-keymap";
-import { formatYoutubeShortcut, YOUTUBE_NATIVE_SHORTCUTS } from "@/lib/youtube-keymap";
+import { formatYoutubeShortcut, YOUTUBE_NATIVE_SHORTCUTS, YOUTUBE_SECTION_ANCHOR_KEYS } from "@/lib/youtube-keymap";
 import { z } from "@/lib/zod";
 
 interface HotkeyRow {
@@ -20,9 +20,15 @@ interface HotkeyGroup {
   rows: HotkeyRow[];
 }
 
+interface YoutubeDialogText {
+  labelByHotkey: Map<string, string>;
+  titleBySection: Map<KeymapSection, string>;
+}
+
 const HOTKEY_DIALOG_SELECTOR = "ytd-hotkey-dialog-renderer";
 const POPUP_CONTAINER_SELECTOR = "ytd-popup-container";
 const SECTION_SELECTOR = "ytd-hotkey-dialog-section-renderer";
+const SECTION_TITLE_SELECTOR = "#sub-title";
 const OPTION_SELECTOR = "ytd-hotkey-dialog-section-option-renderer";
 const OPTION_LABEL_SELECTOR = "#label";
 const OPTION_HOTKEY_SELECTOR = "#hotkey";
@@ -59,8 +65,12 @@ type HotkeySection = z.infer<typeof SECTION_SCHEMA>;
 
 const dialogDataRecords = createOverrideRecords<unknown>();
 
-// YouTube-only rows reuse YouTube's own (localized) label when its dialog lists the same hotkey
-function buildGroups(youtubeLabelByHotkey: Map<string, string>) {
+function findSectionByHotkeys(hotkeys: string[]) {
+  return Object.values(KeymapSection).find(section => hotkeys.includes(YOUTUBE_SECTION_ANCHOR_KEYS[section]));
+}
+
+// Section titles and YouTube-only rows reuse YouTube's own (localized) text when its dialog has them
+function buildGroups({ labelByHotkey, titleBySection }: YoutubeDialogText) {
   const groups: HotkeyGroup[] = [];
   for (const section of Object.values(KeymapSection)) {
     const rows: HotkeyRow[] = [];
@@ -95,12 +105,12 @@ function buildGroups(youtubeLabelByHotkey: Map<string, string>) {
 
       const hotkey = formatYoutubeShortcut(shortcut);
       rows.push({
-        label: youtubeLabelByHotkey.get(hotkey) ?? shortcut.label,
+        label: labelByHotkey.get(hotkey) ?? shortcut.label,
         hotkey
       });
     }
     groups.push({
-      title: section,
+      title: titleBySection.get(section) ?? section,
       rows
     });
   }
@@ -137,19 +147,39 @@ function appendTitleSuffix(title: unknown) {
   };
 }
 
-function readDataLabels(sections: HotkeySection[]) {
-  const labelByHotkey = new Map<string, string>();
-  for (const section of sections) {
-    for (const { hotkeyDialogSectionOptionRenderer: option } of section.hotkeyDialogSectionRenderer.options) {
-      const parsedLabel = TEXT_SCHEMA.safeParse(option.label);
-      if (!parsedLabel.success) {
+function readText(text: unknown) {
+  const parsed = TEXT_SCHEMA.safeParse(text);
+  if (!parsed.success) {
+    return;
+  }
+
+  return parsed.data.runs.map(run => run.text).join("");
+}
+
+function readDataText(sections: HotkeySection[]) {
+  const dialogText: YoutubeDialogText = {
+    labelByHotkey: new Map(),
+    titleBySection: new Map()
+  };
+  for (const { hotkeyDialogSectionRenderer: youtubeSection } of sections) {
+    const options = youtubeSection.options.map(option => option.hotkeyDialogSectionOptionRenderer);
+    for (const option of options) {
+      const label = readText(option.label);
+      if (!label) {
         continue;
       }
 
-      labelByHotkey.set(option.hotkey, parsedLabel.data.runs.map(run => run.text).join(""));
+      dialogText.labelByHotkey.set(option.hotkey, label);
     }
+    const section = findSectionByHotkeys(options.map(option => option.hotkey));
+    const title = readText(youtubeSection.title);
+    if (!section || !title) {
+      continue;
+    }
+
+    dialogText.titleBySection.set(section, title);
   }
-  return labelByHotkey;
+  return dialogText;
 }
 
 function buildDialogData(data: unknown) {
@@ -161,7 +191,7 @@ function buildDialogData(data: unknown) {
   return {
     ...parsed.data,
     title: appendTitleSuffix(parsed.data.title),
-    sections: buildGroups(readDataLabels(parsed.data.sections)).map(toSection)
+    sections: buildGroups(readDataText(parsed.data.sections)).map(toSection)
   };
 }
 
@@ -176,18 +206,32 @@ function createDataSlot(elDialog: Element & Record<typeof DATA_PROPERTY, unknown
   };
 }
 
-function readDomLabels(elDialog: Element) {
-  const labelByHotkey = new Map<string, string>();
-  for (const elOption of elDialog.querySelectorAll(OPTION_SELECTOR)) {
-    const label = elOption.querySelector(OPTION_LABEL_SELECTOR)?.textContent.trim();
-    const hotkey = elOption.querySelector(OPTION_HOTKEY_SELECTOR)?.textContent.trim();
-    if (!label || !hotkey) {
+function readDomText(elDialog: Element) {
+  const dialogText: YoutubeDialogText = {
+    labelByHotkey: new Map(),
+    titleBySection: new Map()
+  };
+  for (const elSection of elDialog.querySelectorAll(SECTION_SELECTOR)) {
+    const hotkeys: string[] = [];
+    for (const elOption of elSection.querySelectorAll(OPTION_SELECTOR)) {
+      const label = elOption.querySelector(OPTION_LABEL_SELECTOR)?.textContent.trim();
+      const hotkey = elOption.querySelector(OPTION_HOTKEY_SELECTOR)?.textContent.trim();
+      if (!label || !hotkey) {
+        continue;
+      }
+
+      hotkeys.push(hotkey);
+      dialogText.labelByHotkey.set(hotkey, label);
+    }
+    const section = findSectionByHotkeys(hotkeys);
+    const title = elSection.querySelector(SECTION_TITLE_SELECTOR)?.textContent.trim();
+    if (!section || !title) {
       continue;
     }
 
-    labelByHotkey.set(hotkey, label);
+    dialogText.titleBySection.set(section, title);
   }
-  return labelByHotkey;
+  return dialogText;
 }
 
 function createGroupElement({ title, rows }: HotkeyGroup) {
@@ -219,7 +263,7 @@ function applyDomFallback(elDialog: Element) {
   elFallback.setAttribute(FALLBACK_ATTRIBUTE, "");
   const elStyle = document.createElement("style");
   elStyle.textContent = FALLBACK_CSS;
-  const groups = buildGroups(readDomLabels(elDialog));
+  const groups = buildGroups(readDomText(elDialog));
   elFallback.append(elStyle, ...groups.map(createGroupElement));
   elSections.after(elFallback);
   elSections.setAttribute(HIDDEN_BY_FALLBACK_ATTRIBUTE, "");

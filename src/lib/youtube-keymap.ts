@@ -190,3 +190,10 @@ export function formatYoutubeShortcut({ combos, hotkeyLabel }: YoutubeShortcut) 
     style: ShortcutStyle.Dialog
   });
 }
+
+// A key YouTube always lists in each dialog section, so its localized section title can be found in any language
+export const YOUTUBE_SECTION_ANCHOR_KEYS: Record<KeymapSection, string> = {
+  [KeymapSection.Playback]: YOUTUBE_HOTKEYS.playPause.key,
+  [KeymapSection.General]: YOUTUBE_HOTKEYS.fullscreen.key,
+  [KeymapSection.Subtitles]: YOUTUBE_HOTKEYS.captions.key
+};
