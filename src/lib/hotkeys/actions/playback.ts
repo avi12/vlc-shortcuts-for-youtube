@@ -1,4 +1,3 @@
-import { seekNatively } from "@/lib/hotkeys/native/seek";
 import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import { getVideo, isPlaying, type YoutubePlayer } from "@/lib/player";
 import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
@@ -32,16 +31,6 @@ export function playPrevious(player: YoutubePlayer) {
   dispatchYoutubeHotkey({
     player,
     hotkey: YOUTUBE_HOTKEYS.previous
-  });
-}
-
-export function jump({ player, seconds }: {
-  player: YoutubePlayer;
-  seconds: number;
-}) {
-  seekNatively({
-    player,
-    seconds
   });
 }
 

@@ -3,7 +3,6 @@ import { cycleAudioTrack } from "@/lib/hotkeys/actions/audio-tracks";
 import { toggleControls } from "@/lib/hotkeys/actions/controls-visibility";
 import { stepFrame } from "@/lib/hotkeys/actions/frame-step";
 import {
-  jump,
   playNext,
   playPrevious,
   stop,
@@ -15,13 +14,14 @@ import { takeSnapshot } from "@/lib/hotkeys/actions/snapshot";
 import { resetSpeed, SpeedDirection, stepFineSpeed, stepPresetSpeed } from "@/lib/hotkeys/actions/speed";
 import { CycleDirection, cycleSubtitles } from "@/lib/hotkeys/actions/subtitles";
 import { stepVolume, toggleMute, VolumeDirection } from "@/lib/hotkeys/actions/volume";
+import { seekNatively } from "@/lib/hotkeys/native/seek";
 import type { YoutubePlayer } from "@/lib/player";
 import { JUMP_SECONDS_BY_ACTION, VlcAction, type VlcBinding } from "@/lib/vlc-keymap";
 
 type ActionHandler = (player: YoutubePlayer) => void;
 
 function createJumpHandler(action: VlcAction): ActionHandler {
-  return player => jump({
+  return player => seekNatively({
     player,
     seconds: JUMP_SECONDS_BY_ACTION.get(action) ?? 0
   });

@@ -52,11 +52,14 @@ export function stepFineSpeed({ player, direction }: {
 }) {
   const rates = player.getAvailablePlaybackRates();
   const targetRate = roundRate(getCurrentRate(player) + direction * FINE_SPEED_STEP);
+  const slowestRate = Math.min(...rates);
+  const fastestRate = Math.max(...rates);
+  const rate = Math.min(Math.max(targetRate, slowestRate), fastestRate);
   showRateInNativeBezel({
     player,
     applyRate: () => applyRate({
       player,
-      rate: Math.min(Math.max(targetRate, Math.min(...rates)), Math.max(...rates))
+      rate
     })
   });
 }
