@@ -1,3 +1,5 @@
+import { isPlayerFocusKey } from "@/lib/youtube-keymap";
+
 const EDITABLE_SELECTOR = [
   "input",
   "textarea",
@@ -54,8 +56,10 @@ export function isKeyForPage({ e, elPlayer }: {
   }
 
   const isSpace = e.key === " ";
+  const isOutsidePlayer = !elPlayer.contains(element);
   return isTypingInTextBox(e) ||
     element.closest(OVERLAY_SELECTOR) !== null ||
+    isPlayerFocusKey(e) && isOutsidePlayer ||
     isSpace && isActivatableOutsidePlayer({
       element,
       elPlayer

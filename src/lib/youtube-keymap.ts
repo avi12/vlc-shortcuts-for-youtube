@@ -206,6 +206,14 @@ export function formatYoutubeHotkey(hotkey: YoutubeHotkey) {
 // YouTube's shortcuts for controls VLC also has - VLC's keys replace them, so these are swallowed
 const YOUTUBE_REPLACED_COMBOS = Object.values(YOUTUBE_HOTKEYS).map(toCombo);
 
+// YouTube listens for its volume keys on the player itself, so they work only while focus is inside it - elsewhere
+// they stay the page's and scroll it. Every other YouTube key is also handled page-wide
+const PLAYER_FOCUS_KEYS = new Set<string>([YOUTUBE_HOTKEYS.volumeUp.key, YOUTUBE_HOTKEYS.volumeDown.key]);
+
+export function isPlayerFocusKey(e: KeyboardEvent) {
+  return PLAYER_FOCUS_KEYS.has(e.key);
+}
+
 export function isShortsNavigationKey(e: KeyboardEvent) {
   return YOUTUBE_SHORTS_NAVIGATION_HOTKEYS.some(hotkey => isComboMatch({
     combo: toCombo(hotkey),
