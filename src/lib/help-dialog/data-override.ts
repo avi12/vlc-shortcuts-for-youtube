@@ -6,6 +6,7 @@ import {
   findSectionByHotkeys,
   type HotkeyGroup
 } from "@/lib/help-dialog/hotkey-groups";
+import { isMusicSite } from "@/lib/site";
 import { z } from "@/lib/zod";
 
 const DATA_PROPERTY = "data";
@@ -85,6 +86,19 @@ function toSection({ title, rows }: HotkeyGroup<HotkeyOption>): HotkeySection {
   };
 }
 
+function readSectionHotkeys({ hotkeyDialogSectionRenderer }: HotkeySection) {
+  return hotkeyDialogSectionRenderer.options.map(option => option.hotkeyDialogSectionOptionRenderer.hotkey);
+}
+
+// YouTube Music's sections VLC has no counterpart for (Navigation) stay exactly as Music sent them
+function findMusicOnlySections(sections: HotkeySection[]) {
+  if (!isMusicSite()) {
+    return [];
+  }
+
+  return sections.filter(section => !findSectionByHotkeys(readSectionHotkeys(section)));
+}
+
 function readDataText(sections: HotkeySection[]) {
   const dialogText = createEmptyDialogText<HotkeyOption>();
   for (const { hotkeyDialogSectionRenderer: youtubeSection } of sections) {
@@ -126,7 +140,10 @@ function buildDialogData(data: unknown) {
   return {
     ...parsed.data,
     title: appendTitleSuffix(parsed.data.title),
-    sections: buildGroups(readDataText(parsed.data.sections)).map(toSection)
+    sections: [
+      ...buildGroups(readDataText(parsed.data.sections)).map(toSection),
+      ...findMusicOnlySections(parsed.data.sections)
+    ]
   };
 }
 

@@ -1,9 +1,26 @@
 import { isVlcControlsEnabled, onEnabledChange } from "@/lib/enabled-flag";
 import { isRendererDialog, syncDialogData } from "@/lib/help-dialog/data-override";
 import { applyDomFallback, removeDomFallback } from "@/lib/help-dialog/dom-fallback";
+import { getSite, Site } from "@/lib/site";
 
-const HOTKEY_DIALOG_SELECTOR = "ytd-hotkey-dialog-renderer";
-const POPUP_CONTAINER_SELECTOR = "ytd-popup-container";
+// YouTube Music renders the same dialog data in its own elements, and mounts its dialogs straight in <body>
+const DIALOG_ELEMENTS_BY_SITE: Record<Site, {
+  dialogSelector: string;
+  hostSelector: string;
+}> = {
+  [Site.Youtube]: {
+    dialogSelector: "ytd-hotkey-dialog-renderer",
+    hostSelector: "ytd-popup-container"
+  },
+  [Site.Music]: {
+    dialogSelector: "ytmusic-hotkey-dialog-renderer",
+    hostSelector: "body"
+  }
+};
+
+function getDialogElements() {
+  return DIALOG_ELEMENTS_BY_SITE[getSite()];
+}
 
 function syncDialog(elDialog: Element) {
   const isEnabled = isVlcControlsEnabled();
@@ -20,26 +37,27 @@ function syncDialog(elDialog: Element) {
 }
 
 function syncAllDialogs() {
-  for (const elDialog of document.querySelectorAll(HOTKEY_DIALOG_SELECTOR)) {
+  for (const elDialog of document.querySelectorAll(getDialogElements().dialogSelector)) {
     syncDialog(elDialog);
   }
 }
 
-function waitForPopupContainer(onFound: (elContainer: Element) => void) {
-  const elExisting = document.querySelector(POPUP_CONTAINER_SELECTOR);
+function waitForDialogHost(onFound: (elHost: Element) => void) {
+  const { hostSelector } = getDialogElements();
+  const elExisting = document.querySelector(hostSelector);
   if (elExisting) {
     onFound(elExisting);
     return;
   }
 
   const observer = new MutationObserver(() => {
-    const elContainer = document.querySelector(POPUP_CONTAINER_SELECTOR);
-    if (!elContainer) {
+    const elHost = document.querySelector(hostSelector);
+    if (!elHost) {
       return;
     }
 
     observer.disconnect();
-    onFound(elContainer);
+    onFound(elHost);
   });
   observer.observe(document.documentElement, {
     childList: true,
@@ -47,10 +65,10 @@ function waitForPopupContainer(onFound: (elContainer: Element) => void) {
   });
 }
 
-// YouTube mounts the dialog lazily in ytd-popup-container on the first Shift+/ and may reassign its data on reopen
+// YouTube mounts the dialog lazily on the first Shift+/ and may reassign its data on reopen
 export function installHelpDialogOverride() {
-  waitForPopupContainer(elContainer => {
-    new MutationObserver(syncAllDialogs).observe(elContainer, {
+  waitForDialogHost(elHost => {
+    new MutationObserver(syncAllDialogs).observe(elHost, {
       childList: true,
       subtree: true
     });

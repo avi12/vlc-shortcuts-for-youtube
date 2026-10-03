@@ -1,8 +1,10 @@
 import { VLC_WHEEL_VOLUME, VlcAction } from "@/lib/vlc-keymap";
 import { YOUTUBE_NATIVE_SHORTCUTS } from "@/lib/youtube-keymap";
+import { YOUTUBE_MUSIC_NATIVE_SHORTCUTS } from "@/lib/youtube-music-keymap";
 
 type YoutubeNativeShortcut = typeof YOUTUBE_NATIVE_SHORTCUTS[keyof typeof YOUTUBE_NATIVE_SHORTCUTS];
-type DialogRowSource = VlcAction | typeof VLC_WHEEL_VOLUME | YoutubeNativeShortcut;
+type MusicNativeShortcut = typeof YOUTUBE_MUSIC_NATIVE_SHORTCUTS[keyof typeof YOUTUBE_MUSIC_NATIVE_SHORTCUTS];
+type DialogRowSource = VlcAction | typeof VLC_WHEEL_VOLUME | YoutubeNativeShortcut | MusicNativeShortcut;
 
 // The help dialog lists related shortcuts side by side - VLC's and YouTube's own alike - in this order
 const DIALOG_ROW_ORDER: DialogRowSource[] = [
@@ -31,14 +33,18 @@ const DIALOG_ROW_ORDER: DialogRowSource[] = [
   VlcAction.FasterFine,
   VlcAction.NormalSpeed,
   VlcAction.ToggleLoop,
+  VlcAction.Shuffle,
   VlcAction.ToggleFullscreen,
   YOUTUBE_NATIVE_SHORTCUTS.theaterMode,
   VlcAction.ToggleMiniplayer,
   YOUTUBE_NATIVE_SHORTCUTS.closeMiniplayerOrDialog,
+  YOUTUBE_MUSIC_NATIVE_SHORTCUTS.toggleQueue,
   VlcAction.ToggleMute,
   VlcAction.VolumeUp,
   VlcAction.VolumeDown,
   VLC_WHEEL_VOLUME,
+  YOUTUBE_MUSIC_NATIVE_SHORTCUTS.like,
+  YOUTUBE_MUSIC_NATIVE_SHORTCUTS.dislike,
   VlcAction.CycleAudioTrack,
   VlcAction.CycleAspectRatio,
   VlcAction.ZoomIn360,
