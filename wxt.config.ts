@@ -4,7 +4,7 @@ import { strToU8, unzipSync, zipSync } from "fflate";
 import { readFile, writeFile } from "node:fs/promises";
 import { defineConfig } from "wxt";
 
-export const EXTENSION_NAME = "VLC Controls for YouTube";
+export const EXTENSION_NAME = "VLC Shortcuts for YouTube";
 export const FALLBACK_GECKO_ID = "vlc-controls-in-youtube@avi12.com";
 // Firefox reads the data_collection_permissions key AMO requires from 140 on. Chromium before 137 reports a held
 // key's auto-repeats as KeyboardEvent.repeat false while another key (Shift, Ctrl) is also held, so toggles like

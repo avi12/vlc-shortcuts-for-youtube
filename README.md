@@ -1,4 +1,4 @@
-# VLC Controls for YouTube
+# VLC Shortcuts for YouTube
 
 A browser extension that gives YouTube's player VLC's keyboard shortcuts. YouTube's player tooltips and its
 <kbd>Shift</kbd> + <kbd>/</kbd> shortcuts dialog are rewritten to match, and every action shows YouTube's own on-screen

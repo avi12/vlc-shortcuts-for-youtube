@@ -9,7 +9,7 @@ async function reflectEnabledState(isEnabled: boolean) {
   await Promise.all([
     browser.action.setBadgeText({ text: isEnabled ? "" : BADGE_TEXT_OFF }),
     browser.action.setBadgeBackgroundColor({ color: BADGE_COLOR_OFF }),
-    browser.action.setTitle({ title: `VLC controls: ${stateLabel} - click to toggle` })
+    browser.action.setTitle({ title: `VLC shortcuts: ${stateLabel} - click to toggle` })
   ]);
 }
 
