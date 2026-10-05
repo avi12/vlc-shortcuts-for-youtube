@@ -139,3 +139,8 @@ export function isPlaying(player: YoutubePlayer) {
   const state = player.getPlayerState();
   return state === PlayerState.Playing || state === PlayerState.Buffering;
 }
+
+// A song, episode or video is playing or paused, as opposed to nothing loaded or a finished queue
+export function isMediaActive(player: YoutubePlayer) {
+  return isPlaying(player) || player.getPlayerState() === PlayerState.Paused;
+}
