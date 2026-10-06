@@ -1,6 +1,8 @@
-import { isMediaActive, type YoutubePlayer } from "@/lib/player";
+import { isMediaActive, PLAYER_SELECTOR, type YoutubePlayer } from "@/lib/player";
 import { isMusicSite } from "@/lib/site";
 import { isPlayerFocusKey } from "@/lib/youtube-keymap";
+
+const TAB_KEY = "Tab";
 
 const EDITABLE_SELECTOR = [
   "input",
@@ -13,6 +15,9 @@ const EDITABLE_SELECTOR = [
 ].join(", ");
 const OVERLAY_SELECTOR = "dialog, [role='dialog'], [role='menu'], [role='listbox'], .ytp-popup, tp-yt-iron-dropdown";
 const ACTIVATABLE_SELECTOR = "button, a[href], summary, [role='button'], [role='link'], [role='checkbox'], [role='tab'], [role='option']";
+
+// Whether the viewer's last click or Tab landed inside a player, as opposed to YouTube focusing it on its own
+let isPlayerEnteredByViewer = false;
 
 function getEventElement(e: Event) {
   const [target] = e.composedPath();
@@ -48,19 +53,54 @@ function isActivatableOutsidePlayer({ element, elPlayer }: {
   return element.closest(ACTIVATABLE_SELECTOR) !== null && !elPlayer.contains(element);
 }
 
+function isInsideAnyPlayer(element: Element | null) {
+  return element !== null && element.closest(PLAYER_SELECTOR) !== null;
+}
+
+function onPointerDown(e: PointerEvent) {
+  isPlayerEnteredByViewer = isInsideAnyPlayer(getEventElement(e));
+}
+
+function onTabKeyUp(e: KeyboardEvent) {
+  if (e.key !== TAB_KEY) {
+    return;
+  }
+
+  isPlayerEnteredByViewer = isInsideAnyPlayer(getFocusedElement());
+}
+
+function isModifiedKey(e: KeyboardEvent) {
+  return e.ctrlKey || e.altKey || e.metaKey;
+}
+
 // The volume keys scroll the page and Ctrl/Alt combos double as browser shortcuts (Ctrl+H history, Alt+Left back),
 // so they stay the page's unless the viewer is in the player. YouTube Music's player can't take focus while its
 // player page is closed, so there they act while something is playing or paused instead
 function isPlayerOnlyKey(e: KeyboardEvent) {
-  const isModified = e.ctrlKey || e.altKey || e.metaKey;
-  return isPlayerFocusKey(e) || isModified;
+  return isPlayerFocusKey(e) || isModifiedKey(e);
 }
 
-function isPlayerOutOfUse({ element, elPlayer }: {
+// YouTube focuses its player by itself whenever a video loads, so a browser shortcut also needs the viewer to have
+// clicked or tabbed into the player
+function isViewerInPlayer({ e, element, elPlayer }: {
+  e: KeyboardEvent;
   element: Element;
   elPlayer: YoutubePlayer;
 }) {
-  return isMusicSite() ? !isMediaActive(elPlayer) : !elPlayer.contains(element);
+  const isFocusInPlayer = elPlayer.contains(element);
+  return isModifiedKey(e) ? isFocusInPlayer && isPlayerEnteredByViewer : isFocusInPlayer;
+}
+
+function isPlayerOutOfUse({ e, element, elPlayer }: {
+  e: KeyboardEvent;
+  element: Element;
+  elPlayer: YoutubePlayer;
+}) {
+  return isMusicSite() ? !isMediaActive(elPlayer) : !isViewerInPlayer({
+    e,
+    element,
+    elPlayer
+  });
 }
 
 export function isKeyForPage({ e, elPlayer }: {
@@ -76,6 +116,7 @@ export function isKeyForPage({ e, elPlayer }: {
   return isTypingInTextBox(e) ||
     element.closest(OVERLAY_SELECTOR) !== null ||
     isPlayerOnlyKey(e) && isPlayerOutOfUse({
+      e,
       element,
       elPlayer
     }) ||
@@ -83,6 +124,15 @@ export function isKeyForPage({ e, elPlayer }: {
       element,
       elPlayer
     });
+}
+
+export function installPlayerEntryTracking() {
+  addEventListener("pointerdown", onPointerDown, {
+    capture: true
+  });
+  addEventListener("keyup", onTabKeyUp, {
+    capture: true
+  });
 }
 
 export function isEventInside({ e, elContainer }: {

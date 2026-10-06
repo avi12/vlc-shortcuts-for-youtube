@@ -1,7 +1,7 @@
 import { isVlcControlsEnabled, onEnabledChange } from "@/lib/enabled-flag";
 import { installAspectRatioReset, resetAspectRatio } from "@/lib/hotkeys/actions/aspect-ratio";
 import { showAllControls } from "@/lib/hotkeys/actions/controls-visibility";
-import { isEventInside, isKeyForPage } from "@/lib/hotkeys/event-targets";
+import { installPlayerEntryTracking, isEventInside, isKeyForPage } from "@/lib/hotkeys/event-targets";
 import { installBezelRegistry } from "@/lib/hotkeys/native/bezel-component";
 import { runAction } from "@/lib/hotkeys/run-action";
 import { resetVolumeBoost } from "@/lib/hotkeys/volume-boost";
@@ -153,6 +153,7 @@ export function installHotkeys() {
     capture: true
   });
   addEventListener("blur", releaseAllHeldKeys);
+  installPlayerEntryTracking();
   installWheelVolume();
   installAspectRatioReset();
   onEnabledChange(undoSideEffects);
