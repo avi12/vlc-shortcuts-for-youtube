@@ -1,10 +1,11 @@
 import { createMenuIcon } from "@/lib/context-menu/menu-icons";
+import type {
+  MenuRow} from "@/lib/context-menu/menu-model";
 import {
   CHOICE_ROWS,
   type ChoiceRowModel,
   COMMAND_ROWS,
   type CommandRowModel,
-  MenuRow,
   TOGGLE_ROW
 } from "@/lib/context-menu/menu-model";
 import {

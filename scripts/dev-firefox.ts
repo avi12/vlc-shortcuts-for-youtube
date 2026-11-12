@@ -185,10 +185,10 @@ const TAB_REFRESH_TIMEOUT_MS = 10_000;
 interface RdpPacket {
   from?: string;
   type?: string;
-  tabs?: {
+  tabs?: Array<{
     actor: string;
     url?: string;
-  }[];
+  }>;
   frame?: { consoleActor?: string };
   resultID?: string;
 }
@@ -198,10 +198,10 @@ interface RdpPacket {
 async function connectRdp(port: number) {
   const socket = connect(port, "127.0.0.1");
   let buffer = Buffer.alloc(0);
-  const waiters: {
+  const waiters: Array<{
     isMatch: (packet: RdpPacket) => boolean;
     fulfill: (packet: RdpPacket) => void;
-  }[] = [];
+  }> = [];
 
   socket.on("data", chunk => {
     buffer = Buffer.concat([buffer, typeof chunk === "string" ? Buffer.from(chunk) : chunk]);

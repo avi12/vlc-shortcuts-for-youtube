@@ -6,10 +6,10 @@ export enum WorldMessage {
   SET_TAB_ENABLED = "set-tab-enabled"
 }
 
-type WorldProtocolMap = {
+interface WorldProtocolMap {
   // The context menu's own toggle, which switches VLC's controls for this tab only - the bridge owns that switch
   [WorldMessage.SET_TAB_ENABLED](isEnabled: boolean): void;
-};
+}
 
 const WORLD_NAMESPACE = "vlc-controls";
 

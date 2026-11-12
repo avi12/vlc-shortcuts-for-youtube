@@ -34,7 +34,7 @@ import {
   resolve
 } from "node:path";
 import { inspect } from "node:util";
-import webExtRun from "web-ext-run";
+import type webExtRun from "web-ext-run";
 import { consoleStream as webExtConsoleStream } from "web-ext-run/util/logger";
 import { build } from "wxt";
 import { MatchPattern } from "wxt/utils/match-patterns";
@@ -203,11 +203,11 @@ const MAIN_WORLD = "MAIN";
 const DEV_STYLE_ATTRIBUTE = "data-vlc-controls-dev-style";
 
 interface BuiltManifest {
-  content_scripts?: {
+  content_scripts?: Array<{
     js?: string[];
     css?: string[];
     world?: string;
-  }[];
+  }>;
 }
 
 // The extension's stylesheets leave the open pages with the reload that refreshes them, so each comes back as a
