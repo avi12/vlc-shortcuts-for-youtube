@@ -1,6 +1,12 @@
 {
-  "$schema": "https://raw.githubusercontent.com/getfallow/fallow/main/schema/fallowrc.json",
-  "entry": ["src/entrypoints/**", "web-ext.config.ts"],
+  "$schema": "./node_modules/fallow/schema.json",
+  "extends": [
+    "./node_modules/fallow-config-avi12/fallow.json"
+  ],
+  "entry": [
+    "src/entrypoints/**",
+    "web-ext.config.ts"
+  ],
   "health": {
     "maxCognitive": 30,
     "maxCrap": 10000
