@@ -147,8 +147,8 @@ export function installProcessDiagnostics() {
 // ── Helpers for the browser targets ──────────────────────────────────────────
 
 export async function findFreeTcpPort(startPort: number) {
-  const MAX_PROBES = 50;
-  for (let port = startPort; port < startPort + MAX_PROBES; port++) {
+  const maxProbes = 50;
+  for (let port = startPort; port < startPort + maxProbes; port++) {
     const isAvailable = await new Promise<boolean>(resolvePromise => {
       const server = createServer();
       server.once("error", () => resolvePromise(false));
@@ -425,9 +425,9 @@ async function reloadExtensionAndTabs({ target, browser, startedAt }: {
 
 // web-ext-run's info logs are noise; surface warnings and up
 function suppressWebExtInfoLogs() {
-  const WARN_LOG_LEVEL = 40;
+  const warnLogLevel = 40;
   webExtConsoleStream.write = ({ level, msg: message }) => {
-    if (level >= WARN_LOG_LEVEL) {
+    if (level >= warnLogLevel) {
       console.warn(message);
     }
   };
@@ -545,8 +545,8 @@ export async function runDevServer(target: BrowserTarget) {
 
     isExiting = true;
     logEvent("Shutting down - closing watcher and browser");
-    const FORCED_EXIT_MS = 3000;
-    setTimeout(() => process.exit(0), FORCED_EXIT_MS).unref();
+    const forcedExitMs = 3000;
+    setTimeout(() => process.exit(0), forcedExitMs).unref();
     await watcher.close().catch(() => {});
     await browser.runner.exit().catch(error => {
       logEvent("runner.exit() failed:");
@@ -574,11 +574,11 @@ export async function runDevServer(target: BrowserTarget) {
       return;
     }
 
-    const LIVENESS_POLL_MS = 2000;
-    const MAX_CONSECUTIVE_FAILURES = 3;
+    const livenessPollMs = 2000;
+    const maxConsecutiveFailures = 3;
     let consecutiveFailures = 0;
     while (!isExiting) {
-      await sleep(LIVENESS_POLL_MS);
+      await sleep(livenessPollMs);
 
       if (isExiting) {
         return;
@@ -586,7 +586,7 @@ export async function runDevServer(target: BrowserTarget) {
 
       consecutiveFailures = await isBrowserAlive(browser.debugPort) ? 0 : consecutiveFailures + 1;
 
-      if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+      if (consecutiveFailures >= maxConsecutiveFailures) {
         logEvent(`${target.name} is no longer reachable - shutting down`);
         await exit();
         return;

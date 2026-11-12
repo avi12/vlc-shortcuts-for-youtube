@@ -84,12 +84,12 @@ function endTextOnlyStatus(bezel: unknown) {
 // Each bezel is recorded as it hides (its constructor's first call) or shows. The original method still
 // runs, with the same arguments and result
 function recordBezelInstances(namespace: PlayerNamespace) {
-  const BezelClass = Object.values(namespace).find(isBezelClass);
-  if (!BezelClass) {
+  const bezelClass = Object.values(namespace).find(isBezelClass);
+  if (!bezelClass) {
     return;
   }
 
-  const { prototype } = BezelClass;
+  const { prototype } = bezelClass;
   const { show, hide } = prototype;
   prototype.show = function (this: unknown) {
     rememberBezel(this);

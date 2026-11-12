@@ -35,7 +35,7 @@ const SET_OPTIONS_MARKERS = [".length", "options"] as const;
 const SELECT_EVENT = "select";
 const CLICK_EVENT = "click";
 // YouTube appends each of its own context-menu rows in order, so ours sit after them whatever their priority
-const APPEND_TO_END = true;
+const SHOULD_APPEND_TO_END = true;
 
 interface NativeComponent {
   element: HTMLElement;
@@ -150,8 +150,8 @@ function findMenuClasses({ namespace, panelMenuPrototype }: {
   panelMenuPrototype: object;
 }) {
   const values = Object.values(namespace);
-  const MenuItem = values.find(isMenuItemClass);
-  const ChoiceItem = values.find(isChoiceItemClass);
+  const menuItemClass = values.find(isMenuItemClass);
+  const choiceItemClass = values.find(isChoiceItemClass);
   const createItemTemplate = values.find(isItemTemplateFactory);
   const addItemName = findOwnMethodName({
     prototype: panelMenuPrototype,
@@ -161,16 +161,16 @@ function findMenuClasses({ namespace, panelMenuPrototype }: {
     prototype: panelMenuPrototype,
     markers: REMOVE_ITEM_MARKERS
   });
-  if (!MenuItem || !ChoiceItem || !createItemTemplate || !addItemName || !removeItemName) {
+  if (!menuItemClass || !choiceItemClass || !createItemTemplate || !addItemName || !removeItemName) {
     return null;
   }
 
   const selectOptionName = findOwnMethodName({
-    prototype: ChoiceItem.prototype,
+    prototype: choiceItemClass.prototype,
     markers: SELECT_OPTION_MARKERS
   });
   const setOptionsName = selectOptionName && findOwnMethodName({
-    prototype: ChoiceItem.prototype,
+    prototype: choiceItemClass.prototype,
     markers: SET_OPTIONS_MARKERS,
     excluded: [selectOptionName]
   });
@@ -179,8 +179,8 @@ function findMenuClasses({ namespace, panelMenuPrototype }: {
   }
 
   return {
-    MenuItem,
-    ChoiceItem,
+    MenuItem: menuItemClass,
+    ChoiceItem: choiceItemClass,
     createItemTemplate,
     addItemName,
     removeItemName,
@@ -192,12 +192,12 @@ function findMenuClasses({ namespace, panelMenuPrototype }: {
 // Every row list records itself as YouTube fills it, so the right-click menu can be found by its element later.
 // The original method still runs, with the same arguments and result
 function recordPanelMenus(namespace: PlayerNamespace) {
-  const PanelMenuClass = Object.values(namespace).find(isPanelMenuClass);
-  if (!PanelMenuClass) {
+  const panelMenuClass = Object.values(namespace).find(isPanelMenuClass);
+  if (!panelMenuClass) {
     return;
   }
 
-  const panelMenuPrototype = PanelMenuClass.prototype;
+  const panelMenuPrototype = panelMenuClass.prototype;
   const classes = findMenuClasses({
     namespace,
     panelMenuPrototype
@@ -279,7 +279,7 @@ export function getNativeContextMenu(): NativeContextMenu | null {
     element: panelMenu.element,
     popup,
     addItem(item) {
-      addItem.call(panelMenu, item, APPEND_TO_END);
+      addItem.call(panelMenu, item, SHOULD_APPEND_TO_END);
     },
     removeItem(item) {
       removeItem.call(panelMenu, item);

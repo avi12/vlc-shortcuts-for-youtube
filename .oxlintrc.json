@@ -12,20 +12,67 @@
     "typescript/no-base-to-string": "off",
     "typescript/restrict-template-expressions": "off",
     "typescript/no-useless-default-assignment": "off",
-    "typescript/consistent-type-assertions": ["error", { "assertionStyle": "never" }],
+    "typescript/consistent-type-assertions": [
+      "error",
+      {
+        "assertionStyle": "never"
+      }
+    ],
     "import/default": "off",
     "no-restricted-globals": [
       "error",
-      { "name": "process", "message": "extension code does not run under Node - read config via import.meta.env, not process" }
+      {
+        "name": "process",
+        "message": "extension code does not run under Node - read config via import.meta.env, not process"
+      }
     ],
-    "naming/convention": ["error", { "presets": ["webextension-manifest", "webextension-messages"] }]
+    "naming/convention": [
+      "error",
+      {
+        "presets": [
+          "webextension-manifest",
+          "webextension-messages",
+          "hook-names"
+        ],
+        "allowedNames": [
+          {
+            "reason": "YouTube's player script assigns this global; the name is theirs",
+            "names": [
+              "_yt_player"
+            ]
+          }
+        ]
+      }
+    ]
   },
   "overrides": [
     {
-      "files": ["./scripts/*.ts", "**/*.config.ts", "**/*.config.js", "**/*.config.mjs"],
-      "env": { "node": true },
-      "rules": { "no-restricted-globals": "off" }
+      "files": [
+        "./scripts/*.ts",
+        "**/*.config.ts",
+        "**/*.config.js",
+        "**/*.config.mjs"
+      ],
+      "env": {
+        "node": true
+      },
+      "rules": {
+        "no-restricted-globals": "off"
+      }
+    },
+    {
+      "files": [
+        "src/entrypoints/*.ts",
+        "scripts/*.d.ts"
+      ],
+      "rules": {
+        "no-restricted-exports": "off"
+      }
     }
   ],
-  "ignorePatterns": ["user-profiles/**", ".output/**", ".wxt/**"]
+  "ignorePatterns": [
+    "user-profiles/**",
+    ".output/**",
+    ".wxt/**"
+  ]
 }
