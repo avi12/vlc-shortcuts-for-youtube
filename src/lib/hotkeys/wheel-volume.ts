@@ -11,21 +11,21 @@ const PIXELS_PER_LINE = 40;
 let pendingDeltaPixels = 0;
 
 // Browsers turn Shift+wheel into horizontal scrolling, so the notch can arrive on either axis
-function toPixels(e: WheelEvent) {
-  const delta = e.deltaY || e.deltaX;
-  return e.deltaMode === WheelEvent.DOM_DELTA_LINE ? delta * PIXELS_PER_LINE : delta;
+function toPixels(event: WheelEvent) {
+  const delta = event.deltaY || event.deltaX;
+  return event.deltaMode === WheelEvent.DOM_DELTA_LINE ? delta * PIXELS_PER_LINE : delta;
 }
 
 // Shift+wheel anywhere over the player changes the volume; the plain wheel keeps scrolling the page. On Shorts
 // the wheel moves between shorts, so it stays YouTube's there
-function getWheelVolumePlayer(e: WheelEvent) {
+function getWheelVolumePlayer(event: WheelEvent) {
   const isVolumeWheel = VLC_WHEEL_VOLUME.combos.some(combo => isWheelComboMatch({
     combo,
-    e
+    e: event
   }));
   const player = isVolumeWheel ? getPlayer() : null;
   if (!player || isShortsPlayer(player) || !isEventInside({
-    e,
+    e: event,
     elContainer: player
   })) {
     return null;
@@ -34,15 +34,15 @@ function getWheelVolumePlayer(e: WheelEvent) {
   return player;
 }
 
-function onWheel(e: WheelEvent) {
-  const player = isVlcControlsEnabled() ? getWheelVolumePlayer(e) : null;
+function onWheel(event: WheelEvent) {
+  const player = isVlcControlsEnabled() ? getWheelVolumePlayer(event) : null;
   if (!player) {
     return;
   }
 
-  e.preventDefault();
-  e.stopImmediatePropagation();
-  pendingDeltaPixels += toPixels(e);
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  pendingDeltaPixels += toPixels(event);
   const notches = Math.trunc(pendingDeltaPixels / PIXELS_PER_WHEEL_NOTCH);
   if (notches === 0) {
     return;

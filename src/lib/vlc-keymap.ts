@@ -488,10 +488,10 @@ export const VLC_WHEEL_VOLUME = {
 
 export const VLC_WHEEL_SHORTCUTS = [VLC_WHEEL_VOLUME];
 
-export function findBindings(e: KeyboardEvent) {
+export function findBindings(event: KeyboardEvent) {
   return VLC_BINDINGS.filter(binding => binding.combos.some(combo => isComboMatch({
     combo,
-    e
+    e: event
   })));
 }
 

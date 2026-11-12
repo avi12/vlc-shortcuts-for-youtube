@@ -168,8 +168,8 @@ export function selectAspectRatio({ player, label }: {
 }
 
 export function installAspectRatioReset() {
-  document.addEventListener("loadstart", e => {
-    if (isMainVideo(e.target)) {
+  document.addEventListener("loadstart", event => {
+    if (isMainVideo(event.target)) {
       resetAspectRatio();
     }
   }, {

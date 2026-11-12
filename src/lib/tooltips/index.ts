@@ -242,8 +242,8 @@ function observeTooltipText(elButton: Element) {
   });
 }
 
-function handleButtonEnter(e: Event) {
-  const elTarget = e.target;
+function handleButtonEnter(event: Event) {
+  const elTarget = event.target;
   const elButton = elTarget instanceof Element ? elTarget.closest(HOVERABLE_BUTTON_SELECTOR) : null;
   elHoveredButton = elButton;
 

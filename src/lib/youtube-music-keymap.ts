@@ -121,9 +121,9 @@ export function formatMusicHotkey(hotkey: YoutubeHotkey) {
 // Music's, even where VLC binds it
 const MUSIC_NAVIGATION_PREFIX_COMBO: KeyCombo = { key: "g" };
 
-export function isMusicNavigationPrefix(e: KeyboardEvent) {
+export function isMusicNavigationPrefix(event: KeyboardEvent) {
   return isComboMatch({
     combo: MUSIC_NAVIGATION_PREFIX_COMBO,
-    e
+    e: event
   });
 }

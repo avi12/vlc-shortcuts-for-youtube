@@ -3,8 +3,8 @@
 export const ENABLED_ATTRIBUTE = "data-vlc-controls";
 
 export enum EnabledState {
-  ON = "on",
-  OFF = "off"
+  ENABLED = "on",
+  DISABLED = "off"
 }
 
 type EnabledChangeCallback = (isEnabled: boolean) => void;
@@ -15,7 +15,7 @@ const enabledAttributeObserver = new MutationObserver(notifyEnabledChange);
 let isRetired = false;
 
 export function isVlcControlsEnabled() {
-  return !isRetired && document.documentElement.getAttribute(ENABLED_ATTRIBUTE) !== EnabledState.OFF;
+  return !isRetired && document.documentElement.getAttribute(ENABLED_ATTRIBUTE) !== EnabledState.DISABLED;
 }
 
 // A retired copy is not the same as one switched off: it leaves YouTube's page as YouTube's own, while a copy the

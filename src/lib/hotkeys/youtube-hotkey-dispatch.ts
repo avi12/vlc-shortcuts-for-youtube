@@ -10,8 +10,8 @@ enum KeyEventType {
 const dispatchedEvents = new WeakSet<Event>();
 
 // Our own synthetic presses must reach YouTube's handler instead of being swallowed as a replaced key
-export function isDispatchedYoutubeHotkey(e: Event) {
-  return dispatchedEvents.has(e);
+export function isDispatchedYoutubeHotkey(event: Event) {
+  return dispatchedEvents.has(event);
 }
 
 function dispatchKey({ player, hotkey, eventType }: {
@@ -19,13 +19,13 @@ function dispatchKey({ player, hotkey, eventType }: {
   hotkey: YoutubeHotkey;
   eventType: KeyEventType;
 }) {
-  const e = new KeyboardEvent(eventType, {
+  const event = new KeyboardEvent(eventType, {
     ...hotkey,
     bubbles: true,
     cancelable: true
   });
-  dispatchedEvents.add(e);
-  player.dispatchEvent(e);
+  dispatchedEvents.add(event);
+  player.dispatchEvent(event);
 }
 
 // The key the player presses for a YouTube key: the key itself, YouTube Music's own key for the same control, or

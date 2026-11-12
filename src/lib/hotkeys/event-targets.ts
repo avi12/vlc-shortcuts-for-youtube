@@ -14,8 +14,8 @@ const EDITABLE_SELECTOR = [
 const OVERLAY_SELECTOR = "dialog, [role='dialog'], [role='menu'], [role='listbox'], .ytp-popup, tp-yt-iron-dropdown";
 const ACTIVATABLE_SELECTOR = "button, a[href], summary, [role='button'], [role='link'], [role='checkbox'], [role='tab'], [role='option']";
 
-function getEventElement(e: Event) {
-  const [target] = e.composedPath();
+function getEventElement(event: Event) {
+  const [target] = event.composedPath();
   return target instanceof Element ? target : null;
 }
 
@@ -34,8 +34,8 @@ function getFocusedElement() {
 
 // Keys typed into a text box (search, comments, live chat) stay the text box's. The whole event path is checked,
 // since a field inside a web component's shadow root is invisible to closest() from the event's target
-function isTypingInTextBox(e: KeyboardEvent) {
-  const isPathEditable = e.composedPath().some(target => target instanceof Element && isEditableElement(target));
+function isTypingInTextBox(event: KeyboardEvent) {
+  const isPathEditable = event.composedPath().some(target => target instanceof Element && isEditableElement(target));
   const elFocused = getFocusedElement();
   return isPathEditable || elFocused !== null && isEditableElement(elFocused);
 }
@@ -48,15 +48,15 @@ function isActivatableOutsidePlayer({ element, elPlayer }: {
   return element.closest(ACTIVATABLE_SELECTOR) !== null && !elPlayer.contains(element);
 }
 
-function isModifiedKey(e: KeyboardEvent) {
-  return e.ctrlKey || e.altKey || e.metaKey;
+function isModifiedKey(event: KeyboardEvent) {
+  return event.ctrlKey || event.altKey || event.metaKey;
 }
 
 // The volume keys scroll the page and Ctrl/Alt combos double as browser shortcuts (Ctrl+H history, Alt+Left back),
 // so they stay the page's unless the player has focus. YouTube Music's player can't take focus while its player
 // page is closed, so there they act while something is playing or paused instead
-function isPlayerOnlyKey(e: KeyboardEvent) {
-  return isPlayerFocusKey(e) || isModifiedKey(e);
+function isPlayerOnlyKey(event: KeyboardEvent) {
+  return isPlayerFocusKey(event) || isModifiedKey(event);
 }
 
 function isPlayerOutOfUse({ element, elPlayer }: {
@@ -90,8 +90,8 @@ export function isKeyForPage({ e, elPlayer }: {
 
 // A Ctrl/Alt combo left to the browser outside a text box, which YouTube's own handler reads as the bare key
 // (Alt+Right as Right, seeking 5 seconds)
-export function isBrowserShortcutOutsideTextBox(e: KeyboardEvent) {
-  return isModifiedKey(e) && !isTypingInTextBox(e);
+export function isBrowserShortcutOutsideTextBox(event: KeyboardEvent) {
+  return isModifiedKey(event) && !isTypingInTextBox(event);
 }
 
 export function isEventInside({ e, elContainer }: {

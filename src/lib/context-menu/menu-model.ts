@@ -23,8 +23,8 @@ export enum MenuRow {
 
 // What the toggle row shows beside its label, since YouTube's rows have no switch of their own
 enum ToggleValue {
-  ON = "On",
-  OFF = "Off"
+  ENABLED = "On",
+  DISABLED = "Off"
 }
 
 // A row that opens a sub-panel of the choices VLC offers for that control, with the current one checked
@@ -129,6 +129,6 @@ export const COMMAND_ROWS: CommandRowModel[] = [
 export const TOGGLE_ROW = {
   id: MenuRow.TOGGLE,
   label: TOGGLE_LABEL,
-  readValue: () => isVlcControlsEnabled() ? ToggleValue.ON : ToggleValue.OFF,
+  readValue: () => isVlcControlsEnabled() ? ToggleValue.ENABLED : ToggleValue.DISABLED,
   flip: () => worldMessenger.sendMessage(WorldMessage.SET_TAB_ENABLED, !isVlcControlsEnabled())
 };

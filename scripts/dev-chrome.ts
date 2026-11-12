@@ -170,8 +170,8 @@ async function refreshTargetOverCdp({ webSocketUrl, expressions }: {
   const contexts: CdpExecutionContext[] = [];
   const replyById = new Map<number, (message: CdpMessage) => void>();
   let nextId = 1;
-  webSocket.onmessage = e => {
-    const message: CdpMessage = JSON.parse(String(e.data));
+  webSocket.onmessage = event => {
+    const message: CdpMessage = JSON.parse(String(event.data));
     if (message.method === "Runtime.executionContextCreated" && message.params?.context) {
       contexts.push(message.params.context);
     }

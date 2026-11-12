@@ -8,8 +8,8 @@ import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 const START_SECONDS = 0;
 
 enum LoopStatus {
-  ON = "Loop on",
-  OFF = "Loop off"
+  ENABLED = "Loop on",
+  DISABLED = "Loop off"
 }
 
 // Shorts' own next/previous buttons; its player swallows the arrow keys Shorts otherwise moves with
@@ -79,7 +79,7 @@ export function toggleLoop(player: YoutubePlayer) {
   player.setLoopVideo?.(elVideo.loop);
   showStatusInNativeBezel({
     player,
-    text: elVideo.loop ? LoopStatus.ON : LoopStatus.OFF
+    text: elVideo.loop ? LoopStatus.ENABLED : LoopStatus.DISABLED
   });
 }
 

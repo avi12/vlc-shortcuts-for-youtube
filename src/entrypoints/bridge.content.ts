@@ -8,7 +8,7 @@ import { WorldMessage, worldMessenger } from "@/lib/world-messaging";
 import { defineContentScript } from "#imports";
 
 function mirrorEnabledState(isEnabled: boolean) {
-  document.documentElement.setAttribute(ENABLED_ATTRIBUTE, isEnabled ? EnabledState.ON : EnabledState.OFF);
+  document.documentElement.setAttribute(ENABLED_ATTRIBUTE, isEnabled ? EnabledState.ENABLED : EnabledState.DISABLED);
 }
 
 // Isolated world: the MAIN-world script has no extension APIs, so the toggle reaches it through an attribute on

@@ -33,15 +33,15 @@ function releaseAllHeldKeys() {
   }
 }
 
-function swallow(e: KeyboardEvent) {
-  e.stopImmediatePropagation();
-  swallowedKeyCodes.add(e.code);
+function swallow(event: KeyboardEvent) {
+  event.stopImmediatePropagation();
+  swallowedKeyCodes.add(event.code);
 }
 
-function getTargetPlayer(e: KeyboardEvent) {
-  const player = isVlcControlsEnabled() && !e.isComposing ? getPlayer() : null;
+function getTargetPlayer(event: KeyboardEvent) {
+  const player = isVlcControlsEnabled() && !event.isComposing ? getPlayer() : null;
   if (!player || isKeyForPage({
-    e,
+    e: event,
     elPlayer: player
   })) {
     return null;
@@ -51,9 +51,9 @@ function getTargetPlayer(e: KeyboardEvent) {
 }
 
 // Kept from YouTube without cancelling the browser's own shortcut (Alt+Left still goes back)
-function isVlcComboLeftToBrowser(e: KeyboardEvent) {
+function isVlcComboLeftToBrowser(event: KeyboardEvent) {
   const isOnPlayerPage = isVlcControlsEnabled() && getPlayer() !== null;
-  return isOnPlayerPage && isBrowserShortcutOutsideTextBox(e) && findBindings(e).length > 0;
+  return isOnPlayerPage && isBrowserShortcutOutsideTextBox(event) && findBindings(event).length > 0;
 }
 
 function isBindingActive({ binding, player, e }: {
@@ -82,18 +82,18 @@ function findActiveBinding({ e, player }: {
   return activeBindings.find(binding => binding.isSphericalOnly) ?? activeBindings[0];
 }
 
-function onKeyDown(e: KeyboardEvent) {
-  if (isDispatchedYoutubeHotkey(e)) {
+function onKeyDown(event: KeyboardEvent) {
+  if (isDispatchedYoutubeHotkey(event)) {
     return;
   }
 
-  swallowedKeyCodes.delete(e.code);
+  swallowedKeyCodes.delete(event.code);
   const isMusicNavigation = isAfterMusicNavigationPrefix;
-  isAfterMusicNavigationPrefix = isMusicSite() && isMusicNavigationPrefix(e);
-  const player = getTargetPlayer(e);
-  const isShortsNavigation = player !== null && isShortsPlayer(player) && isShortsNavigationKey(e);
-  if (!player && isVlcComboLeftToBrowser(e)) {
-    swallow(e);
+  isAfterMusicNavigationPrefix = isMusicSite() && isMusicNavigationPrefix(event);
+  const player = getTargetPlayer(event);
+  const isShortsNavigation = player !== null && isShortsPlayer(player) && isShortsNavigationKey(event);
+  if (!player && isVlcComboLeftToBrowser(event)) {
+    swallow(event);
     return;
   }
 
@@ -102,44 +102,44 @@ function onKeyDown(e: KeyboardEvent) {
   }
 
   const binding = findActiveBinding({
-    e,
+    e: event,
     player
   });
   if (binding) {
-    e.preventDefault();
-    swallow(e);
+    event.preventDefault();
+    swallow(event);
     const release = runAction({
       binding,
       player,
-      isRepeat: e.repeat
+      isRepeat: event.repeat
     });
     if (typeof release === "function") {
-      releaseByKeyCode.set(e.code, release);
+      releaseByKeyCode.set(event.code, release);
     }
 
     return;
   }
 
   // YouTube Music's own keys that VLC doesn't bind keep working there
-  const isReplacedKey = !isMusicSite() && isReplacedYoutubeKey(e);
+  const isReplacedKey = !isMusicSite() && isReplacedYoutubeKey(event);
   if (isReplacedKey) {
-    swallow(e);
+    swallow(event);
   }
 }
 
-function onKeyPress(e: KeyboardEvent) {
-  if (swallowedKeyCodes.has(e.code)) {
-    e.stopImmediatePropagation();
+function onKeyPress(event: KeyboardEvent) {
+  if (swallowedKeyCodes.has(event.code)) {
+    event.stopImmediatePropagation();
   }
 }
 
-function onKeyUp(e: KeyboardEvent) {
-  if (!swallowedKeyCodes.delete(e.code)) {
+function onKeyUp(event: KeyboardEvent) {
+  if (!swallowedKeyCodes.delete(event.code)) {
     return;
   }
 
-  e.stopImmediatePropagation();
-  releaseHeldKey(e.code);
+  event.stopImmediatePropagation();
+  releaseHeldKey(event.code);
 }
 
 function undoSideEffects(isEnabled: boolean) {

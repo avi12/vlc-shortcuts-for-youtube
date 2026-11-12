@@ -255,21 +255,21 @@ const YOUTUBE_REPLACED_COMBOS = Object.values(YOUTUBE_HOTKEYS).map(toHotkeyCombo
 // they stay the page's and scroll it. Every other YouTube key is also handled page-wide
 const PLAYER_FOCUS_KEYS = new Set<string>([YOUTUBE_HOTKEYS.volumeUp.key, YOUTUBE_HOTKEYS.volumeDown.key]);
 
-export function isPlayerFocusKey(e: KeyboardEvent) {
-  return PLAYER_FOCUS_KEYS.has(e.key);
+export function isPlayerFocusKey(event: KeyboardEvent) {
+  return PLAYER_FOCUS_KEYS.has(event.key);
 }
 
-export function isShortsNavigationKey(e: KeyboardEvent) {
+export function isShortsNavigationKey(event: KeyboardEvent) {
   return YOUTUBE_SHORTS_NAVIGATION_HOTKEYS.some(hotkey => isComboMatch({
     combo: toHotkeyCombo(hotkey),
-    e
+    e: event
   }));
 }
 
-export function isReplacedYoutubeKey(e: KeyboardEvent) {
+export function isReplacedYoutubeKey(event: KeyboardEvent) {
   return YOUTUBE_REPLACED_COMBOS.some(combo => isComboMatch({
     combo,
-    e
+    e: event
   }));
 }
 
