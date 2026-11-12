@@ -94,6 +94,7 @@ interface JumpSize {
 }
 
 const SECONDS_PER_MINUTE = 60;
+const LONG_JUMP_MINUTES = 5;
 
 // VLC 3.x jump lengths (key-jump-*)
 const JUMP_SECONDS = {
@@ -101,7 +102,7 @@ const JUMP_SECONDS = {
   arrow: 5,
   short: 10,
   medium: SECONDS_PER_MINUTE,
-  long: 5 * SECONDS_PER_MINUTE
+  long: LONG_JUMP_MINUTES * SECONDS_PER_MINUTE
 } as const;
 
 // Each jump length sits on the arrow keys under its own modifier. Ctrl alone stays YouTube's chapter

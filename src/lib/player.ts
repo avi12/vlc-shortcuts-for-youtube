@@ -15,13 +15,16 @@ export enum PlayerKind {
   MUSIC = "music"
 }
 
+const BUFFERING_STATE_CODE = 3;
+const CUED_STATE_CODE = 5;
+
 enum PlayerState {
   UNSTARTED = -1,
   ENDED = 0,
   PLAYING = 1,
   PAUSED = 2,
-  BUFFERING = 3,
-  CUED = 5
+  BUFFERING = BUFFERING_STATE_CODE,
+  CUED = CUED_STATE_CODE
 }
 
 export interface YoutubePlayer extends HTMLElement {

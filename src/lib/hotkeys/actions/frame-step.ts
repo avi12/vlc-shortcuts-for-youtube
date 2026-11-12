@@ -4,7 +4,8 @@ import { isPlaying, type YoutubePlayer } from "@/lib/player";
 import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 
 // The frame length YouTube's own frame keys step by
-const FRAME_SECONDS = 1 / 30;
+const FRAMES_PER_SECOND = 30;
+const FRAME_SECONDS = 1 / FRAMES_PER_SECOND;
 
 export enum FrameDirection {
   BACKWARD = -1,

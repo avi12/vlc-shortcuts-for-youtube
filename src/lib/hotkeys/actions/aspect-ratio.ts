@@ -13,48 +13,31 @@ enum VideoBoxProperty {
 }
 
 // VLC's aspect ratio menu, in its cycle order - the same list the right-click menu offers
+const ASPECT_RATIO_LABELS = ["16:9", "4:3", "1:1", "16:10", "2.21:1", "2.35:1", "2.39:1", "5:4"] as const;
+
+function parseAspectRatio(label: string) {
+  const [width = 1, height = 1] = label.split(":").map(Number);
+  return width / height;
+}
+
+const DEFAULT_ASPECT_RATIO: {
+  label: string;
+  ratio: number | null;
+} = {
+  label: "Default",
+  ratio: null
+};
+
 export const ASPECT_RATIOS = [
-  {
-    label: "Default",
-    ratio: null
-  },
-  {
-    label: "16:9",
-    ratio: 16 / 9
-  },
-  {
-    label: "4:3",
-    ratio: 4 / 3
-  },
-  {
-    label: "1:1",
-    ratio: 1
-  },
-  {
-    label: "16:10",
-    ratio: 16 / 10
-  },
-  {
-    label: "2.21:1",
-    ratio: 2.21
-  },
-  {
-    label: "2.35:1",
-    ratio: 2.35
-  },
-  {
-    label: "2.39:1",
-    ratio: 2.39
-  },
-  {
-    label: "5:4",
-    ratio: 5 / 4
-  }
-] as const;
+  DEFAULT_ASPECT_RATIO,
+  ...ASPECT_RATIO_LABELS.map(label => ({
+    label,
+    ratio: parseAspectRatio(label)
+  }))
+];
 
-type AspectRatio = typeof ASPECT_RATIOS[number];
+type AspectRatio = typeof DEFAULT_ASPECT_RATIO;
 
-const [DEFAULT_ASPECT_RATIO] = ASPECT_RATIOS;
 let currentAspectRatio: AspectRatio = DEFAULT_ASPECT_RATIO;
 let resizeObserver: ResizeObserver | null = null;
 

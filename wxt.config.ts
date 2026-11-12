@@ -12,7 +12,8 @@ const FIREFOX_MIN_VERSION = "140.0";
 const CHROMIUM_MIN_VERSION = "137";
 
 const url = packageJson.repository;
-const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;
+const AUTHOR_PATTERN = /^(?<author>.+) <(?<email>.+)>$/;
+const { author = "", email = "" } = AUTHOR_PATTERN.exec(packageJson.author)?.groups ?? {};
 
 // Firefox reviewers rebuild from the source zip, so it ships build (not install) instructions
 function renderBuildInstructions(browser: string) {
