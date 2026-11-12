@@ -4,8 +4,8 @@ import { YOUTUBE_HOTKEYS, YOUTUBE_SEEK_SECONDS } from "@/lib/youtube-keymap";
 
 // YouTube keeps both direction overlays laid out and fades the idle one to opacity 0
 enum SeekOverlayDurationSelector {
-  Forward = ".ytp-seek-overlay-animation-forward .ytp-seek-overlay-duration",
-  Backward = ".ytp-seek-overlay-animation-back .ytp-seek-overlay-duration"
+  FORWARD = ".ytp-seek-overlay-animation-forward .ytp-seek-overlay-duration",
+  BACKWARD = ".ytp-seek-overlay-animation-back .ytp-seek-overlay-duration"
 }
 
 const SIGNED_SECONDS_PATTERN = /^([+−-])\s*(\d+)$/;
@@ -17,7 +17,7 @@ function findOverlayDuration({ player, isForward }: {
   player: YoutubePlayer;
   isForward: boolean;
 }) {
-  return player.querySelector(isForward ? SeekOverlayDurationSelector.Forward : SeekOverlayDurationSelector.Backward);
+  return player.querySelector(isForward ? SeekOverlayDurationSelector.FORWARD : SeekOverlayDurationSelector.BACKWARD);
 }
 
 function isOverlayShowing({ player, isForward }: {

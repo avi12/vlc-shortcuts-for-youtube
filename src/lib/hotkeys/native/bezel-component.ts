@@ -17,8 +17,8 @@ const BEZEL_OWN_METHODS = ["show", "hide", "showPlaybackIcon"] as const;
 export const TEXT_ONLY_BEZEL_CLASS = "vlc-controls-text-bezel";
 
 export enum BezelValue {
-  Label = "label",
-  Title = "title"
+  LABEL = "label",
+  TITLE = "title"
 }
 
 interface BezelComponent {

@@ -75,59 +75,59 @@ function createSpeedHandler({ step, direction }: {
 }
 
 const ACTION_HANDLERS: Record<VlcAction, ActionHandler> = {
-  [VlcAction.PlayPause]: togglePlayPause,
-  [VlcAction.Stop]: stop,
-  [VlcAction.ToggleFullscreen]: toggleFullscreen,
-  [VlcAction.Next]: playNext,
-  [VlcAction.Previous]: playPrevious,
-  [VlcAction.JumpBackwardExtraShort]: createJumpHandler(VlcAction.JumpBackwardExtraShort),
-  [VlcAction.JumpForwardExtraShort]: createJumpHandler(VlcAction.JumpForwardExtraShort),
-  [VlcAction.JumpBackwardArrow]: createJumpHandler(VlcAction.JumpBackwardArrow),
-  [VlcAction.JumpForwardArrow]: createJumpHandler(VlcAction.JumpForwardArrow),
-  [VlcAction.JumpBackwardShort]: createJumpHandler(VlcAction.JumpBackwardShort),
-  [VlcAction.JumpForwardShort]: createJumpHandler(VlcAction.JumpForwardShort),
-  [VlcAction.JumpBackwardMedium]: createJumpHandler(VlcAction.JumpBackwardMedium),
-  [VlcAction.JumpForwardMedium]: createJumpHandler(VlcAction.JumpForwardMedium),
-  [VlcAction.JumpBackwardLong]: createJumpHandler(VlcAction.JumpBackwardLong),
-  [VlcAction.JumpForwardLong]: createJumpHandler(VlcAction.JumpForwardLong),
-  [VlcAction.PreviousFrame]: createFrameHandler(FrameDirection.Backward),
-  [VlcAction.NextFrame]: createFrameHandler(FrameDirection.Forward),
-  [VlcAction.VolumeUp]: createVolumeHandler(VolumeDirection.Louder),
-  [VlcAction.VolumeDown]: createVolumeHandler(VolumeDirection.Quieter),
-  [VlcAction.ToggleMute]: toggleMute,
-  [VlcAction.Faster]: createSpeedHandler({
+  [VlcAction.PLAY_PAUSE]: togglePlayPause,
+  [VlcAction.STOP]: stop,
+  [VlcAction.TOGGLE_FULLSCREEN]: toggleFullscreen,
+  [VlcAction.NEXT]: playNext,
+  [VlcAction.PREVIOUS]: playPrevious,
+  [VlcAction.JUMP_BACKWARD_EXTRA_SHORT]: createJumpHandler(VlcAction.JUMP_BACKWARD_EXTRA_SHORT),
+  [VlcAction.JUMP_FORWARD_EXTRA_SHORT]: createJumpHandler(VlcAction.JUMP_FORWARD_EXTRA_SHORT),
+  [VlcAction.JUMP_BACKWARD_ARROW]: createJumpHandler(VlcAction.JUMP_BACKWARD_ARROW),
+  [VlcAction.JUMP_FORWARD_ARROW]: createJumpHandler(VlcAction.JUMP_FORWARD_ARROW),
+  [VlcAction.JUMP_BACKWARD_SHORT]: createJumpHandler(VlcAction.JUMP_BACKWARD_SHORT),
+  [VlcAction.JUMP_FORWARD_SHORT]: createJumpHandler(VlcAction.JUMP_FORWARD_SHORT),
+  [VlcAction.JUMP_BACKWARD_MEDIUM]: createJumpHandler(VlcAction.JUMP_BACKWARD_MEDIUM),
+  [VlcAction.JUMP_FORWARD_MEDIUM]: createJumpHandler(VlcAction.JUMP_FORWARD_MEDIUM),
+  [VlcAction.JUMP_BACKWARD_LONG]: createJumpHandler(VlcAction.JUMP_BACKWARD_LONG),
+  [VlcAction.JUMP_FORWARD_LONG]: createJumpHandler(VlcAction.JUMP_FORWARD_LONG),
+  [VlcAction.PREVIOUS_FRAME]: createFrameHandler(FrameDirection.BACKWARD),
+  [VlcAction.NEXT_FRAME]: createFrameHandler(FrameDirection.FORWARD),
+  [VlcAction.VOLUME_UP]: createVolumeHandler(VolumeDirection.LOUDER),
+  [VlcAction.VOLUME_DOWN]: createVolumeHandler(VolumeDirection.QUIETER),
+  [VlcAction.TOGGLE_MUTE]: toggleMute,
+  [VlcAction.FASTER]: createSpeedHandler({
     step: stepPresetSpeed,
-    direction: SpeedDirection.Faster
+    direction: SpeedDirection.FASTER
   }),
-  [VlcAction.Slower]: createSpeedHandler({
+  [VlcAction.SLOWER]: createSpeedHandler({
     step: stepPresetSpeed,
-    direction: SpeedDirection.Slower
+    direction: SpeedDirection.SLOWER
   }),
-  [VlcAction.FasterFine]: createSpeedHandler({
+  [VlcAction.FASTER_FINE]: createSpeedHandler({
     step: stepFineSpeed,
-    direction: SpeedDirection.Faster
+    direction: SpeedDirection.FASTER
   }),
-  [VlcAction.SlowerFine]: createSpeedHandler({
+  [VlcAction.SLOWER_FINE]: createSpeedHandler({
     step: stepFineSpeed,
-    direction: SpeedDirection.Slower
+    direction: SpeedDirection.SLOWER
   }),
-  [VlcAction.NormalSpeed]: resetSpeed,
-  [VlcAction.CycleSubtitles]: createSubtitlesHandler(CycleDirection.Forward),
-  [VlcAction.CycleSubtitlesReverse]: createSubtitlesHandler(CycleDirection.Backward),
-  [VlcAction.CycleAudioTrack]: cycleAudioTrack,
-  [VlcAction.CycleAspectRatio]: cycleAspectRatio,
-  [VlcAction.ToggleLoop]: toggleLoop,
-  [VlcAction.Shuffle]: shuffle,
-  [VlcAction.Snapshot]: takeSnapshot,
-  [VlcAction.ToggleControls]: toggleControls,
-  [VlcAction.ToggleMiniplayer]: toggleMiniplayer,
-  [VlcAction.ShowMoreVideos]: showMoreVideos,
-  [VlcAction.ZoomIn360]: createHoldHandler(VlcAction.ZoomIn360),
-  [VlcAction.ZoomOut360]: createHoldHandler(VlcAction.ZoomOut360),
-  [VlcAction.PanUp360]: createHoldHandler(VlcAction.PanUp360),
-  [VlcAction.PanLeft360]: createHoldHandler(VlcAction.PanLeft360),
-  [VlcAction.PanDown360]: createHoldHandler(VlcAction.PanDown360),
-  [VlcAction.PanRight360]: createHoldHandler(VlcAction.PanRight360)
+  [VlcAction.NORMAL_SPEED]: resetSpeed,
+  [VlcAction.CYCLE_SUBTITLES]: createSubtitlesHandler(CycleDirection.FORWARD),
+  [VlcAction.CYCLE_SUBTITLES_REVERSE]: createSubtitlesHandler(CycleDirection.BACKWARD),
+  [VlcAction.CYCLE_AUDIO_TRACK]: cycleAudioTrack,
+  [VlcAction.CYCLE_ASPECT_RATIO]: cycleAspectRatio,
+  [VlcAction.TOGGLE_LOOP]: toggleLoop,
+  [VlcAction.SHUFFLE]: shuffle,
+  [VlcAction.SNAPSHOT]: takeSnapshot,
+  [VlcAction.TOGGLE_CONTROLS]: toggleControls,
+  [VlcAction.TOGGLE_MINIPLAYER]: toggleMiniplayer,
+  [VlcAction.SHOW_MORE_VIDEOS]: showMoreVideos,
+  [VlcAction.ZOOM_IN_360]: createHoldHandler(VlcAction.ZOOM_IN_360),
+  [VlcAction.ZOOM_OUT_360]: createHoldHandler(VlcAction.ZOOM_OUT_360),
+  [VlcAction.PAN_UP_360]: createHoldHandler(VlcAction.PAN_UP_360),
+  [VlcAction.PAN_LEFT_360]: createHoldHandler(VlcAction.PAN_LEFT_360),
+  [VlcAction.PAN_DOWN_360]: createHoldHandler(VlcAction.PAN_DOWN_360),
+  [VlcAction.PAN_RIGHT_360]: createHoldHandler(VlcAction.PAN_RIGHT_360)
 };
 
 // Held keys keep stepping like VLC; toggles fire once per press

@@ -22,8 +22,8 @@ export function showStatusInNativeBezel({ player, text }: {
     bezel.hide();
   }
 
-  bezel.updateValue(BezelValue.Label, text);
-  bezel.updateValue(BezelValue.Title, text);
+  bezel.updateValue(BezelValue.LABEL, text);
+  bezel.updateValue(BezelValue.TITLE, text);
   bezel.element.classList.remove(YOUTUBE_TEXT_HIDDEN_CLASS);
   bezel.element.classList.add(TEXT_ONLY_BEZEL_CLASS);
   timers.showTimer.start();
@@ -36,6 +36,6 @@ export function rewriteNativeBezelText({ player, title, label }: {
   label: string;
 }) {
   const bezel = getBezel(player);
-  bezel?.updateValue(BezelValue.Title, title);
-  bezel?.updateValue(BezelValue.Label, label);
+  bezel?.updateValue(BezelValue.TITLE, title);
+  bezel?.updateValue(BezelValue.LABEL, label);
 }

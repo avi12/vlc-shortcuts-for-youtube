@@ -6,16 +6,16 @@ import { formatActionShortcut, VlcAction } from "@/lib/vlc-keymap";
 
 // aria-keyshortcuts goes first so the label attributes are rewritten against YouTube's own key
 enum TooltipAttribute {
-  AriaKeyShortcuts = "aria-keyshortcuts",
-  TooltipTitle = "data-tooltip-title",
-  TitleNoTooltip = "data-title-no-tooltip",
-  Title = "title",
-  AriaLabel = "aria-label"
+  ARIA_KEY_SHORTCUTS = "aria-keyshortcuts",
+  TOOLTIP_TITLE = "data-tooltip-title",
+  TITLE_NO_TOOLTIP = "data-title-no-tooltip",
+  TITLE = "title",
+  ARIA_LABEL = "aria-label"
 }
 
 enum ButtonEnterEvent {
-  PointerOver = "pointerover",
-  FocusIn = "focusin"
+  POINTER_OVER = "pointerover",
+  FOCUS_IN = "focusin"
 }
 
 interface ShortcutButton {
@@ -28,35 +28,35 @@ interface ShortcutButton {
 const SHORTCUT_BUTTONS: ShortcutButton[] = [
   {
     selector: ".ytp-play-button",
-    action: VlcAction.PlayPause
+    action: VlcAction.PLAY_PAUSE
   },
   {
     selector: ".ytp-miniplayer-play-button",
-    action: VlcAction.PlayPause
+    action: VlcAction.PLAY_PAUSE
   },
   {
     selector: ".ytp-next-button",
-    action: VlcAction.Next
+    action: VlcAction.NEXT
   },
   {
     selector: ".ytp-prev-button",
-    action: VlcAction.Previous
+    action: VlcAction.PREVIOUS
   },
   {
     selector: ".ytp-mute-button",
-    action: VlcAction.ToggleMute
+    action: VlcAction.TOGGLE_MUTE
   },
   {
     selector: ".ytp-subtitles-button",
-    action: VlcAction.CycleSubtitles
+    action: VlcAction.CYCLE_SUBTITLES
   },
   {
     selector: ".ytp-fullscreen-button",
-    action: VlcAction.ToggleFullscreen
+    action: VlcAction.TOGGLE_FULLSCREEN
   },
   {
     selector: ".ytp-miniplayer-button",
-    action: VlcAction.ToggleMiniplayer
+    action: VlcAction.TOGGLE_MINIPLAYER
   },
   {
     selector: ".ytp-jump-button",
@@ -64,16 +64,16 @@ const SHORTCUT_BUTTONS: ShortcutButton[] = [
   },
   {
     selector: ".ytp-fullscreen-grid",
-    action: VlcAction.ShowMoreVideos,
+    action: VlcAction.SHOW_MORE_VIDEOS,
     isContainer: true
   },
   {
     selector: ".ytp-fullscreen-grid-hover-overlay",
-    action: VlcAction.ShowMoreVideos
+    action: VlcAction.SHOW_MORE_VIDEOS
   },
   {
     selector: ".ytp-fullscreen-grid-expand-button",
-    action: VlcAction.ShowMoreVideos
+    action: VlcAction.SHOW_MORE_VIDEOS
   }
 ];
 
@@ -110,7 +110,7 @@ function replaceShortcutSuffix({ text, action }: {
   const label = text.replace(SHORTCUT_SUFFIX_PATTERN, "");
   const shortcut = action && formatActionShortcut({
     action,
-    style: ShortcutStyle.Tooltip
+    style: ShortcutStyle.TOOLTIP
   });
   return shortcut ? `${label} (${shortcut})` : label;
 }
@@ -124,10 +124,10 @@ function rewriteAttribute({ attribute, value, action }: {
     return null;
   }
 
-  if (attribute === TooltipAttribute.AriaKeyShortcuts) {
+  if (attribute === TooltipAttribute.ARIA_KEY_SHORTCUTS) {
     return action && formatActionShortcut({
       action,
-      style: ShortcutStyle.Tooltip
+      style: ShortcutStyle.TOOLTIP
     });
   }
 

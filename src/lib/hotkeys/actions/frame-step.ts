@@ -7,13 +7,13 @@ import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 const FRAME_SECONDS = 1 / 30;
 
 export enum FrameDirection {
-  Backward = -1,
-  Forward = 1
+  BACKWARD = -1,
+  FORWARD = 1
 }
 
 const FRAME_HOTKEYS = {
-  [FrameDirection.Backward]: YOUTUBE_HOTKEYS.previousFrame,
-  [FrameDirection.Forward]: YOUTUBE_HOTKEYS.nextFrame
+  [FrameDirection.BACKWARD]: YOUTUBE_HOTKEYS.previousFrame,
+  [FrameDirection.FORWARD]: YOUTUBE_HOTKEYS.nextFrame
 };
 
 // VLC's frame step pauses first; YouTube's own frame keys only step while paused, and Shorts has none

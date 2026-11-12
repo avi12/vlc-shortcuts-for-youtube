@@ -49,7 +49,7 @@ function onWheel(e: WheelEvent) {
   }
 
   pendingDeltaPixels -= notches * PIXELS_PER_WHEEL_NOTCH;
-  const direction = notches < 0 ? VolumeDirection.Louder : VolumeDirection.Quieter;
+  const direction = notches < 0 ? VolumeDirection.LOUDER : VolumeDirection.QUIETER;
   for (let i = 0; i < Math.abs(notches); i++) {
     stepVolume({
       player,

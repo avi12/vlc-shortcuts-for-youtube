@@ -11,8 +11,8 @@
  * to start listening, which depends on Node's child_process socket handling.
  */
 
-import { YOUTUBE_PAGE_MATCHES } from "@/lib/page-matches";
 import { reloadDevEnv } from "./dev-env";
+import { YOUTUBE_PAGE_MATCHES } from "@/lib/page-matches";
 import chokidar from "chokidar";
 import { createHash } from "node:crypto";
 import {

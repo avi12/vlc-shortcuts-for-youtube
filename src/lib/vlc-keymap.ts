@@ -11,47 +11,47 @@ import { YOUTUBE_360_HOTKEYS, YOUTUBE_HOTKEYS, type YoutubeHotkey } from "@/lib/
 import { YOUTUBE_MUSIC_HOTKEYS } from "@/lib/youtube-music-keymap";
 
 export enum VlcAction {
-  PlayPause = "play-pause",
-  Stop = "stop",
-  ToggleFullscreen = "toggle-fullscreen",
-  Next = "next",
-  Previous = "previous",
-  JumpBackwardExtraShort = "jump-backward-extra-short",
-  JumpForwardExtraShort = "jump-forward-extra-short",
-  JumpBackwardArrow = "jump-backward-arrow",
-  JumpForwardArrow = "jump-forward-arrow",
-  JumpBackwardShort = "jump-backward-short",
-  JumpForwardShort = "jump-forward-short",
-  JumpBackwardMedium = "jump-backward-medium",
-  JumpForwardMedium = "jump-forward-medium",
-  JumpBackwardLong = "jump-backward-long",
-  JumpForwardLong = "jump-forward-long",
-  PreviousFrame = "previous-frame",
-  NextFrame = "next-frame",
-  VolumeUp = "volume-up",
-  VolumeDown = "volume-down",
-  ToggleMute = "toggle-mute",
-  Slower = "slower",
-  Faster = "faster",
-  SlowerFine = "slower-fine",
-  FasterFine = "faster-fine",
-  NormalSpeed = "normal-speed",
-  CycleSubtitles = "cycle-subtitles",
-  CycleSubtitlesReverse = "cycle-subtitles-reverse",
-  CycleAudioTrack = "cycle-audio-track",
-  CycleAspectRatio = "cycle-aspect-ratio",
-  ToggleLoop = "toggle-loop",
-  Shuffle = "shuffle",
-  Snapshot = "snapshot",
-  ToggleControls = "toggle-controls",
-  ToggleMiniplayer = "toggle-miniplayer",
-  ShowMoreVideos = "show-more-videos",
-  ZoomIn360 = "zoom-in-360",
-  ZoomOut360 = "zoom-out-360",
-  PanUp360 = "pan-up-360",
-  PanLeft360 = "pan-left-360",
-  PanDown360 = "pan-down-360",
-  PanRight360 = "pan-right-360"
+  PLAY_PAUSE = "play-pause",
+  STOP = "stop",
+  TOGGLE_FULLSCREEN = "toggle-fullscreen",
+  NEXT = "next",
+  PREVIOUS = "previous",
+  JUMP_BACKWARD_EXTRA_SHORT = "jump-backward-extra-short",
+  JUMP_FORWARD_EXTRA_SHORT = "jump-forward-extra-short",
+  JUMP_BACKWARD_ARROW = "jump-backward-arrow",
+  JUMP_FORWARD_ARROW = "jump-forward-arrow",
+  JUMP_BACKWARD_SHORT = "jump-backward-short",
+  JUMP_FORWARD_SHORT = "jump-forward-short",
+  JUMP_BACKWARD_MEDIUM = "jump-backward-medium",
+  JUMP_FORWARD_MEDIUM = "jump-forward-medium",
+  JUMP_BACKWARD_LONG = "jump-backward-long",
+  JUMP_FORWARD_LONG = "jump-forward-long",
+  PREVIOUS_FRAME = "previous-frame",
+  NEXT_FRAME = "next-frame",
+  VOLUME_UP = "volume-up",
+  VOLUME_DOWN = "volume-down",
+  TOGGLE_MUTE = "toggle-mute",
+  SLOWER = "slower",
+  FASTER = "faster",
+  SLOWER_FINE = "slower-fine",
+  FASTER_FINE = "faster-fine",
+  NORMAL_SPEED = "normal-speed",
+  CYCLE_SUBTITLES = "cycle-subtitles",
+  CYCLE_SUBTITLES_REVERSE = "cycle-subtitles-reverse",
+  CYCLE_AUDIO_TRACK = "cycle-audio-track",
+  CYCLE_ASPECT_RATIO = "cycle-aspect-ratio",
+  TOGGLE_LOOP = "toggle-loop",
+  SHUFFLE = "shuffle",
+  SNAPSHOT = "snapshot",
+  TOGGLE_CONTROLS = "toggle-controls",
+  TOGGLE_MINIPLAYER = "toggle-miniplayer",
+  SHOW_MORE_VIDEOS = "show-more-videos",
+  ZOOM_IN_360 = "zoom-in-360",
+  ZOOM_OUT_360 = "zoom-out-360",
+  PAN_UP_360 = "pan-up-360",
+  PAN_LEFT_360 = "pan-left-360",
+  PAN_DOWN_360 = "pan-down-360",
+  PAN_RIGHT_360 = "pan-right-360"
 }
 
 export interface VlcBinding {
@@ -81,8 +81,8 @@ export interface VlcBinding {
 }
 
 enum JumpDirection {
-  Backward = -1,
-  Forward = 1
+  BACKWARD = -1,
+  FORWARD = 1
 }
 
 interface JumpSize {
@@ -112,17 +112,17 @@ const JUMP_SIZES: JumpSize[] = [
     modifiers: {
       isShift: true
     },
-    backwardAction: VlcAction.JumpBackwardExtraShort,
-    forwardAction: VlcAction.JumpForwardExtraShort
+    backwardAction: VlcAction.JUMP_BACKWARD_EXTRA_SHORT,
+    forwardAction: VlcAction.JUMP_FORWARD_EXTRA_SHORT
   },
   {
     seconds: JUMP_SECONDS.arrow,
     modifiers: {},
-    backwardAction: VlcAction.JumpBackwardArrow,
-    forwardAction: VlcAction.JumpForwardArrow,
+    backwardAction: VlcAction.JUMP_BACKWARD_ARROW,
+    forwardAction: VlcAction.JUMP_FORWARD_ARROW,
     youtubeEquivalents: {
-      [JumpDirection.Backward]: YOUTUBE_HOTKEYS.seekBackwardShort,
-      [JumpDirection.Forward]: YOUTUBE_HOTKEYS.seekForwardShort
+      [JumpDirection.BACKWARD]: YOUTUBE_HOTKEYS.seekBackwardShort,
+      [JumpDirection.FORWARD]: YOUTUBE_HOTKEYS.seekForwardShort
     }
   },
   {
@@ -130,11 +130,11 @@ const JUMP_SIZES: JumpSize[] = [
     modifiers: {
       isAlt: true
     },
-    backwardAction: VlcAction.JumpBackwardShort,
-    forwardAction: VlcAction.JumpForwardShort,
+    backwardAction: VlcAction.JUMP_BACKWARD_SHORT,
+    forwardAction: VlcAction.JUMP_FORWARD_SHORT,
     youtubeEquivalents: {
-      [JumpDirection.Backward]: YOUTUBE_HOTKEYS.seekBackwardLong,
-      [JumpDirection.Forward]: YOUTUBE_HOTKEYS.seekForwardLong
+      [JumpDirection.BACKWARD]: YOUTUBE_HOTKEYS.seekBackwardLong,
+      [JumpDirection.FORWARD]: YOUTUBE_HOTKEYS.seekForwardLong
     }
   },
   {
@@ -143,8 +143,8 @@ const JUMP_SIZES: JumpSize[] = [
       isCtrl: true,
       isShift: true
     },
-    backwardAction: VlcAction.JumpBackwardMedium,
-    forwardAction: VlcAction.JumpForwardMedium
+    backwardAction: VlcAction.JUMP_BACKWARD_MEDIUM,
+    forwardAction: VlcAction.JUMP_FORWARD_MEDIUM
   },
   {
     seconds: JUMP_SECONDS.long,
@@ -152,19 +152,19 @@ const JUMP_SIZES: JumpSize[] = [
       isCtrl: true,
       isAlt: true
     },
-    backwardAction: VlcAction.JumpBackwardLong,
-    forwardAction: VlcAction.JumpForwardLong
+    backwardAction: VlcAction.JUMP_BACKWARD_LONG,
+    forwardAction: VlcAction.JUMP_FORWARD_LONG
   }
 ];
 
 const JUMP_DIRECTION_KEYS: Record<JumpDirection, string> = {
-  [JumpDirection.Backward]: "ArrowLeft",
-  [JumpDirection.Forward]: "ArrowRight"
+  [JumpDirection.BACKWARD]: "ArrowLeft",
+  [JumpDirection.FORWARD]: "ArrowRight"
 };
 
 const JUMP_DIRECTION_WORDS: Record<JumpDirection, string> = {
-  [JumpDirection.Backward]: "back",
-  [JumpDirection.Forward]: "forward"
+  [JumpDirection.BACKWARD]: "back",
+  [JumpDirection.FORWARD]: "forward"
 };
 
 export const FINE_SPEED_STEP = 0.1;
@@ -185,8 +185,8 @@ function createJumpBinding({ jumpSize, direction }: {
   direction: JumpDirection;
 }): VlcBinding {
   return {
-    action: direction === JumpDirection.Forward ? jumpSize.forwardAction : jumpSize.backwardAction,
-    section: KeymapSection.Playback,
+    action: direction === JumpDirection.FORWARD ? jumpSize.forwardAction : jumpSize.backwardAction,
+    section: KeymapSection.PLAYBACK,
     label: `Jump ${JUMP_DIRECTION_WORDS[direction]} ${formatDuration(jumpSize.seconds)}`,
     combos: [{
       key: JUMP_DIRECTION_KEYS[direction],
@@ -197,7 +197,7 @@ function createJumpBinding({ jumpSize, direction }: {
   };
 }
 
-const JUMP_DIRECTIONS = [JumpDirection.Backward, JumpDirection.Forward];
+const JUMP_DIRECTIONS = [JumpDirection.BACKWARD, JumpDirection.FORWARD];
 
 const JUMP_BINDINGS = JUMP_SIZES.flatMap(jumpSize => JUMP_DIRECTIONS.map(direction => createJumpBinding({
   jumpSize,
@@ -206,44 +206,44 @@ const JUMP_BINDINGS = JUMP_SIZES.flatMap(jumpSize => JUMP_DIRECTIONS.map(directi
 
 export const JUMP_SECONDS_BY_ACTION = new Map<VlcAction, number>();
 for (const { seconds, backwardAction, forwardAction } of JUMP_SIZES) {
-  JUMP_SECONDS_BY_ACTION.set(backwardAction, JumpDirection.Backward * seconds);
-  JUMP_SECONDS_BY_ACTION.set(forwardAction, JumpDirection.Forward * seconds);
+  JUMP_SECONDS_BY_ACTION.set(backwardAction, JumpDirection.BACKWARD * seconds);
+  JUMP_SECONDS_BY_ACTION.set(forwardAction, JumpDirection.FORWARD * seconds);
 }
 
 // YouTube moves a 360° view for as long as its key is held, so these keep moving while held too
 const VIEW_360_BINDING_BASE = {
-  section: KeymapSection.General,
+  section: KeymapSection.GENERAL,
   isRepeatable: true,
   isSphericalOnly: true,
-  site: Site.Youtube
+  site: Site.YOUTUBE
 } as const satisfies Partial<VlcBinding>;
 
 export const VLC_BINDINGS: VlcBinding[] = [
   {
-    action: VlcAction.PlayPause,
-    section: KeymapSection.Playback,
+    action: VlcAction.PLAY_PAUSE,
+    section: KeymapSection.PLAYBACK,
     label: "Play/pause",
     combos: [{ key: " " }],
     youtubeEquivalent: YOUTUBE_HOTKEYS.playPause
   },
   ...JUMP_BINDINGS,
   {
-    action: VlcAction.Previous,
-    section: KeymapSection.Playback,
+    action: VlcAction.PREVIOUS,
+    section: KeymapSection.PLAYBACK,
     label: "Previous video",
     combos: [{ key: "p" }],
     youtubeEquivalent: YOUTUBE_HOTKEYS.previous
   },
   {
-    action: VlcAction.Next,
-    section: KeymapSection.Playback,
+    action: VlcAction.NEXT,
+    section: KeymapSection.PLAYBACK,
     label: "Next video",
     combos: [{ key: "n" }],
     youtubeEquivalent: YOUTUBE_HOTKEYS.next
   },
   {
-    action: VlcAction.PreviousFrame,
-    section: KeymapSection.Playback,
+    action: VlcAction.PREVIOUS_FRAME,
+    section: KeymapSection.PLAYBACK,
     label: "Previous frame",
     combos: [{
       key: "e",
@@ -253,34 +253,34 @@ export const VLC_BINDINGS: VlcBinding[] = [
     youtubeEquivalent: YOUTUBE_HOTKEYS.previousFrame
   },
   {
-    action: VlcAction.NextFrame,
-    section: KeymapSection.Playback,
+    action: VlcAction.NEXT_FRAME,
+    section: KeymapSection.PLAYBACK,
     label: "Next frame",
     combos: [{ key: "e" }],
     isRepeatable: true,
     youtubeEquivalent: YOUTUBE_HOTKEYS.nextFrame
   },
   {
-    action: VlcAction.Slower,
-    section: KeymapSection.Playback,
+    action: VlcAction.SLOWER,
+    section: KeymapSection.PLAYBACK,
     label: SLOWER_LABEL,
     combos: [{ key: "-" }],
     isRepeatable: true,
     youtubeEquivalent: YOUTUBE_HOTKEYS.slower
   },
   {
-    action: VlcAction.Faster,
-    section: KeymapSection.Playback,
+    action: VlcAction.FASTER,
+    section: KeymapSection.PLAYBACK,
     label: FASTER_LABEL,
     combos: [{ key: "+" }],
     isRepeatable: true,
     // YouTube Music's + likes the song
-    site: Site.Youtube,
+    site: Site.YOUTUBE,
     youtubeEquivalent: YOUTUBE_HOTKEYS.faster
   },
   {
-    action: VlcAction.SlowerFine,
-    section: KeymapSection.Playback,
+    action: VlcAction.SLOWER_FINE,
+    section: KeymapSection.PLAYBACK,
     label: `${SLOWER_LABEL} (${FINE_SPEED_STEP_LABEL})`,
     combos: [{ key: "[" }],
     isRepeatable: true,
@@ -290,8 +290,8 @@ export const VLC_BINDINGS: VlcBinding[] = [
     }
   },
   {
-    action: VlcAction.FasterFine,
-    section: KeymapSection.Playback,
+    action: VlcAction.FASTER_FINE,
+    section: KeymapSection.PLAYBACK,
     label: `${FASTER_LABEL} (${FINE_SPEED_STEP_LABEL})`,
     combos: [{ key: "]" }],
     isRepeatable: true,
@@ -301,71 +301,71 @@ export const VLC_BINDINGS: VlcBinding[] = [
     }
   },
   {
-    action: VlcAction.NormalSpeed,
-    section: KeymapSection.Playback,
+    action: VlcAction.NORMAL_SPEED,
+    section: KeymapSection.PLAYBACK,
     label: "Normal speed",
     combos: [{ key: "=" }]
   },
   {
-    action: VlcAction.Stop,
-    section: KeymapSection.Playback,
+    action: VlcAction.STOP,
+    section: KeymapSection.PLAYBACK,
     label: "Stop",
     combos: [{ key: "s" }]
   },
   {
-    action: VlcAction.ToggleLoop,
-    section: KeymapSection.Playback,
+    action: VlcAction.TOGGLE_LOOP,
+    section: KeymapSection.PLAYBACK,
     label: "Toggle loop",
     combos: [{ key: "l" }],
     musicEquivalent: YOUTUBE_MUSIC_HOTKEYS.repeat
   },
   {
-    action: VlcAction.Shuffle,
-    section: KeymapSection.Playback,
+    action: VlcAction.SHUFFLE,
+    section: KeymapSection.PLAYBACK,
     label: "Shuffle",
     combos: [{ key: "r" }],
-    site: Site.Music,
+    site: Site.MUSIC,
     musicEquivalent: YOUTUBE_MUSIC_HOTKEYS.shuffle
   },
   {
-    action: VlcAction.ToggleFullscreen,
-    section: KeymapSection.General,
+    action: VlcAction.TOGGLE_FULLSCREEN,
+    section: KeymapSection.GENERAL,
     label: "Toggle fullscreen",
     combos: [{ key: "f" }],
     youtubeEquivalent: YOUTUBE_HOTKEYS.fullscreen
   },
   {
-    action: VlcAction.ToggleMiniplayer,
-    section: KeymapSection.General,
+    action: VlcAction.TOGGLE_MINIPLAYER,
+    section: KeymapSection.GENERAL,
     label: "Toggle miniplayer",
     combos: [{ key: "i" }, {
       key: "i",
       isShift: true
     }],
-    site: Site.Youtube,
+    site: Site.YOUTUBE,
     youtubeEquivalent: YOUTUBE_HOTKEYS.miniplayer
   },
   {
-    action: VlcAction.ShowMoreVideos,
-    section: KeymapSection.General,
+    action: VlcAction.SHOW_MORE_VIDEOS,
+    section: KeymapSection.GENERAL,
     label: "Show more videos at the end",
     combos: [{
       key: "v",
       isShift: true
     }],
-    site: Site.Youtube,
+    site: Site.YOUTUBE,
     youtubeEquivalent: YOUTUBE_HOTKEYS.moreVideos
   },
   {
-    action: VlcAction.ToggleMute,
-    section: KeymapSection.General,
+    action: VlcAction.TOGGLE_MUTE,
+    section: KeymapSection.GENERAL,
     label: "Mute/unmute",
     combos: [{ key: "m" }],
     youtubeEquivalent: YOUTUBE_HOTKEYS.mute
   },
   {
-    action: VlcAction.VolumeUp,
-    section: KeymapSection.General,
+    action: VlcAction.VOLUME_UP,
+    section: KeymapSection.GENERAL,
     label: "Volume up",
     combos: [{ key: "ArrowUp" }, {
       key: "ArrowUp",
@@ -374,8 +374,8 @@ export const VLC_BINDINGS: VlcBinding[] = [
     isRepeatable: true
   },
   {
-    action: VlcAction.VolumeDown,
-    section: KeymapSection.General,
+    action: VlcAction.VOLUME_DOWN,
+    section: KeymapSection.GENERAL,
     label: "Volume down",
     combos: [{ key: "ArrowDown" }, {
       key: "ArrowDown",
@@ -384,20 +384,20 @@ export const VLC_BINDINGS: VlcBinding[] = [
     isRepeatable: true
   },
   {
-    action: VlcAction.CycleAudioTrack,
-    section: KeymapSection.General,
+    action: VlcAction.CYCLE_AUDIO_TRACK,
+    section: KeymapSection.GENERAL,
     label: "Cycle audio track",
     combos: [{ key: "b" }]
   },
   {
-    action: VlcAction.CycleAspectRatio,
-    section: KeymapSection.General,
+    action: VlcAction.CYCLE_ASPECT_RATIO,
+    section: KeymapSection.GENERAL,
     label: "Cycle aspect ratio",
     combos: [{ key: "a" }]
   },
   {
     ...VIEW_360_BINDING_BASE,
-    action: VlcAction.ZoomIn360,
+    action: VlcAction.ZOOM_IN_360,
     label: "Zoom in",
     combos: [{ key: "PageUp" }],
     isPlayerFocusOnly: true,
@@ -405,7 +405,7 @@ export const VLC_BINDINGS: VlcBinding[] = [
   },
   {
     ...VIEW_360_BINDING_BASE,
-    action: VlcAction.ZoomOut360,
+    action: VlcAction.ZOOM_OUT_360,
     label: "Zoom out",
     combos: [{ key: "PageDown" }],
     isPlayerFocusOnly: true,
@@ -413,35 +413,35 @@ export const VLC_BINDINGS: VlcBinding[] = [
   },
   {
     ...VIEW_360_BINDING_BASE,
-    action: VlcAction.PanUp360,
+    action: VlcAction.PAN_UP_360,
     label: "Pan up",
     combos: [{ key: "i" }],
     youtubeEquivalent: YOUTUBE_360_HOTKEYS.lookUp
   },
   {
     ...VIEW_360_BINDING_BASE,
-    action: VlcAction.PanLeft360,
+    action: VlcAction.PAN_LEFT_360,
     label: "Pan left",
     combos: [{ key: "j" }],
     youtubeEquivalent: YOUTUBE_360_HOTKEYS.lookLeft
   },
   {
     ...VIEW_360_BINDING_BASE,
-    action: VlcAction.PanDown360,
+    action: VlcAction.PAN_DOWN_360,
     label: "Pan down",
     combos: [{ key: "k" }],
     youtubeEquivalent: YOUTUBE_360_HOTKEYS.lookDown
   },
   {
     ...VIEW_360_BINDING_BASE,
-    action: VlcAction.PanRight360,
+    action: VlcAction.PAN_RIGHT_360,
     label: "Pan right",
     combos: [{ key: "l" }],
     youtubeEquivalent: YOUTUBE_360_HOTKEYS.lookRight
   },
   {
-    action: VlcAction.Snapshot,
-    section: KeymapSection.General,
+    action: VlcAction.SNAPSHOT,
+    section: KeymapSection.GENERAL,
     label: "Take snapshot",
     combos: [{
       key: "s",
@@ -449,8 +449,8 @@ export const VLC_BINDINGS: VlcBinding[] = [
     }]
   },
   {
-    action: VlcAction.ToggleControls,
-    section: KeymapSection.General,
+    action: VlcAction.TOGGLE_CONTROLS,
+    section: KeymapSection.GENERAL,
     label: "Hide/show controls",
     combos: [{
       key: "h",
@@ -458,14 +458,14 @@ export const VLC_BINDINGS: VlcBinding[] = [
     }]
   },
   {
-    action: VlcAction.CycleSubtitles,
-    section: KeymapSection.Subtitles,
+    action: VlcAction.CYCLE_SUBTITLES,
+    section: KeymapSection.SUBTITLES,
     label: "Cycle subtitle track",
     combos: [{ key: "v" }]
   },
   {
-    action: VlcAction.CycleSubtitlesReverse,
-    section: KeymapSection.Subtitles,
+    action: VlcAction.CYCLE_SUBTITLES_REVERSE,
+    section: KeymapSection.SUBTITLES,
     label: "Cycle subtitle track in reverse",
     combos: [{
       key: "v",
@@ -478,7 +478,7 @@ const WHEEL_KEY = "wheel";
 
 // Shift keeps the plain wheel scrolling the page
 export const VLC_WHEEL_VOLUME = {
-  section: KeymapSection.General,
+  section: KeymapSection.GENERAL,
   label: "Volume up/down",
   combos: [{
     key: WHEEL_KEY,

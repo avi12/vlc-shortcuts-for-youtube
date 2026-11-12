@@ -6,10 +6,10 @@ const ASPECT_RATIO_STATUS_PREFIX = "Aspect ratio: ";
 const SPHERICAL_UNAVAILABLE_LABEL = "not available on 360° videos";
 
 enum VideoBoxProperty {
-  Top = "--vlc-controls-video-top",
-  Left = "--vlc-controls-video-left",
-  Width = "--vlc-controls-video-width",
-  Height = "--vlc-controls-video-height"
+  TOP = "--vlc-controls-video-top",
+  LEFT = "--vlc-controls-video-left",
+  WIDTH = "--vlc-controls-video-width",
+  HEIGHT = "--vlc-controls-video-height"
 }
 
 // VLC's aspect ratio menu, in its cycle order - the same list the right-click menu offers
@@ -78,10 +78,10 @@ function fitVideoBox({ player, ratio }: {
   const width = isPlayerWider ? playerRect.height * ratio : playerRect.width;
   const height = isPlayerWider ? playerRect.height : playerRect.width / ratio;
   const boxValues = {
-    [VideoBoxProperty.Top]: playerRect.top - parentRect.top + (playerRect.height - height) / 2,
-    [VideoBoxProperty.Left]: playerRect.left - parentRect.left + (playerRect.width - width) / 2,
-    [VideoBoxProperty.Width]: width,
-    [VideoBoxProperty.Height]: height
+    [VideoBoxProperty.TOP]: playerRect.top - parentRect.top + (playerRect.height - height) / 2,
+    [VideoBoxProperty.LEFT]: playerRect.left - parentRect.left + (playerRect.width - width) / 2,
+    [VideoBoxProperty.WIDTH]: width,
+    [VideoBoxProperty.HEIGHT]: height
   };
   for (const [property, value] of Object.entries(boxValues)) {
     player.style.setProperty(property, toPixels(value));

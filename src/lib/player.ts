@@ -9,19 +9,19 @@ const EMBED_PATH_PREFIX = "/embed/";
 
 // YouTube's player variants differ in which of YouTube's own keys they honor; YouTube Music's honors none
 export enum PlayerKind {
-  Watch = "watch",
-  Shorts = "shorts",
-  Embed = "embed",
-  Music = "music"
+  WATCH = "watch",
+  SHORTS = "shorts",
+  EMBED = "embed",
+  MUSIC = "music"
 }
 
 enum PlayerState {
-  Unstarted = -1,
-  Ended = 0,
-  Playing = 1,
-  Paused = 2,
-  Buffering = 3,
-  Cued = 5
+  UNSTARTED = -1,
+  ENDED = 0,
+  PLAYING = 1,
+  PAUSED = 2,
+  BUFFERING = 3,
+  CUED = 5
 }
 
 export interface YoutubePlayer extends HTMLElement {
@@ -112,18 +112,18 @@ export function getVideo(player: YoutubePlayer) {
 
 export function getPlayerKind(player: YoutubePlayer) {
   if (isMusicSite()) {
-    return PlayerKind.Music;
+    return PlayerKind.MUSIC;
   }
 
   if (player.id === SHORTS_PLAYER_ID) {
-    return PlayerKind.Shorts;
+    return PlayerKind.SHORTS;
   }
 
-  return location.pathname.startsWith(EMBED_PATH_PREFIX) ? PlayerKind.Embed : PlayerKind.Watch;
+  return location.pathname.startsWith(EMBED_PATH_PREFIX) ? PlayerKind.EMBED : PlayerKind.WATCH;
 }
 
 export function isShortsPlayer(player: YoutubePlayer) {
-  return getPlayerKind(player) === PlayerKind.Shorts;
+  return getPlayerKind(player) === PlayerKind.SHORTS;
 }
 
 export function isMainVideo(target: EventTarget | null) {
@@ -141,10 +141,10 @@ export function isSphericalVideo(player: YoutubePlayer) {
 
 export function isPlaying(player: YoutubePlayer) {
   const state = player.getPlayerState();
-  return state === PlayerState.Playing || state === PlayerState.Buffering;
+  return state === PlayerState.PLAYING || state === PlayerState.BUFFERING;
 }
 
 // A song, episode or video is playing or paused, as opposed to nothing loaded or a finished queue
 export function isMediaActive(player: YoutubePlayer) {
-  return isPlaying(player) || player.getPlayerState() === PlayerState.Paused;
+  return isPlaying(player) || player.getPlayerState() === PlayerState.PAUSED;
 }

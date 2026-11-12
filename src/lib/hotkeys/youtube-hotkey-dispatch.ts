@@ -3,8 +3,8 @@ import { isHotkeyHonored, type YoutubeHotkey } from "@/lib/youtube-keymap";
 import { findMusicHotkey } from "@/lib/youtube-music-keymap";
 
 enum KeyEventType {
-  Press = "keydown",
-  Release = "keyup"
+  PRESS = "keydown",
+  RELEASE = "keyup"
 }
 
 const dispatchedEvents = new WeakSet<Event>();
@@ -35,7 +35,7 @@ function findPlayerHotkey({ player, hotkey }: {
   hotkey: YoutubeHotkey;
 }) {
   const playerKind = getPlayerKind(player);
-  if (playerKind === PlayerKind.Music) {
+  if (playerKind === PlayerKind.MUSIC) {
     return findMusicHotkey(hotkey);
   }
 
@@ -68,7 +68,7 @@ export function dispatchYoutubeHotkey({ player, hotkey, count = 1, fallback }: {
     dispatchKey({
       player,
       hotkey: playerHotkey,
-      eventType: KeyEventType.Press
+      eventType: KeyEventType.PRESS
     });
   }
   return true;
@@ -79,14 +79,14 @@ export function dispatchMusicHotkey({ player, hotkey }: {
   player: YoutubePlayer;
   hotkey: YoutubeHotkey;
 }) {
-  if (getPlayerKind(player) !== PlayerKind.Music) {
+  if (getPlayerKind(player) !== PlayerKind.MUSIC) {
     return;
   }
 
   dispatchKey({
     player,
     hotkey,
-    eventType: KeyEventType.Press
+    eventType: KeyEventType.PRESS
   });
 }
 
@@ -107,6 +107,6 @@ export function holdYoutubeHotkey({ player, hotkey }: {
   return () => dispatchKey({
     player,
     hotkey,
-    eventType: KeyEventType.Release
+    eventType: KeyEventType.RELEASE
   });
 }

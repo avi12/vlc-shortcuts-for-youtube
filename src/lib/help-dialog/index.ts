@@ -8,11 +8,11 @@ const DIALOG_ELEMENTS_BY_SITE: Record<Site, {
   dialogSelector: string;
   hostSelector: string;
 }> = {
-  [Site.Youtube]: {
+  [Site.YOUTUBE]: {
     dialogSelector: "ytd-hotkey-dialog-renderer",
     hostSelector: "ytd-popup-container"
   },
-  [Site.Music]: {
+  [Site.MUSIC]: {
     dialogSelector: "ytmusic-hotkey-dialog-renderer",
     hostSelector: "body"
   }

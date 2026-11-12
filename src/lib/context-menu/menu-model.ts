@@ -12,19 +12,19 @@ import { WorldMessage, worldMessenger } from "@/lib/world-messaging";
 
 // VLC's own right-click sections: what plays, what it sounds like, how it looks and what it reads
 export enum MenuRow {
-  Speed = "speed",
-  AudioTrack = "audio-track",
-  SubtitleTrack = "subtitle-track",
-  AspectRatio = "aspect-ratio",
-  Snapshot = "snapshot",
-  Controls = "controls",
-  Toggle = "toggle"
+  SPEED = "speed",
+  AUDIO_TRACK = "audio-track",
+  SUBTITLE_TRACK = "subtitle-track",
+  ASPECT_RATIO = "aspect-ratio",
+  SNAPSHOT = "snapshot",
+  CONTROLS = "controls",
+  TOGGLE = "toggle"
 }
 
 // What the toggle row shows beside its label, since YouTube's rows have no switch of their own
 enum ToggleValue {
-  On = "On",
-  Off = "Off"
+  ON = "On",
+  OFF = "Off"
 }
 
 // A row that opens a sub-panel of the choices VLC offers for that control, with the current one checked
@@ -52,7 +52,7 @@ const NO_SHORTCUT = "";
 
 export const CHOICE_ROWS: ChoiceRowModel[] = [
   {
-    id: MenuRow.Speed,
+    id: MenuRow.SPEED,
     label: "Speed",
     readOptions: getSpeedLabels,
     readSelected: getSpeedLabel,
@@ -62,7 +62,7 @@ export const CHOICE_ROWS: ChoiceRowModel[] = [
     })
   },
   {
-    id: MenuRow.AudioTrack,
+    id: MenuRow.AUDIO_TRACK,
     label: "Audio track",
     readOptions: getAudioTrackNames,
     readSelected: getActiveAudioTrackName,
@@ -72,7 +72,7 @@ export const CHOICE_ROWS: ChoiceRowModel[] = [
     })
   },
   {
-    id: MenuRow.SubtitleTrack,
+    id: MenuRow.SUBTITLE_TRACK,
     label: "Subtitle track",
     readOptions: getSubtitleLabels,
     readSelected: getActiveSubtitleLabel,
@@ -82,7 +82,7 @@ export const CHOICE_ROWS: ChoiceRowModel[] = [
     })
   },
   {
-    id: MenuRow.AspectRatio,
+    id: MenuRow.ASPECT_RATIO,
     label: "Aspect ratio",
     readOptions: () => ASPECT_RATIOS.map(aspectRatio => aspectRatio.label),
     readSelected: getAspectRatioLabel,
@@ -104,7 +104,7 @@ function createActionRow({ id, action, run }: {
     label: findBinding(action)?.label ?? "",
     shortcut: formatActionShortcut({
       action,
-      style: ShortcutStyle.Tooltip
+      style: ShortcutStyle.TOOLTIP
     }) ?? NO_SHORTCUT,
     run
   };
@@ -112,13 +112,13 @@ function createActionRow({ id, action, run }: {
 
 export const COMMAND_ROWS: CommandRowModel[] = [
   createActionRow({
-    id: MenuRow.Snapshot,
-    action: VlcAction.Snapshot,
+    id: MenuRow.SNAPSHOT,
+    action: VlcAction.SNAPSHOT,
     run: takeSnapshot
   }),
   createActionRow({
-    id: MenuRow.Controls,
-    action: VlcAction.ToggleControls,
+    id: MenuRow.CONTROLS,
+    action: VlcAction.TOGGLE_CONTROLS,
     run: toggleControls
   })
 ];
@@ -127,8 +127,8 @@ export const COMMAND_ROWS: CommandRowModel[] = [
 // one that turns them back on. It switches this tab alone, and only the isolated world reaches storage, so the
 // switch travels over the world channel
 export const TOGGLE_ROW = {
-  id: MenuRow.Toggle,
+  id: MenuRow.TOGGLE,
   label: TOGGLE_LABEL,
-  readValue: () => isVlcControlsEnabled() ? ToggleValue.On : ToggleValue.Off,
-  flip: () => worldMessenger.sendMessage(WorldMessage.SetTabEnabled, !isVlcControlsEnabled())
+  readValue: () => isVlcControlsEnabled() ? ToggleValue.ON : ToggleValue.OFF,
+  flip: () => worldMessenger.sendMessage(WorldMessage.SET_TAB_ENABLED, !isVlcControlsEnabled())
 };

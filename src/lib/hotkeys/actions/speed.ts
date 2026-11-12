@@ -9,8 +9,8 @@ const RATE_PRECISION = 100;
 const RATE_EPSILON = 0.001;
 
 export enum SpeedDirection {
-  Faster = 1,
-  Slower = -1
+  FASTER = 1,
+  SLOWER = -1
 }
 
 function roundRate(rate: number) {
@@ -42,7 +42,7 @@ function stepPresetSpeedSilently({ player, direction }: {
 }) {
   const rates = player.getAvailablePlaybackRates();
   const currentRate = player.getPlaybackRate();
-  const nextRate = direction === SpeedDirection.Faster ?
+  const nextRate = direction === SpeedDirection.FASTER ?
     rates.find(rate => rate > currentRate) :
     rates.findLast(rate => rate < currentRate);
   if (nextRate === undefined) {
@@ -63,7 +63,7 @@ export function stepPresetSpeed({ player, direction }: {
 }) {
   dispatchYoutubeHotkey({
     player,
-    hotkey: direction === SpeedDirection.Faster ? YOUTUBE_HOTKEYS.faster : YOUTUBE_HOTKEYS.slower,
+    hotkey: direction === SpeedDirection.FASTER ? YOUTUBE_HOTKEYS.faster : YOUTUBE_HOTKEYS.slower,
     fallback: () => stepPresetSpeedSilently({
       player,
       direction

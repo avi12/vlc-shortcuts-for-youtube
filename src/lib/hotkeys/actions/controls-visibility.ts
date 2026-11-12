@@ -7,8 +7,8 @@ import type { YoutubePlayer } from "@/lib/player";
 const YOUTUBE_AUTOHIDE_CLASS = "ytp-autohide";
 
 enum ControlsStatus {
-  Hidden = "Controls hidden",
-  Shown = "Controls shown"
+  HIDDEN = "Controls hidden",
+  SHOWN = "Controls shown"
 }
 
 const observerByPlayer = new Map<YoutubePlayer, MutationObserver>();
@@ -49,7 +49,7 @@ export function toggleControls(player: YoutubePlayer) {
 
   showStatusInNativeBezel({
     player,
-    text: isHidden ? ControlsStatus.Shown : ControlsStatus.Hidden
+    text: isHidden ? ControlsStatus.SHOWN : ControlsStatus.HIDDEN
   });
 }
 

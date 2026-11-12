@@ -8,14 +8,14 @@ import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 const START_SECONDS = 0;
 
 enum LoopStatus {
-  On = "Loop on",
-  Off = "Loop off"
+  ON = "Loop on",
+  OFF = "Loop off"
 }
 
 // Shorts' own next/previous buttons; its player swallows the arrow keys Shorts otherwise moves with
 enum ShortsNavigationButton {
-  Next = "#navigation-button-down button",
-  Previous = "#navigation-button-up button"
+  NEXT = "#navigation-button-down button",
+  PREVIOUS = "#navigation-button-up button"
 }
 
 export function togglePlayPause(player: YoutubePlayer) {
@@ -41,7 +41,7 @@ function clickShortsNavigation(button: ShortsNavigationButton) {
 // On Shorts the next and previous video are the next and previous short
 export function playNext(player: YoutubePlayer) {
   if (isShortsPlayer(player)) {
-    clickShortsNavigation(ShortsNavigationButton.Next);
+    clickShortsNavigation(ShortsNavigationButton.NEXT);
     return;
   }
 
@@ -53,7 +53,7 @@ export function playNext(player: YoutubePlayer) {
 
 export function playPrevious(player: YoutubePlayer) {
   if (isShortsPlayer(player)) {
-    clickShortsNavigation(ShortsNavigationButton.Previous);
+    clickShortsNavigation(ShortsNavigationButton.PREVIOUS);
     return;
   }
 
@@ -79,7 +79,7 @@ export function toggleLoop(player: YoutubePlayer) {
   player.setLoopVideo?.(elVideo.loop);
   showStatusInNativeBezel({
     player,
-    text: elVideo.loop ? LoopStatus.On : LoopStatus.Off
+    text: elVideo.loop ? LoopStatus.ON : LoopStatus.OFF
   });
 }
 

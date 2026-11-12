@@ -20,11 +20,11 @@ export function readTabEnabled() {
     return null;
   }
 
-  return stored === EnabledState.On;
+  return stored === EnabledState.ON;
 }
 
 export function setTabEnabled(isEnabled: boolean) {
-  getTabStore()?.setItem(TAB_ENABLED_KEY, isEnabled ? EnabledState.On : EnabledState.Off);
+  getTabStore()?.setItem(TAB_ENABLED_KEY, isEnabled ? EnabledState.ON : EnabledState.OFF);
 }
 
 export function clearTabEnabled() {

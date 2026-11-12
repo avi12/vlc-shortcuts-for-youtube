@@ -90,30 +90,30 @@ export function findMusicHotkey(hotkey: YoutubeHotkey) {
 // Music's own rows for these, in Music's (localized) wording
 export const YOUTUBE_MUSIC_NATIVE_SHORTCUTS = {
   toggleQueue: {
-    section: KeymapSection.General,
+    section: KeymapSection.GENERAL,
     combos: [{ key: "q" }]
   },
   like: {
-    section: KeymapSection.General,
+    section: KeymapSection.GENERAL,
     combos: [{ key: "+" }]
   },
   dislike: {
-    section: KeymapSection.General,
+    section: KeymapSection.GENERAL,
     combos: [{ key: "_" }]
   }
 } as const satisfies Record<string, YoutubeShortcut>;
 
 // A key Music always lists in each of its dialog sections that VLC's sections match. Music has no captions section
 export const MUSIC_SECTION_ANCHOR_KEYS: Partial<Record<KeymapSection, string>> = {
-  [KeymapSection.Playback]: YOUTUBE_MUSIC_HOTKEYS.playPause.key,
-  [KeymapSection.General]: YOUTUBE_MUSIC_HOTKEYS.fullscreen.key
+  [KeymapSection.PLAYBACK]: YOUTUBE_MUSIC_HOTKEYS.playPause.key,
+  [KeymapSection.GENERAL]: YOUTUBE_MUSIC_HOTKEYS.fullscreen.key
 };
 
 // Music's dialog writes a key the way YouTube's tooltips do ("SHIFT + n"), never "N (SHIFT+n)"
 export function formatMusicHotkey(hotkey: YoutubeHotkey) {
   return formatCombos({
     combos: [toHotkeyCombo(hotkey)],
-    style: ShortcutStyle.Tooltip
+    style: ShortcutStyle.TOOLTIP
   });
 }
 

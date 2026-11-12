@@ -8,7 +8,7 @@ import { WorldMessage, worldMessenger } from "@/lib/world-messaging";
 import { defineContentScript } from "#imports";
 
 function mirrorEnabledState(isEnabled: boolean) {
-  document.documentElement.setAttribute(ENABLED_ATTRIBUTE, isEnabled ? EnabledState.On : EnabledState.Off);
+  document.documentElement.setAttribute(ENABLED_ATTRIBUTE, isEnabled ? EnabledState.ON : EnabledState.OFF);
 }
 
 // Isolated world: the MAIN-world script has no extension APIs, so the toggle reaches it through an attribute on
@@ -22,7 +22,7 @@ export default defineContentScript({
   runAt: "document_start",
   cssInjectionMode: "manifest",
   async main() {
-    worldMessenger.onMessage(WorldMessage.SetTabEnabled, ({ data }) => {
+    worldMessenger.onMessage(WorldMessage.SET_TAB_ENABLED, ({ data }) => {
       setTabEnabled(data);
       mirrorEnabledState(data);
     });

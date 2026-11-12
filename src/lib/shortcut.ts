@@ -1,8 +1,8 @@
 // YouTube's own Shift+/ dialog categories, so every key sits where YouTube users expect it
 export enum KeymapSection {
-  Playback = "Playback",
-  General = "General",
-  Subtitles = "Subtitles and closed captions"
+  PLAYBACK = "Playback",
+  GENERAL = "General",
+  SUBTITLES = "Subtitles and closed captions"
 }
 
 export interface KeyCombo {
@@ -14,8 +14,8 @@ export interface KeyCombo {
 
 // YouTube's two notations: tooltips write "SHIFT+n", the Shift+/ dialog writes "N (SHIFT+n)"
 export enum ShortcutStyle {
-  Tooltip = "tooltip",
-  Dialog = "dialog"
+  TOOLTIP = "tooltip",
+  DIALOG = "dialog"
 }
 
 // Spelled the way YouTube's own dialog spells them
@@ -139,7 +139,7 @@ function formatCombo({ combo, style }: {
   const isShiftOnly = isComboShifted(combo) && !combo.isCtrl && !combo.isAlt;
   if (isShiftOnly && typedOnKey) {
     const shiftedKey = `${MODIFIER_NAMES.shift}+${typedOnKey}`;
-    return style === ShortcutStyle.Dialog ? `${combo.key.toUpperCase()} (${shiftedKey})` : shiftedKey;
+    return style === ShortcutStyle.DIALOG ? `${combo.key.toUpperCase()} (${shiftedKey})` : shiftedKey;
   }
 
   const modifiers = [

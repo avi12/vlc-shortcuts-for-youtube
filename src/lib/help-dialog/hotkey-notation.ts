@@ -32,7 +32,7 @@ const SHIFTED_LETTER_SIGNATURE = toHotkeySignature(formatYoutubeHotkey(SHIFTED_L
 const CONTROL_SIGNATURE = toHotkeySignature(
   formatCombos({
     combos: [CONTROL_SAMPLE],
-    style: ShortcutStyle.Dialog
+    style: ShortcutStyle.DIALOG
   })
 );
 const SHIFT_NAME_PATTERN = /[(（]\s*([^+＋]+?)\s*[+＋]/;
@@ -48,7 +48,7 @@ function formatEnglishShiftedKey(key: string) {
       key,
       isShift: true
     }],
-    style: ShortcutStyle.Dialog
+    style: ShortcutStyle.DIALOG
   });
 }
 

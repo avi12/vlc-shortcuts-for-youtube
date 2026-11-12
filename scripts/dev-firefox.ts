@@ -8,7 +8,6 @@
  * one-off session to sign in to YouTube; web-ext's own RDP server survives either way.
  */
 
-import { FALLBACK_GECKO_ID } from "@@/wxt.config";
 import {
   type BrowserTarget,
   cloneFile,
@@ -20,6 +19,7 @@ import {
   START_URL,
   USER_PROFILES_DIR
 } from "./dev-shared";
+import { FALLBACK_GECKO_ID } from "@@/wxt.config";
 import { spawnSync } from "node:child_process";
 import {
   existsSync,

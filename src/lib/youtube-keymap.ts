@@ -30,24 +30,24 @@ const DIGIT_COMBOS = Array.from({ length: 10 }, (_, digit) => ({ key: String(dig
 // dialog lists one only where YouTube's own dialog does, in YouTube's (localized) wording
 export const YOUTUBE_NATIVE_SHORTCUTS = {
   theaterMode: {
-    section: KeymapSection.General,
+    section: KeymapSection.GENERAL,
     combos: [{ key: "t" }]
   },
   closeMiniplayerOrDialog: {
-    section: KeymapSection.General,
+    section: KeymapSection.GENERAL,
     combos: [{ key: "Escape" }]
   },
   seekToPercentage: {
-    section: KeymapSection.Playback,
+    section: KeymapSection.PLAYBACK,
     combos: DIGIT_COMBOS,
     hotkeyLabel: "0..9"
   },
   previousChapter: {
-    section: KeymapSection.Playback,
+    section: KeymapSection.PLAYBACK,
     combos: [YOUTUBE_CHAPTER_COMBOS.previous]
   },
   nextChapter: {
-    section: KeymapSection.Playback,
+    section: KeymapSection.PLAYBACK,
     combos: [YOUTUBE_CHAPTER_COMBOS.next]
   }
 } as const satisfies Record<string, YoutubeShortcut>;
@@ -211,10 +211,10 @@ const YOUTUBE_SHORTS_NAVIGATION_HOTKEYS = [YOUTUBE_HOTKEYS.volumeUp, YOUTUBE_HOT
 // change the short); the embed ignores volume, speed and frame keys and seeks 10s on the arrows. The watch
 // page honors every key, and YouTube Music's player none (Music has keys of its own, see youtube-music-keymap.ts)
 const HONORED_HOTKEYS_BY_PLAYER_KIND: Record<PlayerKind, ReadonlySet<YoutubeHotkey> | null> = {
-  [PlayerKind.Music]: new Set(),
-  [PlayerKind.Watch]: null,
-  [PlayerKind.Shorts]: new Set([YOUTUBE_HOTKEYS.playPause, YOUTUBE_HOTKEYS.mute, YOUTUBE_HOTKEYS.fullscreen]),
-  [PlayerKind.Embed]: new Set([
+  [PlayerKind.MUSIC]: new Set(),
+  [PlayerKind.WATCH]: null,
+  [PlayerKind.SHORTS]: new Set([YOUTUBE_HOTKEYS.playPause, YOUTUBE_HOTKEYS.mute, YOUTUBE_HOTKEYS.fullscreen]),
+  [PlayerKind.EMBED]: new Set([
     YOUTUBE_HOTKEYS.playPause,
     YOUTUBE_HOTKEYS.mute,
     YOUTUBE_HOTKEYS.fullscreen,
@@ -244,7 +244,7 @@ export function toHotkeyCombo({ key, shiftKey }: YoutubeHotkey): KeyCombo {
 export function formatYoutubeHotkey(hotkey: YoutubeHotkey) {
   return formatCombos({
     combos: [toHotkeyCombo(hotkey)],
-    style: ShortcutStyle.Dialog
+    style: ShortcutStyle.DIALOG
   });
 }
 
@@ -276,13 +276,13 @@ export function isReplacedYoutubeKey(e: KeyboardEvent) {
 export function formatYoutubeShortcut({ combos, hotkeyLabel }: YoutubeShortcut) {
   return hotkeyLabel ?? formatCombos({
     combos,
-    style: ShortcutStyle.Dialog
+    style: ShortcutStyle.DIALOG
   });
 }
 
 // A key YouTube always lists in each dialog section, so its localized section title can be found in any language
 export const YOUTUBE_SECTION_ANCHOR_KEYS: Record<KeymapSection, string> = {
-  [KeymapSection.Playback]: YOUTUBE_HOTKEYS.playPause.key,
-  [KeymapSection.General]: YOUTUBE_HOTKEYS.fullscreen.key,
-  [KeymapSection.Subtitles]: YOUTUBE_HOTKEYS.captions.key
+  [KeymapSection.PLAYBACK]: YOUTUBE_HOTKEYS.playPause.key,
+  [KeymapSection.GENERAL]: YOUTUBE_HOTKEYS.fullscreen.key,
+  [KeymapSection.SUBTITLES]: YOUTUBE_HOTKEYS.captions.key
 };

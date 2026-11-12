@@ -4,8 +4,8 @@ import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 import { z } from "@/lib/zod";
 
 export enum CycleDirection {
-  Forward = 1,
-  Backward = -1
+  FORWARD = 1,
+  BACKWARD = -1
 }
 
 const CAPTIONS_MODULE = "captions";
@@ -18,8 +18,8 @@ const NATIVE_TOGGLE_TIMEOUT_MS = 1000;
 const RANKS_PER_LANGUAGE = 2;
 
 enum CaptionsOption {
-  Tracklist = "tracklist",
-  Track = "track"
+  TRACKLIST = "tracklist",
+  TRACK = "track"
 }
 
 const responseTrackSchema = z.looseObject({
@@ -107,7 +107,7 @@ function orderTracks({ tracks, iDefault }: {
 }
 
 function getActiveVssId(player: YoutubePlayer) {
-  const parsed = activeTrackSchema.safeParse(player.getOption?.(CAPTIONS_MODULE, CaptionsOption.Track));
+  const parsed = activeTrackSchema.safeParse(player.getOption?.(CAPTIONS_MODULE, CaptionsOption.TRACK));
   return parsed.success ? parsed.data.vss_id : null;
 }
 
@@ -141,7 +141,7 @@ function toModuleTrack({ player, track }: {
   track: ResponseTrack;
 }) {
   const parsedTracklist = z.array(moduleTrackSchema).safeParse(
-    player.getOption?.(CAPTIONS_MODULE, CaptionsOption.Tracklist, { includeAsr: true })
+    player.getOption?.(CAPTIONS_MODULE, CaptionsOption.TRACKLIST, { includeAsr: true })
   );
   const moduleTrack = parsedTracklist.success ?
     parsedTracklist.data.find(candidate => candidate.vss_id === track.vssId) :
@@ -217,7 +217,7 @@ async function selectTrack({ player, track }: {
   }
 
   player.setOption?.(
-    CAPTIONS_MODULE, CaptionsOption.Track, toModuleTrack({
+    CAPTIONS_MODULE, CaptionsOption.TRACK, toModuleTrack({
       player,
       track
     })
