@@ -3,6 +3,11 @@
   "extends": [
     "./node_modules/fallow-config-avi12/fallow.json"
   ],
+  "ignoreDependencies": [
+    "fallow-config-avi12",
+    "oxlint-config-avi12",
+    "oxlint-plugin-naming"
+  ],
   "entry": [
     "src/entrypoints/**",
     "web-ext.config.ts"
