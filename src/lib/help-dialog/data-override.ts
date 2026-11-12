@@ -1,4 +1,4 @@
-import { applyOverride, createOverrideRecords, type OverrideSlot, restoreOverride } from "@/lib/dom-overrides";
+import { applyOverride, createOverrideRecords, restoreOverride } from "@/lib/dom-overrides";
 import {
   addYoutubeRow,
   buildGroups,
@@ -122,7 +122,8 @@ function readDataText(sections: HotkeySection[]) {
     }
     const section = findSectionByHotkeys(hotkeys);
     const title = readText(youtubeSection.title);
-    if (!section || !title) {
+    const isSectionIncomplete = !section || !title;
+    if (isSectionIncomplete) {
       continue;
     }
 

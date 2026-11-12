@@ -9,7 +9,6 @@
  */
 
 import {
-  type BrowserTarget,
   cloneFile,
   findFreeTcpPort,
   isYoutubePageUrl,
@@ -42,7 +41,8 @@ const POWERSHELL_TIMEOUT_MS = 10_000;
 const { GECKO_ID = FALLBACK_GECKO_ID, EXTENSION_UUID = "7c1e4a52-3b9d-4f60-a8e2-5d0c9b7f1e36" } = process.env;
 
 function findFirefoxBinary() {
-  if (platform() !== "win32") {
+  const isUnsupportedPlatform = platform() !== "win32";
+  if (isUnsupportedPlatform) {
     return undefined;
   }
 
@@ -100,7 +100,8 @@ function findDefaultFirefoxProfile() {
   };
   const firefoxDataPath = firefoxDataPaths[platform()];
   const profilesIniPath = firefoxDataPath && join(firefoxDataPath, "profiles.ini");
-  if (!firefoxDataPath || !profilesIniPath || !existsSync(profilesIniPath)) {
+  const isProfilesIniMissing = !firefoxDataPath || !profilesIniPath || !existsSync(profilesIniPath);
+  if (isProfilesIniMissing) {
     return undefined;
   }
 
@@ -114,7 +115,8 @@ function findDefaultFirefoxProfile() {
 
   const defaultSection = ini.split(/(?=^\[Profile\d)/m).find(section => /^Default=1$/m.test(section));
   const profilePath = defaultSection?.match(/^Path=(.+)$/m)?.[1]?.trim();
-  if (!defaultSection || !profilePath) {
+  const isDefaultProfileMissing = !defaultSection || !profilePath;
+  if (isDefaultProfileMissing) {
     return undefined;
   }
 
@@ -126,7 +128,8 @@ function findDefaultFirefoxProfile() {
 function setupFirefoxProfile() {
   mkdirSync(FIREFOX_PROFILE_DIR, { recursive: true });
   const sourceProfile = findDefaultFirefoxProfile();
-  if (sourceProfile && existsSync(sourceProfile)) {
+  const canCloneSourceProfile = sourceProfile && existsSync(sourceProfile);
+  if (canCloneSourceProfile) {
     console.log(`Cloning Firefox profile from ${sourceProfile}...`);
     for (const file of FIREFOX_SESSION_FILES) {
       cloneFile({
@@ -143,7 +146,8 @@ function setupFirefoxProfile() {
 // A dev Firefox left over from a crashed session keeps the profile locked, so it is closed and its stale
 // lock files removed before launching
 function closeLeftoverFirefox() {
-  if (platform() !== "win32") {
+  const isUnsupportedPlatform = platform() !== "win32";
+  if (isUnsupportedPlatform) {
     return;
   }
 
@@ -168,7 +172,8 @@ Start-Sleep -Milliseconds 500
 let rdpPort: number | undefined;
 
 function findRdpPort() {
-  if (rdpPort !== undefined || platform() !== "win32") {
+  const shouldSkipRdpLookup = rdpPort !== undefined || platform() !== "win32";
+  if (shouldSkipRdpLookup) {
     return rdpPort;
   }
 
@@ -215,7 +220,8 @@ async function connectRdp(port: number) {
       const packet: RdpPacket = JSON.parse(buffer.subarray(iColon + 1, iColon + 1 + length).toString());
       buffer = buffer.subarray(iColon + 1 + length);
       const iWaiter = waiters.findIndex(waiter => waiter.isMatch(packet));
-      if (iWaiter !== -1) {
+      const hasWaiter = iWaiter !== -1;
+      if (hasWaiter) {
         waiters.splice(iWaiter, 1)[0]?.fulfill(packet);
       }
     }
@@ -280,7 +286,8 @@ async function refreshTabOverRdp({ rdp, tabActor, expressions }: {
 // Firefox debugs a tab through its top frame, so a YouTube embed inside another site keeps its copy until reloaded
 async function refreshYoutubeTabsOverRdp({ expressions }: { expressions: string[] }) {
   const port = findRdpPort();
-  if (port === undefined) {
+  const isRdpPortMissing = port === undefined;
+  if (isRdpPortMissing) {
     logEvent("Firefox's RDP port not found - reload the YouTube tabs by hand");
     return 0;
   }

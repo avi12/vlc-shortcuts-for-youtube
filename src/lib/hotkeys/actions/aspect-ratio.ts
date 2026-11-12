@@ -83,7 +83,8 @@ export function resetAspectRatio() {
   resizeObserver?.disconnect();
   resizeObserver = null;
   for (const elPlayer of document.querySelectorAll(`.${ASPECT_RATIO_CLASS}`)) {
-    if (elPlayer instanceof HTMLElement) {
+    const isPlayerElement = elPlayer instanceof HTMLElement;
+    if (isPlayerElement) {
       clearAspectRatio(elPlayer);
     }
   }
@@ -115,7 +116,8 @@ function applyAspectRatio({ player, aspectRatio }: {
     text: `${ASPECT_RATIO_STATUS_PREFIX}${label}`
   });
 
-  if (ratio === null) {
+  const isDefaultRatio = ratio === null;
+  if (isDefaultRatio) {
     return;
   }
 

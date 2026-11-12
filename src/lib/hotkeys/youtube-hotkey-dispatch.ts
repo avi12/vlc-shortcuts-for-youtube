@@ -35,7 +35,8 @@ function findPlayerHotkey({ player, hotkey }: {
   hotkey: YoutubeHotkey;
 }) {
   const playerKind = getPlayerKind(player);
-  if (playerKind === PlayerKind.MUSIC) {
+  const isMusicPlayer = playerKind === PlayerKind.MUSIC;
+  if (isMusicPlayer) {
     return findMusicHotkey(hotkey);
   }
 
@@ -79,7 +80,8 @@ export function dispatchMusicHotkey({ player, hotkey }: {
   player: YoutubePlayer;
   hotkey: YoutubeHotkey;
 }) {
-  if (getPlayerKind(player) !== PlayerKind.MUSIC) {
+  const isNotMusicPlayer = getPlayerKind(player) !== PlayerKind.MUSIC;
+  if (isNotMusicPlayer) {
     return;
   }
 

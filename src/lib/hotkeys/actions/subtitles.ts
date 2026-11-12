@@ -116,7 +116,8 @@ function getActivePosition({ player, tracks }: {
   tracks: ResponseTrack[];
 }) {
   const activeVssId = getActiveVssId(player);
-  if (activeVssId === null) {
+  const isCaptionsOff = activeVssId === null;
+  if (isCaptionsOff) {
     return OFF_POSITION;
   }
 
@@ -180,7 +181,8 @@ function waitForCaptionsOn(player: YoutubePlayer) {
   const startedAt = performance.now();
   return new Promise<boolean>(resolve => {
     function check() {
-      if (getActiveVssId(player) !== null) {
+      const isTrackActive = getActiveVssId(player) !== null;
+      if (isTrackActive) {
         resolve(true);
         return;
       }
@@ -257,7 +259,8 @@ export async function selectSubtitleLabel({ player, label }: {
 }) {
   const isTurningOff = label === SUBTITLES_OFF_LABEL;
   if (isTurningOff) {
-    if (getActiveVssId(player) !== null) {
+    const isCaptionTrackActive = getActiveVssId(player) !== null;
+    if (isCaptionTrackActive) {
       toggleNativeCaptions(player);
     }
 
@@ -281,7 +284,8 @@ export async function cycleSubtitles({ player, direction }: {
   direction: CycleDirection;
 }) {
   const tracks = readOrderedTracks(player);
-  if (tracks.length === 0) {
+  const hasNoTracks = tracks.length === 0;
+  if (hasNoTracks) {
     toggleNativeCaptions(player);
     return;
   }

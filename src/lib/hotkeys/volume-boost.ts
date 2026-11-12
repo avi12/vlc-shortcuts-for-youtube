@@ -15,7 +15,8 @@ function endBoostWhenYoutubeLowersVolume({ player, gain }: {
   gain: GainNode;
 }) {
   return () => {
-    if (player.getVolume() < MAX_PLAYER_VOLUME) {
+    const isWithinNativeRange = player.getVolume() < MAX_PLAYER_VOLUME;
+    if (isWithinNativeRange) {
       gain.gain.value = UNBOOSTED_GAIN;
     }
   };
@@ -28,11 +29,13 @@ async function routeVideoWhenRunning({ context, elVideo, gain }: {
   elVideo: HTMLVideoElement;
   gain: GainNode;
 }) {
-  if (context.state !== "running") {
+  const isSuspended = context.state !== "running";
+  if (isSuspended) {
     await context.resume();
   }
 
-  if (context.state !== "running") {
+  const isStillNotRunning = context.state !== "running";
+  if (isStillNotRunning) {
     return;
   }
 

@@ -134,7 +134,8 @@ export function getBezelTimers(bezel: BezelComponent) {
   const timers = Object.values(bezel).filter(isBezelTimer);
   const showTimer = timers.find(timer => Object.values(timer).includes(bezelPrototype?.show));
   const hideTimer = timers.find(timer => Object.values(timer).includes(bezelPrototype?.hide));
-  return showTimer && hideTimer ? {
+  const hasTimers = showTimer && hideTimer;
+  return hasTimers ? {
     showTimer,
     hideTimer
   } : null;

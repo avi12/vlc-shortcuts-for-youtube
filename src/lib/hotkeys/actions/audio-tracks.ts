@@ -21,7 +21,8 @@ function isSameTrack({ track, activeTrack }: {
   track: unknown;
   activeTrack: unknown;
 }) {
-  if (track === activeTrack) {
+  const isActiveTrack = track === activeTrack;
+  if (isActiveTrack) {
     return true;
   }
 
@@ -80,11 +81,13 @@ export function selectAudioTrack({ player, name }: {
   name: string;
 }) {
   const namedTrack = readNamedTracks(player).find(candidate => candidate.name === name);
-  if (!namedTrack || !player.setAudioTrack) {
+  const setAudioTrack = player.setAudioTrack?.bind(player);
+  const isTrackSwitchUnsupported = !namedTrack || !setAudioTrack;
+  if (isTrackSwitchUnsupported) {
     return;
   }
 
-  player.setAudioTrack(namedTrack.track);
+  setAudioTrack(namedTrack.track);
   showTrack({
     player,
     track: namedTrack.track
@@ -94,7 +97,9 @@ export function selectAudioTrack({ player, name }: {
 export function cycleAudioTrack(player: YoutubePlayer) {
   const tracks = readNamedTracks(player).map(({ track }) => track);
   const activeTrack = player.getAudioTrack?.();
-  if (!player.setAudioTrack || tracks.length < MULTIPLE_TRACKS_MIN) {
+  const setAudioTrack = player.setAudioTrack?.bind(player);
+  const isSwitchingUnavailable = !setAudioTrack || tracks.length < MULTIPLE_TRACKS_MIN;
+  if (isSwitchingUnavailable) {
     showTrack({
       player,
       track: activeTrack
@@ -107,7 +112,7 @@ export function cycleAudioTrack(player: YoutubePlayer) {
     activeTrack
   }));
   const nextTrack = tracks[(iActive + 1) % tracks.length];
-  player.setAudioTrack(nextTrack);
+  setAudioTrack(nextTrack);
   showTrack({
     player,
     track: nextTrack

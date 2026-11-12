@@ -1,4 +1,4 @@
-import { applyOverride, createOverrideRecords, type OverrideSlot, restoreOverride } from "@/lib/dom-overrides";
+import { applyOverride, createOverrideRecords, restoreOverride } from "@/lib/dom-overrides";
 import { isVlcControlsEnabled, onEnabledChange, unlessRetired } from "@/lib/enabled-flag";
 import { PLAYER_SELECTOR } from "@/lib/player";
 import { ShortcutStyle } from "@/lib/shortcut";
@@ -120,11 +120,13 @@ function rewriteAttribute({ attribute, value, action }: {
   value: string | null;
   action: VlcAction | null;
 }) {
-  if (value === null) {
+  const isValueMissing = value === null;
+  if (isValueMissing) {
     return null;
   }
 
-  if (attribute === TooltipAttribute.ARIA_KEY_SHORTCUTS) {
+  const isKeyShortcutsAttribute = attribute === TooltipAttribute.ARIA_KEY_SHORTCUTS;
+  if (isKeyShortcutsAttribute) {
     return action && formatActionShortcut({
       action,
       style: ShortcutStyle.TOOLTIP
@@ -146,7 +148,8 @@ function createAttributeSlot({ elButton, attribute }: {
     target: elButton,
     read: () => elButton.getAttribute(attribute),
     write(value: string | null) {
-      if (value === null) {
+      const isAttributeCleared = value === null;
+      if (isAttributeCleared) {
         elButton.removeAttribute(attribute);
         return;
       }
@@ -230,7 +233,8 @@ function syncTooltipText(elText: Element) {
 
 function observeTooltipText(elButton: Element) {
   const elText = elButton.closest(PLAYER_SELECTOR)?.querySelector(TOOLTIP_TEXT_SELECTOR);
-  if (!elText || observedTooltipTexts.has(elText)) {
+  const isTextUnusable = !elText || observedTooltipTexts.has(elText);
+  if (isTextUnusable) {
     return;
   }
 

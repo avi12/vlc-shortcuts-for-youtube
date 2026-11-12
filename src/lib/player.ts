@@ -101,7 +101,8 @@ const sphericalPropertiesSchema = z.object({ fov: z.number() });
 // watch page's player mounted but hidden while Shorts plays in its own
 export function getPlayer() {
   for (const elPlayer of document.querySelectorAll(PLAYER_SELECTOR)) {
-    if (isYoutubePlayer(elPlayer) && elPlayer.checkVisibility()) {
+    const isVisibleYoutubePlayer = isYoutubePlayer(elPlayer) && elPlayer.checkVisibility();
+    if (isVisibleYoutubePlayer) {
       return elPlayer;
     }
   }
@@ -118,7 +119,8 @@ export function getPlayerKind(player: YoutubePlayer) {
     return PlayerKind.MUSIC;
   }
 
-  if (player.id === SHORTS_PLAYER_ID) {
+  const isShortsPlayerId = player.id === SHORTS_PLAYER_ID;
+  if (isShortsPlayerId) {
     return PlayerKind.SHORTS;
   }
 
@@ -135,7 +137,8 @@ export function isMainVideo(target: EventTarget | null) {
 
 export function getVideoTitle(player: YoutubePlayer) {
   const parsed = videoDataSchema.safeParse(player.getVideoData?.());
-  return parsed.success && parsed.data.title ? parsed.data.title : document.title;
+  const hasCustomTitle = parsed.success && parsed.data.title;
+  return hasCustomTitle ? parsed.data.title : document.title;
 }
 
 export function isSphericalVideo(player: YoutubePlayer) {

@@ -39,11 +39,13 @@ function swallow(event: KeyboardEvent) {
 }
 
 function getTargetPlayer(event: KeyboardEvent) {
-  const player = isVlcControlsEnabled() && !event.isComposing ? getPlayer() : null;
-  if (!player || isKeyForPage({
+  const isPlayerControllable = isVlcControlsEnabled() && !event.isComposing;
+  const player = isPlayerControllable ? getPlayer() : null;
+  const isKeyIgnored = !player || isKeyForPage({
     e: event,
     elPlayer: player
-  })) {
+  });
+  if (isKeyIgnored) {
     return null;
   }
 
@@ -92,12 +94,14 @@ function onKeyDown(event: KeyboardEvent) {
   isAfterMusicNavigationPrefix = isMusicSite() && isMusicNavigationPrefix(event);
   const player = getTargetPlayer(event);
   const isShortsNavigation = player !== null && isShortsPlayer(player) && isShortsNavigationKey(event);
-  if (!player && isVlcComboLeftToBrowser(event)) {
+  const isComboLeftToBrowser = !player && isVlcComboLeftToBrowser(event);
+  if (isComboLeftToBrowser) {
     swallow(event);
     return;
   }
 
-  if (!player || isShortsNavigation || isMusicNavigation) {
+  const shouldIgnoreKey = !player || isShortsNavigation || isMusicNavigation;
+  if (shouldIgnoreKey) {
     return;
   }
 
@@ -113,7 +117,8 @@ function onKeyDown(event: KeyboardEvent) {
       player,
       isRepeat: event.repeat
     });
-    if (typeof release === "function") {
+    const isReleaseHandler = typeof release === "function";
+    if (isReleaseHandler) {
       releaseByKeyCode.set(event.code, release);
     }
 

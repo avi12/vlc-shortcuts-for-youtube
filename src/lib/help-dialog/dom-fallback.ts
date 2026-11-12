@@ -21,7 +21,8 @@ function readDomText(elDialog: Element) {
     for (const elOption of elSection.querySelectorAll(OPTION_SELECTOR)) {
       const label = elOption.querySelector(OPTION_LABEL_SELECTOR)?.textContent.trim();
       const hotkey = elOption.querySelector(OPTION_HOTKEY_SELECTOR)?.textContent.trim();
-      if (!label || !hotkey) {
+      const isRowIncomplete = !label || !hotkey;
+      if (isRowIncomplete) {
         continue;
       }
 
@@ -36,7 +37,8 @@ function readDomText(elDialog: Element) {
     }
     const section = findSectionByHotkeys(hotkeys);
     const title = elSection.querySelector(SECTION_TITLE_SELECTOR)?.textContent.trim();
-    if (!section || !title) {
+    const isSectionIncomplete = !section || !title;
+    if (isSectionIncomplete) {
       continue;
     }
 
@@ -67,7 +69,8 @@ function createGroupElement({ title, rows }: HotkeyGroup<never>) {
 export function applyDomFallback(elDialog: Element) {
   const elSections = elDialog.querySelector(SECTION_SELECTOR)?.parentElement;
   const isApplied = elDialog.querySelector(`[${FALLBACK_ATTRIBUTE}]`) !== null;
-  if (!(elSections instanceof HTMLElement) || isApplied) {
+  const shouldSkipFallback = !(elSections instanceof HTMLElement) || isApplied;
+  if (shouldSkipFallback) {
     return;
   }
 

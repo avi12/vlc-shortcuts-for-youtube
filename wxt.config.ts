@@ -61,6 +61,12 @@ const ignoreDevProfilesInWatcher = {
   })
 };
 
+// Chrome's manifest takes author as { email }; Opera and Firefox take the "Name <email>" string
+function createManifestAuthor(browser: string) {
+  const isAuthorString = browser === "opera" || browser === "firefox";
+  return isAuthorString ? packageJson.author : { email };
+}
+
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "src",
@@ -72,8 +78,7 @@ export default defineConfig({
     // No popup: the toolbar click toggles the extension (see background.ts)
     action: {},
     permissions: ["storage"],
-    // Chrome's manifest takes author as { email }; Opera and Firefox take the "Name <email>" string
-    author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
+    author: createManifestAuthor(browser),
     ...(browser === "firefox" && {
       browser_specific_settings: {
         gecko: {

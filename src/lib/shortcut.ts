@@ -137,7 +137,8 @@ function formatCombo({ combo, style }: {
   const shiftedSymbolBaseKey = getShiftedSymbolBaseKey(combo.key);
   const typedOnKey = isLetter(combo.key) ? key : shiftedSymbolBaseKey;
   const isShiftOnly = isComboShifted(combo) && !combo.isCtrl && !combo.isAlt;
-  if (isShiftOnly && typedOnKey) {
+  const hasShiftedTypedKey = isShiftOnly && typedOnKey;
+  if (hasShiftedTypedKey) {
     const shiftedKey = `${MODIFIER_NAMES.shift}+${typedOnKey}`;
     return style === ShortcutStyle.DIALOG ? `${combo.key.toUpperCase()} (${shiftedKey})` : shiftedKey;
   }

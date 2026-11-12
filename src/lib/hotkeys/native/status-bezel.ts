@@ -13,7 +13,8 @@ export function showStatusInNativeBezel({ player, text }: {
 }) {
   const bezel = getBezel(player);
   const timers = bezel ? getBezelTimers(bezel) : null;
-  if (!bezel || !timers) {
+  const isBezelUnavailable = !bezel || !timers;
+  if (isBezelUnavailable) {
     return;
   }
 

@@ -25,7 +25,8 @@ function findOperaBinary() {
     numeric: true
   }));
   const binaryPath = newestVersion && join(OPERA_INSTALL_DIR, newestVersion, "opera.exe");
-  return binaryPath && existsSync(binaryPath) ? binaryPath : undefined;
+  const hasBinary = binaryPath && existsSync(binaryPath);
+  return hasBinary ? binaryPath : undefined;
 }
 
 export const operaTarget = createChromiumTarget({

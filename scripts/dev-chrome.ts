@@ -9,7 +9,6 @@
  */
 
 import {
-  type BrowserTarget,
   cloneFile,
   findFreeTcpPort,
   isYoutubePageUrl,
@@ -84,7 +83,8 @@ function setupChromiumProfile({ profileDir, sourceUserData, sourceProfileName = 
   const isSeeded = existsSync(seededSentinel);
   const sourceRoot = sourceUserData[platform()];
   const sourceProfile = sourceRoot && join(sourceRoot, sourceProfileName);
-  if (!isSeeded && sourceRoot && sourceProfile && existsSync(sourceProfile)) {
+  const shouldCloneProfile = !isSeeded && sourceRoot && sourceProfile && existsSync(sourceProfile);
+  if (shouldCloneProfile) {
     console.log(`Cloning ${basename(profileDir)} profile from ${sourceProfile}...`);
     const destinationProfile = join(profileDir, DEFAULT_CHROMIUM_PROFILE_NAME);
     for (const file of USER_DATA_FILES) {
@@ -172,19 +172,26 @@ async function refreshTargetOverCdp({ webSocketUrl, expressions }: {
   let nextId = 1;
   webSocket.onmessage = event => {
     const message: CdpMessage = JSON.parse(String(event.data));
-    if (message.method === "Runtime.executionContextCreated" && message.params?.context) {
-      contexts.push(message.params.context);
+    const isContextCreatedEvent = message.method === "Runtime.executionContextCreated";
+    const executionContext = isContextCreatedEvent ? message.params?.context : undefined;
+    if (executionContext) {
+      contexts.push(executionContext);
     }
 
-    if (message.id === undefined) {
+    const { id } = message;
+    const isEventMessage = id === undefined;
+    if (isEventMessage) {
       return;
     }
 
-    replyById.get(message.id)?.(message);
-    replyById.delete(message.id);
+    replyById.get(id)?.(message);
+    replyById.delete(id);
   };
 
-  function call(method: string, params: Record<string, unknown> = {}) {
+  function call({ method, params = {} }: {
+    method: string;
+    params?: Record<string, unknown>;
+  }) {
     return new Promise<CdpMessage>(fulfill => {
       const id = nextId++;
       replyById.set(id, fulfill);
@@ -200,18 +207,22 @@ async function refreshTargetOverCdp({ webSocketUrl, expressions }: {
 
   async function refresh() {
     await new Promise(fulfill => webSocket.addEventListener("open", fulfill, { once: true }));
-    const { result } = await call("Page.getFrameTree");
+    const { result } = await call({ method: "Page.getFrameTree" });
     const urlByFrameId = readFrameUrls(result?.frameTree);
-    await call("Runtime.enable");
+    await call({ method: "Runtime.enable" });
     const youtubeContexts = contexts.filter(({ auxData }) => {
-      const frameUrl = auxData?.isDefault && auxData.frameId ? urlByFrameId.get(auxData.frameId) : undefined;
+      const frameId = auxData?.isDefault ? auxData.frameId : undefined;
+      const frameUrl = frameId ? urlByFrameId.get(frameId) : undefined;
       return frameUrl !== undefined && isYoutubePageUrl(frameUrl);
     });
     for (const { id: contextId } of youtubeContexts) {
       for (const expression of expressions) {
-        await call("Runtime.evaluate", {
-          expression,
-          contextId
+        await call({
+          method: "Runtime.evaluate",
+          params: {
+            expression,
+            contextId
+          }
         });
       }
     }
@@ -241,7 +252,9 @@ async function refreshYoutubeTabsOverCdp({ debugPort, expressions }: {
     .catch(() => []);
   const webSocketUrls = targets.flatMap(target => {
     const isYoutubeTarget = REFRESHED_TARGET_TYPES.has(target.type ?? "") && isYoutubePageUrl(target.url ?? "");
-    return isYoutubeTarget && target.webSocketDebuggerUrl ? [target.webSocketDebuggerUrl] : [];
+    const { webSocketDebuggerUrl } = target;
+    const isDebuggableTarget = isYoutubeTarget && webSocketDebuggerUrl;
+    return isDebuggableTarget ? [webSocketDebuggerUrl] : [];
   });
   const results = await Promise.all(
     webSocketUrls.map(webSocketUrl => refreshTargetOverCdp({
@@ -260,7 +273,9 @@ async function listBackgroundWorkerIdsOverCdp(debugPort: number) {
     .catch(() => []);
   return targets.flatMap(target => {
     const isBackgroundWorker = target.type === "service_worker" && EXTENSION_BACKGROUND_URL_PATTERN.test(target.url ?? "");
-    return isBackgroundWorker && target.id ? [target.id] : [];
+    const { id } = target;
+    const isIdentifiableBackgroundWorker = isBackgroundWorker && id;
+    return isIdentifiableBackgroundWorker ? [id] : [];
   });
 }
 
@@ -272,7 +287,8 @@ export function createChromiumTarget(options: ChromiumTargetOptions) {
 
   async function launch(profileDirectory: string) {
     const debugPort = await findFreeTcpPort(options.debugPort);
-    if (debugPort !== options.debugPort) {
+    const isDebugPortReassigned = debugPort !== options.debugPort;
+    if (isDebugPortReassigned) {
       console.log(`${options.name} debug port ${options.debugPort} busy; using ${debugPort} instead`);
     }
 

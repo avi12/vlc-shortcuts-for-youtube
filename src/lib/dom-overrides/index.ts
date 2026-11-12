@@ -31,7 +31,8 @@ export function applyOverride<T>({ slot, transform }: {
     applied
   });
 
-  if (applied === current) {
+  const isTransformNoop = applied === current;
+  if (isTransformNoop) {
     return;
   }
 

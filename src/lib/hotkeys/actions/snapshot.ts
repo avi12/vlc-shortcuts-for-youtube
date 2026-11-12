@@ -67,7 +67,8 @@ function waitFor(isDone: () => boolean) {
   return new Promise<void>(resolve => {
     function check() {
       const isTimedOut = performance.now() - startedAt > QUALITY_SWITCH_TIMEOUT_MS;
-      if (isTimedOut || isDone()) {
+      const isFinished = isTimedOut || isDone();
+      if (isFinished) {
         resolve();
         return;
       }
@@ -85,14 +86,16 @@ async function captureBestFrame(player: YoutubePlayer) {
   const bestQuality = findBestQuality(player);
   const preferredQuality = player.getPreferredQuality?.();
   const isBestQualityShown = bestQuality === null || player.getPlaybackQuality?.() === bestQuality;
-  if (isBestQualityShown || !preferredQuality || !player.setPlaybackQualityRange) {
+  const setPlaybackQualityRange = player.setPlaybackQualityRange?.bind(player);
+  const shouldCaptureAsIs = isBestQualityShown || !preferredQuality || !setPlaybackQualityRange;
+  if (shouldCaptureAsIs) {
     return captureFrame(player);
   }
 
   const wasPlaying = isPlaying(player);
   player.pauseVideo();
   const pausedAt = player.getCurrentTime();
-  player.setPlaybackQualityRange(bestQuality, bestQuality);
+  setPlaybackQualityRange(bestQuality, bestQuality);
   await waitFor(() => player.getPlaybackQuality?.() === bestQuality && isFrameShown(player));
 
   // YouTube reloads the new stream a little before the paused moment
@@ -109,7 +112,7 @@ async function captureBestFrame(player: YoutubePlayer) {
   }
 
   const frameUrl = captureFrame(player);
-  player.setPlaybackQualityRange(preferredQuality, preferredQuality);
+  setPlaybackQualityRange(preferredQuality, preferredQuality);
 
   if (wasPlaying) {
     player.playVideo();

@@ -1,6 +1,5 @@
 import { createMenuIcon } from "@/lib/context-menu/menu-icons";
-import type {
-  MenuRow} from "@/lib/context-menu/menu-model";
+import type { MenuRow } from "@/lib/context-menu/menu-model";
 import {
   CHOICE_ROWS,
   type ChoiceRowModel,
@@ -123,7 +122,8 @@ function syncChoiceRow({ model, menu, player, rows }: {
 }) {
   const options = model.readOptions(player);
   const existingRow = rows.choices.get(model.id);
-  if (options.length === 0) {
+  const hasNoOptions = options.length === 0;
+  if (hasNoOptions) {
     if (existingRow) {
       dropRow({
         menu,
@@ -151,7 +151,8 @@ function syncChoiceRow({ model, menu, player, rows }: {
 
   row.setOptions(options);
   const selected = model.readSelected(player);
-  if (selected !== null) {
+  const hasSelection = selected !== null;
+  if (hasSelection) {
     row.setSelected(selected);
   }
 }
@@ -231,7 +232,8 @@ function syncContextMenu() {
 
   const player = getPlayer();
   // A retired copy leaves YouTube's menu as YouTube's own, for the copy that took over to fill
-  if (isCopyRetired() || !player) {
+  const isMenuUnavailable = isCopyRetired() || !player;
+  if (isMenuUnavailable) {
     dropAllRows({
       menu,
       rows

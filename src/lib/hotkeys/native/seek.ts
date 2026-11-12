@@ -44,7 +44,8 @@ function correctOverlayText({ player, isForward }: {
     isForward
   });
   const match = elDuration?.textContent.trim().match(SIGNED_SECONDS_PATTERN);
-  if (!elDuration || !match) {
+  const isDurationUnreadable = !elDuration || !match;
+  if (isDurationUnreadable) {
     return;
   }
 
@@ -102,12 +103,14 @@ export function seekNatively({ player, seconds }: {
   }
 
   const correctionSeconds = seconds - Math.sign(seconds) * count * stepSeconds;
-  if (correctionSeconds !== 0) {
+  const hasCorrection = correctionSeconds !== 0;
+  if (hasCorrection) {
     pendingCorrectionSeconds += correctionSeconds;
     player.seekTo(player.getCurrentTime() + correctionSeconds, true);
   }
 
-  if (pendingCorrectionSeconds !== 0) {
+  const hasPendingCorrection = pendingCorrectionSeconds !== 0;
+  if (hasPendingCorrection) {
     requestAnimationFrame(() => correctOverlayText({
       player,
       isForward

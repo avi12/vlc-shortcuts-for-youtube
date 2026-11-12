@@ -28,7 +28,8 @@ function syncDialog(elDialog: Element) {
     elDialog,
     isEnabled
   });
-  if (!isEnabled || isDataOverridden) {
+  const shouldRemoveFallback = !isEnabled || isDataOverridden;
+  if (shouldRemoveFallback) {
     removeDomFallback(elDialog);
     return;
   }

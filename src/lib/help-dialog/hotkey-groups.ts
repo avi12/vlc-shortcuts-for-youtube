@@ -105,11 +105,13 @@ function findYoutubeLabel({ binding, youtubeRowsBySignature }: {
     });
   }
 
-  if (!binding.youtubeCoarserEquivalent || isMusicSite()) {
+  const { youtubeCoarserEquivalent } = binding;
+  const hasNoCoarserEquivalent = !youtubeCoarserEquivalent || isMusicSite();
+  if (hasNoCoarserEquivalent) {
     return;
   }
 
-  const { hotkey, step } = binding.youtubeCoarserEquivalent;
+  const { hotkey, step } = youtubeCoarserEquivalent;
   const label = findYoutubeRowLabel({
     hotkey,
     youtubeRowsBySignature

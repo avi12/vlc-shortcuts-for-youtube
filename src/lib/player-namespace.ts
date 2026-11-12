@@ -84,7 +84,8 @@ function readPrototype(value: unknown) {
   }
 
   const { prototype } = value;
-  return typeof prototype === "object" && prototype !== null ? prototype : null;
+  const isObjectPrototype = typeof prototype === "object" && prototype !== null;
+  return isObjectPrototype ? prototype : null;
 }
 
 // Reads a method the object may inherit, where readOwnFunction only sees the object's own

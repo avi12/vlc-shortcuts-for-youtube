@@ -136,7 +136,8 @@ export function runAction({ binding, player, isRepeat }: {
   player: YoutubePlayer;
   isRepeat: boolean;
 }) {
-  if (isRepeat && !binding.isRepeatable) {
+  const isBlockedRepeat = isRepeat && !binding.isRepeatable;
+  if (isBlockedRepeat) {
     return;
   }
 

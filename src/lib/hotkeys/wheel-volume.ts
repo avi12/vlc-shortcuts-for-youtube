@@ -24,10 +24,11 @@ function getWheelVolumePlayer(event: WheelEvent) {
     e: event
   }));
   const player = isVolumeWheel ? getPlayer() : null;
-  if (!player || isShortsPlayer(player) || !isEventInside({
+  const isWheelIgnored = !player || isShortsPlayer(player) || !isEventInside({
     e: event,
     elContainer: player
-  })) {
+  });
+  if (isWheelIgnored) {
     return null;
   }
 
@@ -44,7 +45,8 @@ function onWheel(event: WheelEvent) {
   event.stopImmediatePropagation();
   pendingDeltaPixels += toPixels(event);
   const notches = Math.trunc(pendingDeltaPixels / PIXELS_PER_WHEEL_NOTCH);
-  if (notches === 0) {
+  const hasNoNotches = notches === 0;
+  if (hasNoNotches) {
     return;
   }
 

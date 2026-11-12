@@ -83,7 +83,8 @@ function appendToDevLog({ level, args }: {
   const isTooLong = text.length > DEV_LOG_MAX_ENTRY_CHARS;
   const line = `[${new Date().toISOString()}] [${level}] ${isTooLong ? `${text.slice(0, DEV_LOG_MAX_ENTRY_CHARS)} ...[truncated]` : text}\n`;
   try {
-    if (devLog.bytes + line.length > DEV_LOG_MAX_BYTES) {
+    const isLogSizeExceeded = devLog.bytes + line.length > DEV_LOG_MAX_BYTES;
+    if (isLogSizeExceeded) {
       rotateDevLog();
     }
 
@@ -268,7 +269,8 @@ async function buildWithFsRetry(target: BrowserTarget) {
       return;
     } catch (error) {
       const isTransientFsError = TRANSIENT_FS_ERROR_PATTERN.test(String(error));
-      if (!isTransientFsError || attempt >= MAX_BUILD_ATTEMPTS) {
+      const shouldGiveUpBuild = !isTransientFsError || attempt >= MAX_BUILD_ATTEMPTS;
+      if (shouldGiveUpBuild) {
         throw error;
       }
 
@@ -427,7 +429,8 @@ async function reloadExtensionAndTabs({ target, browser, startedAt }: {
 function suppressWebExtInfoLogs() {
   const warnLogLevel = 40;
   webExtConsoleStream.write = ({ level, msg: message }) => {
-    if (level >= warnLogLevel) {
+    const isWarningOrWorse = level >= warnLogLevel;
+    if (isWarningOrWorse) {
       console.warn(message);
     }
   };
@@ -586,7 +589,8 @@ export async function runDevServer(target: BrowserTarget) {
 
       consecutiveFailures = await isBrowserAlive(browser.debugPort) ? 0 : consecutiveFailures + 1;
 
-      if (consecutiveFailures >= maxConsecutiveFailures) {
+      const hasTargetStoppedResponding = consecutiveFailures >= maxConsecutiveFailures;
+      if (hasTargetStoppedResponding) {
         logEvent(`${target.name} is no longer reachable - shutting down`);
         await exit();
         return;

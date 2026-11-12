@@ -161,7 +161,9 @@ function findMenuClasses({ namespace, panelMenuPrototype }: {
     prototype: panelMenuPrototype,
     markers: REMOVE_ITEM_MARKERS
   });
-  if (!menuItemClass || !choiceItemClass || !createItemTemplate || !addItemName || !removeItemName) {
+  const isNativeComponentMissing = !menuItemClass || !choiceItemClass || !createItemTemplate ||
+    !addItemName || !removeItemName;
+  if (isNativeComponentMissing) {
     return null;
   }
 
@@ -174,7 +176,8 @@ function findMenuClasses({ namespace, panelMenuPrototype }: {
     markers: SET_OPTIONS_MARKERS,
     excluded: [selectOptionName]
   });
-  if (!selectOptionName || !setOptionsName) {
+  const isOptionApiMissing = !selectOptionName || !setOptionsName;
+  if (isOptionApiMissing) {
     return null;
   }
 
@@ -255,7 +258,8 @@ export function getNativeContextMenu() {
   const elPanelMenu = document.querySelector(`${CONTEXT_MENU_SELECTOR} ${PANEL_MENU_SELECTOR}`);
   const panelMenu = elPanelMenu ? registry.panelMenusByElement.get(elPanelMenu) : undefined;
   const elPopup = elPanelMenu?.closest(POPUP_SELECTOR);
-  if (!classes || !panelMenu || !elPopup) {
+  const isContextMenuUnavailable = !classes || !panelMenu || !elPopup;
+  if (isContextMenuUnavailable) {
     return null;
   }
 
@@ -271,7 +275,8 @@ export function getNativeContextMenu() {
     target: panelMenu,
     name: classes.removeItemName
   });
-  if (!isPopup(popup) || !addItem || !removeItem) {
+  const isPopupUnusable = !isPopup(popup) || !addItem || !removeItem;
+  if (isPopupUnusable) {
     return null;
   }
 
@@ -319,7 +324,8 @@ export function createNativeChoiceRow({ label, icon, priority, player, popup, on
     target: item,
     name: classes.selectOptionName
   });
-  if (!setOptions || !selectOption) {
+  const isOptionMethodMissing = !setOptions || !selectOption;
+  if (isOptionMethodMissing) {
     item.dispose();
     return null;
   }

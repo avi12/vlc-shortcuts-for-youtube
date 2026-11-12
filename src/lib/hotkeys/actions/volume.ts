@@ -43,7 +43,8 @@ function stepBoostedVolume({ player, direction }: {
     player,
     volume: getBoostedVolume(player) + direction * YOUTUBE_VOLUME_STEP
   });
-  if (volume === null) {
+  const isVolumeUnavailable = volume === null;
+  if (isVolumeUnavailable) {
     return false;
   }
 

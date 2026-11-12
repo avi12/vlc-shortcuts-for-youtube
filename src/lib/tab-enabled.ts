@@ -16,7 +16,8 @@ function getTabStore() {
 
 export function readTabEnabled() {
   const stored = getTabStore()?.getItem(TAB_ENABLED_KEY) ?? null;
-  if (stored === null) {
+  const isNothingStored = stored === null;
+  if (isNothingStored) {
     return null;
   }
 

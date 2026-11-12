@@ -104,7 +104,8 @@ function readControlNotation(sample: string) {
   const iKey = sample.lastIndexOf(key);
   const prefix = stripBidiMarks(sample.slice(0, iKey));
   const iJoinerKey = prefix.lastIndexOf(JOINER_KEY);
-  if (iKey === -1 || iJoinerKey === -1) {
+  const isKeyOrJoinerMissing = iKey === -1 || iJoinerKey === -1;
+  if (isKeyOrJoinerMissing) {
     return null;
   }
 
@@ -150,7 +151,8 @@ function learnMusicNotation(youtubeRowsBySignature: Map<string, Array<{ hotkey: 
     signature: twoModifierSignature
   });
   const iShiftedKey = shiftedLetterSample?.lastIndexOf(MUSIC_SHIFTED_LETTER_SAMPLE.key.toLowerCase()) ?? -1;
-  const shiftAndJoiner = shiftedLetterSample && iShiftedKey > 0 ? shiftedLetterSample.slice(0, iShiftedKey) : "";
+  const hasShiftPrefix = shiftedLetterSample && iShiftedKey > 0;
+  const shiftAndJoiner = hasShiftPrefix ? shiftedLetterSample.slice(0, iShiftedKey) : "";
   const shiftName = shiftAndJoiner.trim().replace(MUSIC_TRAILING_JOINER_PATTERN, "") || ENGLISH_NOTATION.shiftName;
   const joiner = shiftAndJoiner.slice(shiftAndJoiner.indexOf(shiftName) + shiftName.length) || ENGLISH_NOTATION.joiner;
   const controlName = controlSample?.split(joiner)[0]?.trim() || ENGLISH_NOTATION.controlName;

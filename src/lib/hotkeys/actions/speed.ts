@@ -25,7 +25,8 @@ function applyRate({ player, rate }: {
   player.setPlaybackRate(rate);
   const isRateApplied = Math.abs(player.getPlaybackRate() - rate) < RATE_EPSILON;
   const elVideo = getVideo(player);
-  if (!isRateApplied && elVideo) {
+  const shouldApplyRate = !isRateApplied && elVideo;
+  if (shouldApplyRate) {
     elVideo.playbackRate = rate;
   }
 
@@ -45,7 +46,8 @@ function stepPresetSpeedSilently({ player, direction }: {
   const nextRate = direction === SpeedDirection.FASTER ?
     rates.find(rate => rate > currentRate) :
     rates.findLast(rate => rate < currentRate);
-  if (nextRate === undefined) {
+  const isNextRateMissing = nextRate === undefined;
+  if (isNextRateMissing) {
     return;
   }
 
@@ -103,7 +105,8 @@ export function selectSpeedLabel({ player, label }: {
   label: string;
 }) {
   const rate = player.getAvailablePlaybackRates().find(candidate => formatRate(candidate) === label);
-  if (rate === undefined) {
+  const isRateMissing = rate === undefined;
+  if (isRateMissing) {
     return;
   }
 
