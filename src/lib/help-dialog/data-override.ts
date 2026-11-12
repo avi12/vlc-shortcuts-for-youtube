@@ -68,7 +68,7 @@ function appendTitleSuffix(title: unknown) {
 }
 
 // YouTube's own rows go back exactly as YouTube sent them; only VLC's rows are built
-function toOption({ label, hotkey, youtubeOption }: HotkeyGroup<HotkeyOption>["rows"][number]): HotkeyOption {
+function toOption({ label, hotkey, youtubeOption }: HotkeyGroup<HotkeyOption>["rows"][number]) {
   return youtubeOption ?? {
     hotkeyDialogSectionOptionRenderer: {
       label: createText(label),
@@ -77,7 +77,7 @@ function toOption({ label, hotkey, youtubeOption }: HotkeyGroup<HotkeyOption>["r
   };
 }
 
-function toSection({ title, rows }: HotkeyGroup<HotkeyOption>): HotkeySection {
+function toSection({ title, rows }: HotkeyGroup<HotkeyOption>) {
   return {
     hotkeyDialogSectionRenderer: {
       title: createText(title),
@@ -147,12 +147,12 @@ function buildDialogData(data: unknown) {
   };
 }
 
-function createDataSlot(elDialog: RendererDialog): OverrideSlot<unknown> {
+function createDataSlot(elDialog: RendererDialog) {
   return {
     records: dialogDataRecords,
     target: elDialog,
     read: () => elDialog.data,
-    write(value) {
+    write(value: unknown) {
       elDialog.data = value;
     }
   };

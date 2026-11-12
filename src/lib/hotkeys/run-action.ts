@@ -28,37 +28,37 @@ type ReleaseKey = () => void;
 type ActionHandler = (player: YoutubePlayer) => ReleaseKey | Promise<void> | void;
 
 // Holds the binding's YouTube key down until the viewer lets go of the VLC key
-function createHoldHandler(action: VlcAction): ActionHandler {
+function createHoldHandler(action: VlcAction) {
   const hotkey = findBinding(action)?.youtubeEquivalent;
-  return player => hotkey && holdYoutubeHotkey({
+  return (player: YoutubePlayer) => hotkey && holdYoutubeHotkey({
     player,
     hotkey
   });
 }
 
-function createJumpHandler(action: VlcAction): ActionHandler {
-  return player => seekNatively({
+function createJumpHandler(action: VlcAction) {
+  return (player: YoutubePlayer) => seekNatively({
     player,
     seconds: JUMP_SECONDS_BY_ACTION.get(action) ?? 0
   });
 }
 
-function createFrameHandler(direction: FrameDirection): ActionHandler {
-  return player => stepFrame({
+function createFrameHandler(direction: FrameDirection) {
+  return (player: YoutubePlayer) => stepFrame({
     player,
     direction
   });
 }
 
-function createVolumeHandler(direction: VolumeDirection): ActionHandler {
-  return player => stepVolume({
+function createVolumeHandler(direction: VolumeDirection) {
+  return (player: YoutubePlayer) => stepVolume({
     player,
     direction
   });
 }
 
-function createSubtitlesHandler(direction: CycleDirection): ActionHandler {
-  return player => cycleSubtitles({
+function createSubtitlesHandler(direction: CycleDirection) {
+  return (player: YoutubePlayer) => cycleSubtitles({
     player,
     direction
   });
@@ -67,8 +67,8 @@ function createSubtitlesHandler(direction: CycleDirection): ActionHandler {
 function createSpeedHandler({ step, direction }: {
   step: typeof stepPresetSpeed;
   direction: SpeedDirection;
-}): ActionHandler {
-  return player => step({
+}) {
+  return (player: YoutubePlayer) => step({
     player,
     direction
   });

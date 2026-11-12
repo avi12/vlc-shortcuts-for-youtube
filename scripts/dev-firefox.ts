@@ -339,7 +339,7 @@ function isRemoteAgentAlive(port: number) {
 
 export function createFirefoxTarget({ isMarionetteEnabled }: {
   isMarionetteEnabled: boolean;
-}): BrowserTarget {
+}) {
   async function launch(profileDirectory: string) {
     // The MCP's privileged tools (piercing shadow roots, reading extension storage) only work when Firefox
     // itself was started with system access granted; web-ext passes this env down to Firefox
@@ -380,7 +380,7 @@ export function createFirefoxTarget({ isMarionetteEnabled }: {
 
   return {
     name: "Firefox",
-    wxtBrowser: "firefox",
+    wxtBrowser: "firefox" as const,
     outputDir: resolve(PROJECT_ROOT, "build", OUTPUT_DIR_NAME),
     outDirTemplate: OUTPUT_DIR_NAME,
     prepare: closeLeftoverFirefox,

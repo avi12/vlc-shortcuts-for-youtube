@@ -233,7 +233,7 @@ export function isHotkeyHonored({ playerKind, hotkey }: {
   return HONORED_HOTKEYS_BY_PLAYER_KIND[playerKind]?.has(hotkey) ?? true;
 }
 
-export function toHotkeyCombo({ key, shiftKey }: YoutubeHotkey): KeyCombo {
+export function toHotkeyCombo({ key, shiftKey }: YoutubeHotkey) {
   return {
     key,
     isShift: shiftKey

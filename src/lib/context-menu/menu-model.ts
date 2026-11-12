@@ -98,7 +98,7 @@ function createActionRow({ id, action, run }: {
   id: MenuRow;
   action: VlcAction;
   run: CommandRowModel["run"];
-}): CommandRowModel {
+}) {
   return {
     id,
     label: findBinding(action)?.label ?? "",

@@ -250,7 +250,7 @@ export interface NativeContextMenu {
 
 // YouTube keeps one right-click menu per player and shows its root panel on every open, so the row list in the
 // document is that menu's own
-export function getNativeContextMenu(): NativeContextMenu | null {
+export function getNativeContextMenu() {
   const { classes } = registry;
   const elPanelMenu = document.querySelector(`${CONTEXT_MENU_SELECTOR} ${PANEL_MENU_SELECTOR}`);
   const panelMenu = elPanelMenu ? registry.panelMenusByElement.get(elPanelMenu) : undefined;
@@ -278,10 +278,10 @@ export function getNativeContextMenu(): NativeContextMenu | null {
   return {
     element: panelMenu.element,
     popup,
-    addItem(item) {
+    addItem(item: NativeMenuItem) {
       addItem.call(panelMenu, item, SHOULD_APPEND_TO_END);
     },
-    removeItem(item) {
+    removeItem(item: NativeMenuItem) {
       removeItem.call(panelMenu, item);
     },
     close: () => popup.hide()
@@ -303,7 +303,7 @@ export function createNativeChoiceRow({ label, icon, priority, player, popup, on
   player: HTMLElement;
   popup: NativePopup;
   onSelect: (option: string) => void;
-}): NativeChoiceRow | null {
+}) {
   const { classes } = registry;
   if (!classes) {
     return null;
@@ -327,10 +327,10 @@ export function createNativeChoiceRow({ label, icon, priority, player, popup, on
   item.subscribe(SELECT_EVENT, onSelect);
   return {
     item,
-    setOptions(options) {
+    setOptions(options: string[]) {
       setOptions.call(item, options);
     },
-    setSelected(option) {
+    setSelected(option: string) {
       selectOption.call(item, option);
     }
   };

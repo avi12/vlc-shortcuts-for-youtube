@@ -140,12 +140,12 @@ function rewriteAttribute({ attribute, value, action }: {
 function createAttributeSlot({ elButton, attribute }: {
   elButton: Element;
   attribute: TooltipAttribute;
-}): OverrideSlot<string | null> {
+}) {
   return {
     records: attributeRecords.get(attribute) ?? createOverrideRecords(),
     target: elButton,
     read: () => elButton.getAttribute(attribute),
-    write(value) {
+    write(value: string | null) {
       if (value === null) {
         elButton.removeAttribute(attribute);
         return;
@@ -156,12 +156,12 @@ function createAttributeSlot({ elButton, attribute }: {
   };
 }
 
-function createTextSlot(elText: Element): OverrideSlot<string | null> {
+function createTextSlot(elText: Element) {
   return {
     records: tooltipTextRecords,
     target: elText,
     read: () => elText.textContent,
-    write(value) {
+    write(value: string | null) {
       elText.textContent = value;
     }
   };

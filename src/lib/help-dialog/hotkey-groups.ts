@@ -39,10 +39,10 @@ interface YoutubeDialogText<TYoutubeOption> {
   titleBySection: Map<KeymapSection, string>;
 }
 
-export function createEmptyDialogText<TYoutubeOption>(): YoutubeDialogText<TYoutubeOption> {
+export function createEmptyDialogText<TYoutubeOption>() {
   return {
-    youtubeRowsBySignature: new Map(),
-    titleBySection: new Map()
+    youtubeRowsBySignature: new Map<string, Array<HotkeyRow<TYoutubeOption>>>(),
+    titleBySection: new Map<KeymapSection, string>()
   };
 }
 
@@ -61,7 +61,7 @@ export function addYoutubeRow<TYoutubeOption>({ dialogText, row }: {
   }
 }
 
-function getSectionAnchorKeys(): Partial<Record<KeymapSection, string>> {
+function getSectionAnchorKeys() {
   return isMusicSite() ? MUSIC_SECTION_ANCHOR_KEYS : YOUTUBE_SECTION_ANCHOR_KEYS;
 }
 
@@ -140,7 +140,7 @@ function getNativeShortcuts() {
 function buildRows<TYoutubeOption>({ section, youtubeRowsBySignature }: {
   section: KeymapSection;
   youtubeRowsBySignature: Map<string, Array<HotkeyRow<TYoutubeOption>>>;
-}): Array<HotkeyRow<TYoutubeOption>> {
+}) {
   const notation = learnNotation(youtubeRowsBySignature);
   const vlcRows = VLC_BINDINGS
     .filter(binding => binding.section === section && isBindingOnSite(binding))

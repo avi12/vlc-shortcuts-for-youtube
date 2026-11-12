@@ -138,7 +138,7 @@ function findAlternative({ youtubeRowsBySignature, signature }: {
 // YouTube Music writes shifted letters as a plain combo ("SHIFT + n") and Ctrl as "CTRL": its next-song key tells its
 // word for Shift and the joiner, and its 1-second seek ("CTRL + SHIFT + right arrow", its only key with two
 // modifiers) its word for Ctrl
-function learnMusicNotation(youtubeRowsBySignature: Map<string, Array<{ hotkey: string }>>): HotkeyNotation {
+function learnMusicNotation(youtubeRowsBySignature: Map<string, Array<{ hotkey: string }>>) {
   const shiftedLetterSample = findAlternative({
     youtubeRowsBySignature,
     signature: MUSIC_SHIFTED_LETTER_SIGNATURE
@@ -155,7 +155,7 @@ function learnMusicNotation(youtubeRowsBySignature: Map<string, Array<{ hotkey: 
   const joiner = shiftAndJoiner.slice(shiftAndJoiner.indexOf(shiftName) + shiftName.length) || ENGLISH_NOTATION.joiner;
   const controlName = controlSample?.split(joiner)[0]?.trim() || ENGLISH_NOTATION.controlName;
   return {
-    formatShiftedKey: key => `${shiftName}${joiner}${splitShiftedKey(key).typedOnKey}`,
+    formatShiftedKey: (key: string) => `${shiftName}${joiner}${splitShiftedKey(key).typedOnKey}`,
     controlName,
     altName: matchCasing({
       name: ENGLISH_NOTATION.altName,
@@ -167,7 +167,7 @@ function learnMusicNotation(youtubeRowsBySignature: Map<string, Array<{ hotkey: 
   };
 }
 
-export function learnNotation(youtubeRowsBySignature: Map<string, Array<{ hotkey: string }>>): HotkeyNotation {
+export function learnNotation(youtubeRowsBySignature: Map<string, Array<{ hotkey: string }>>) {
   if (isMusicSite()) {
     return learnMusicNotation(youtubeRowsBySignature);
   }

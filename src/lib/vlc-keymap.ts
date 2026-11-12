@@ -184,7 +184,7 @@ function formatDuration(seconds: number) {
 function createJumpBinding({ jumpSize, direction }: {
   jumpSize: JumpSize;
   direction: JumpDirection;
-}): VlcBinding {
+}) {
   return {
     action: direction === JumpDirection.FORWARD ? jumpSize.forwardAction : jumpSize.backwardAction,
     section: KeymapSection.PLAYBACK,

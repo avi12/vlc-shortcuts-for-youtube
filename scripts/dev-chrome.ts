@@ -266,7 +266,7 @@ async function listBackgroundWorkerIdsOverCdp(debugPort: number) {
 
 // ── Target factory ───────────────────────────────────────────────────────────
 
-export function createChromiumTarget(options: ChromiumTargetOptions): BrowserTarget {
+export function createChromiumTarget(options: ChromiumTargetOptions) {
   const outputDirName = `${options.name.toLowerCase()}-mv3-development`;
   const profileDir = join(USER_PROFILES_DIR, options.profileSubdir);
 
