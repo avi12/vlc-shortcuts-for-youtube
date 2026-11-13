@@ -47,3 +47,4 @@ user-profiles/
 
 # Dev-server session logs (scripts/dev-shared.ts)
 .dev-logs/
+.verify/
