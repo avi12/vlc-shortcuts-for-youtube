@@ -29,19 +29,19 @@ interface HotkeyRow<TYoutubeOption> {
 
 export interface HotkeyGroup<TYoutubeOption> {
   title: string;
-  rows: Array<HotkeyRow<TYoutubeOption>>;
+  rows: HotkeyRow<TYoutubeOption>[];
 }
 
 // The rows and titles YouTube's own dialog shows, already in the viewer's language. One key can have several
 // rows, such as Ctrl+Right's chapter seek and Premium's "Jump ahead"
 interface YoutubeDialogText<TYoutubeOption> {
-  youtubeRowsBySignature: Map<string, Array<HotkeyRow<TYoutubeOption>>>;
+  youtubeRowsBySignature: Map<string, HotkeyRow<TYoutubeOption>[]>;
   titleBySection: Map<KeymapSection, string>;
 }
 
 export function createEmptyDialogText<TYoutubeOption>() {
   return {
-    youtubeRowsBySignature: new Map<string, Array<HotkeyRow<TYoutubeOption>>>(),
+    youtubeRowsBySignature: new Map<string, HotkeyRow<TYoutubeOption>[]>(),
     titleBySection: new Map<KeymapSection, string>()
   };
 }
@@ -81,7 +81,7 @@ function toDialogSignature(hotkey: YoutubeHotkey) {
 
 function findYoutubeRowLabel({ hotkey, youtubeRowsBySignature }: {
   hotkey: YoutubeHotkey;
-  youtubeRowsBySignature: Map<string, Array<HotkeyRow<unknown>>>;
+  youtubeRowsBySignature: Map<string, HotkeyRow<unknown>[]>;
 }) {
   return youtubeRowsBySignature.get(toDialogSignature(hotkey))?.[0]?.label;
 }
@@ -95,7 +95,7 @@ function findMusicEquivalent(binding: VlcBinding) {
 // Music has no speed keys, so there only exact matches count
 function findYoutubeLabel({ binding, youtubeRowsBySignature }: {
   binding: VlcBinding;
-  youtubeRowsBySignature: Map<string, Array<HotkeyRow<unknown>>>;
+  youtubeRowsBySignature: Map<string, HotkeyRow<unknown>[]>;
 }) {
   const exactHotkey = isMusicSite() ? findMusicEquivalent(binding) : binding.youtubeEquivalent;
   if (exactHotkey) {
@@ -122,7 +122,7 @@ function findYoutubeLabel({ binding, youtubeRowsBySignature }: {
 // 360° keys reuse keys other videos bind (l loops them), so their rows say where they apply
 function labelBinding({ binding, youtubeRowsBySignature }: {
   binding: VlcBinding;
-  youtubeRowsBySignature: Map<string, Array<HotkeyRow<unknown>>>;
+  youtubeRowsBySignature: Map<string, HotkeyRow<unknown>[]>;
 }) {
   const label = findYoutubeLabel({
     binding,
@@ -141,7 +141,7 @@ function getNativeShortcuts() {
 
 function buildRows<TYoutubeOption>({ section, youtubeRowsBySignature }: {
   section: KeymapSection;
-  youtubeRowsBySignature: Map<string, Array<HotkeyRow<TYoutubeOption>>>;
+  youtubeRowsBySignature: Map<string, HotkeyRow<TYoutubeOption>[]>;
 }) {
   const notation = learnNotation(youtubeRowsBySignature);
   const vlcRows = VLC_BINDINGS

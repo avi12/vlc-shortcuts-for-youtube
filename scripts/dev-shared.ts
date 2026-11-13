@@ -44,6 +44,7 @@ export const USER_PROFILES_DIR = resolve(PROJECT_ROOT, "user-profiles");
 export const START_URL = "https://www.youtube.com/watch?v=aqz-KE-bpKQ";
 const { LANG = "en" } = process.env;
 export const LANG_ARGS = LANG === "en" ? [] : [`--lang=${LANG}`];
+const MANIFEST_VERSION = 3;
 const REBUILD_DEBOUNCE_MS = 800;
 
 // ── Dev log ──────────────────────────────────────────────────────────────────
@@ -204,11 +205,11 @@ const MAIN_WORLD = "MAIN";
 const DEV_STYLE_ATTRIBUTE = "data-vlc-controls-dev-style";
 
 interface BuiltManifest {
-  content_scripts?: Array<{
+  content_scripts?: {
     js?: string[];
     css?: string[];
     world?: string;
-  }>;
+  }[];
 }
 
 // The extension's stylesheets leave the open pages with the reload that refreshes them, so each comes back as a
@@ -250,7 +251,7 @@ async function buildExtension({ wxtBrowser, outDirTemplate }: Pick<BrowserTarget
     root: PROJECT_ROOT,
     browser: wxtBrowser,
     mode: "development",
-    manifestVersion: 3,
+    manifestVersion: MANIFEST_VERSION,
     outDirTemplate
   });
 }

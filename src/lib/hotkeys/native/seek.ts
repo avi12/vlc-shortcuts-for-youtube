@@ -58,19 +58,19 @@ function correctOverlayText({ player, isForward }: {
 function planPresses(seconds: number) {
   const isForward = seconds > 0;
   const distance = Math.abs(seconds);
-  const isLongStep = distance % YOUTUBE_SEEK_SECONDS.long === 0;
+  const isLongStep = distance % YOUTUBE_SEEK_SECONDS.LONG === 0;
   if (isLongStep) {
     return {
       hotkey: isForward ? YOUTUBE_HOTKEYS.seekForwardLong : YOUTUBE_HOTKEYS.seekBackwardLong,
-      count: distance / YOUTUBE_SEEK_SECONDS.long,
-      stepSeconds: YOUTUBE_SEEK_SECONDS.long
+      count: distance / YOUTUBE_SEEK_SECONDS.LONG,
+      stepSeconds: YOUTUBE_SEEK_SECONDS.LONG
     };
   }
 
   return {
     hotkey: isForward ? YOUTUBE_HOTKEYS.seekForwardShort : YOUTUBE_HOTKEYS.seekBackwardShort,
-    count: Math.ceil(distance / YOUTUBE_SEEK_SECONDS.short),
-    stepSeconds: YOUTUBE_SEEK_SECONDS.short
+    count: Math.ceil(distance / YOUTUBE_SEEK_SECONDS.SHORT),
+    stepSeconds: YOUTUBE_SEEK_SECONDS.SHORT
   };
 }
 

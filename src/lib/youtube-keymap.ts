@@ -197,8 +197,8 @@ export const YOUTUBE_360_HOTKEYS = {
 
 // YouTube's seek keys move by these many seconds
 export const YOUTUBE_SEEK_SECONDS = {
-  short: 5,
-  long: 10
+  SHORT: 5,
+  LONG: 10
 } as const;
 
 // YouTube's volume keys step by this many percent, as VLC's do
