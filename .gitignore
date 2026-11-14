@@ -1,12 +1,12 @@
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 pnpm-debug.log*
 
-node_modules
-build
-.output
+node_modules/
+build/
+.output/
 stats.html
 stats-*.json
 
@@ -28,7 +28,7 @@ keys/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.sw?
