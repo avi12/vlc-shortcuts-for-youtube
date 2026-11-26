@@ -23,12 +23,12 @@ ${EXTENSION_NAME} is built with the WXT framework (https://wxt.dev).
 
 ## Requirements
 - Node.js 22 or newer
-- pnpm (https://pnpm.io/installation)
+- Bun (https://bun.com)
 
 ## Steps
 1. Extract this source archive
-2. From the archive root, install dependencies: \`pnpm install\`
-3. Build the ${browser} extension: \`pnpm build:${browser}\`
+2. From the archive root, install dependencies: \`bun install\`
+3. Build the ${browser} extension: \`bun run build:${browser}\`
 
 The unpacked build is written to build/${browser}-mv3-production/
 `;
