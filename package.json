@@ -18,12 +18,12 @@
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox --mv3",
     "build:opera": "wxt build -b opera",
-    "build:all": "pnpx concurrently \"pnpm build\" \"pnpm build:firefox\" \"pnpm build:opera\" --names \"Chrome ,Firefox,Opera  \"",
+    "build:all": "bunx concurrently \"bun run build\" \"bun run build:firefox\" \"bun run build:opera\" --names \"Chrome ,Firefox,Opera  \"",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox --mv3",
     "zip:opera": "wxt zip -b opera",
-    "zip:all": "pnpx concurrently \"pnpm zip\" \"pnpm zip:firefox\" \"pnpm zip:opera\" --names \"Chrome ,Firefox,Opera  \"",
-    "crx": "pnpm zip && tsx scripts/pack-crx.ts",
+    "zip:all": "bunx concurrently \"bun run zip\" \"bun run zip:firefox\" \"bun run zip:opera\" --names \"Chrome ,Firefox,Opera  \"",
+    "crx": "bun run zip && tsx scripts/pack-crx.ts",
     "lint": "avi12-lint",
     "lint:fix": "avi12-lint --fix",
     "stylelint": "stylelint \"src/**/*.css\" --fix --allow-empty-input",
@@ -37,17 +37,16 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
-    "avi12-lint": "github:avi12/lint-config#v0.4.14&path:/packages/avi12-lint",
     "chokidar": "^5.0.0",
     "crx3": "2.0.0",
     "fallow": "2.103.0",
-    "fallow-config-avi12": "github:avi12/lint-config#v0.4.14&path:/packages/fallow-config",
     "fflate": "^0.8.3",
+    "lint-config": "github:avi12/lint-config#v0.12.0",
+    "oxfmt": "^0.80.0",
     "oxlint": "1.90.0",
-    "oxlint-config-avi12": "github:avi12/lint-config#v0.4.14&path:/packages/oxlint-config",
-    "oxlint-plugin-naming": "github:avi12/lint-config#v0.4.14&path:/packages/oxlint-plugin-naming",
     "oxlint-tsgolint": "7.0.2004",
     "postcss": "^8.5.30",
+    "postcss-html": "^1.8.1",
     "stylelint": "^17.14.0",
     "stylelint-config-ccb": "^3.32.0",
     "tsx": "^4.23.15",
@@ -56,5 +55,10 @@
     "web-ext-run": "^0.2.4",
     "wxt": "^0.21.4"
   },
-  "packageManager": "pnpm@11.1.2"
+  "packageManager": "bun@1.4.5",
+  "trustedDependencies": [
+    "esbuild",
+    "spawn-sync",
+    "unrs-resolver"
+  ]
 }

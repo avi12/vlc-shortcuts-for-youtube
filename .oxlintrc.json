@@ -1,8 +1,8 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "extends": [
-    "./node_modules/oxlint-config-avi12/webextension.json",
-    "./node_modules/oxlint-plugin-naming/preset.json"
+    "./node_modules/lint-config/packages/oxlint-config/webextension.json",
+    "./node_modules/lint-config/packages/oxlint-plugin-naming/preset.json"
   ],
   "rules": {
     "no-control-regex": "off",
