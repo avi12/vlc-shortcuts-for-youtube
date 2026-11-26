@@ -1,5 +1,5 @@
 # Stack
-- pnpm (single package at the repo root)
+- Bun (single package at the repo root)
 - WXT extension framework
 - TypeScript, no UI framework (100% type safety, let TypeScript infer return types - never write them explicitly)
 - Chromium (Chrome, Opera) MV3 + Firefox MV3
@@ -90,24 +90,24 @@ The extension replaces YouTube's player keyboard controls with VLC's hotkeys, re
 
 # Linting
 After each modification, lint with oxlint and Stylelint, and typecheck:
-- `pnpm lint` runs `oxlint --type-aware --fix && pnpm fallow`; oxlint owns logic, type-aware and style rules, and the fallow dead-code audit follows
-- `pnpm stylelint` runs stylelint over `src/**/*.css` with `--fix`
-- `pnpm typecheck`
+- `bun run lint` runs `oxlint --type-aware --fix && bun run fallow`; oxlint owns logic, type-aware and style rules, and the fallow dead-code audit follows
+- `bun run stylelint` runs stylelint over `src/**/*.css` with `--fix`
+- `bun run typecheck`
 - After every bug fix, feature, or refactor - anything that removes or rewires code - run a fallow dead-code audit and clean up what it flags as newly unused (imports, helpers, exports, whole files) so changes never leave orphans behind. Act on the audit by hand - never run `fallow fix`
   - The config is `/.fallowrc.json` (entry `src/entrypoints/**`). It carries NO ignore lists - only `health` thresholds and `unused-enum-members: warn`. Run fallow from the repo root
-  - `pnpm fallow` (= `fallow audit --base HEAD`) is the incremental gate; `pnpm exec fallow dead-code --root .` is the full sweep
-  - fallow is PINNED to 2.103.0 (devDep) - never invoke it via `pnpx`/`pnpm dlx` (that fetches latest and ignores the pin), always the local bin (`pnpm fallow` / `pnpm exec fallow`)
+  - `bun run fallow` (= `fallow audit --base HEAD`) is the incremental gate; `bunx fallow dead-code --root .` is the full sweep
+  - fallow is PINNED to 2.103.0 (devDep) - never invoke it via `bunx`/`bunx` (that fetches latest and ignores the pin), always the local bin (`bun run fallow` / `bunx fallow`)
   - An export used only WITHIN its own file is an over-export: drop the `export` keyword rather than adding an ignore
 
 # Dev server
-Never build - the dev server is always running. `pnpm dev` (or `pnpm dev:firefox` / `pnpm dev:opera`) runs `scripts/dev.ts`, ported from youtube-time-manager's extension dev server: it builds into `build/<browser>-mv3-development/`, sideloads it into an isolated clone of the real browser profile under `user-profiles/`, and on any change under `src/` rebuilds and - only when the output's bytes actually changed - reloads the extension and evaluates the rebuilt page scripts into the open YouTube tabs without reloading them (Chromium over CDP, Firefox over RDP, no `scripting` permission - see Architecture). Each session logs to `.dev-logs/<browser>.log`. `pnpm dev:firefox:no-marionette` drops the automation flags so Google sign-in works. The dev server's own scripts aren't watched - restart it after editing `scripts/`. Only run a build when explicitly asked.
+Never build - the dev server is always running. `bun run dev` (or `bun run dev:firefox` / `bun run dev:opera`) runs `scripts/dev.ts`, ported from youtube-time-manager's extension dev server: it builds into `build/<browser>-mv3-development/`, sideloads it into an isolated clone of the real browser profile under `user-profiles/`, and on any change under `src/` rebuilds and - only when the output's bytes actually changed - reloads the extension and evaluates the rebuilt page scripts into the open YouTube tabs without reloading them (Chromium over CDP, Firefox over RDP, no `scripting` permission - see Architecture). Each session logs to `.dev-logs/<browser>.log`. `bun run dev:firefox:no-marionette` drops the automation flags so Google sign-in works. The dev server's own scripts aren't watched - restart it after editing `scripts/`. Only run a build when explicitly asked.
 
 # Store deploy
 Store releases (Chrome Web Store, Opera Add-ons, Firefox AMO - no Edge) go out via `web-ext-deploy` (Avi's own tool - npm `web-ext-deploy`, source at `/c/repositories/avi/web-ext-deploy`), NOT `wxt submit`. Flow:
 1. Bump `package.json` `version` (must exceed the live store version - stores reject same-or-lower) and commit `chore(release): X.Y.Z`
-2. `pnpm zip:all` builds the production zips into `build/`: `vlc-shortcuts-for-youtube-{version}-{chrome,firefox,opera}-production.zip` plus `-firefox-source.zip`/`-opera-source.zip` (AMO and Opera require the reviewable source zip; only Firefox's carries a README with build instructions, since the repo is open source)
-3. Run `pnpx web-ext-deploy env --auto-fetch-credentials` (`web-ext-deploy` is not a project dep - always invoke it via `pnpx`) - always `--dry-run` FIRST to validate creds + inputs without uploading, then re-run without `--dry-run` to publish. It reads whichever gitignored per-store `chrome.env`/`firefox.env`/`opera.env` files are PRESENT and skips any store whose file is absent. Each file holds that store's creds + `ZIP="build/vlc-shortcuts-for-youtube-{version}-<browser>-production.zip"` (`{version}` is replaced by the `package.json` version) and `ZIP_SOURCE` for Firefox/Opera
-4. Push, then cut a GitHub release for every store release: `pnpm crx` packs `build/vlc-shortcuts-for-youtube-{version}-chrome.crx` (signing key outside the repo, see `scripts/pack-crx.ts`), then `gh release create v{version} --target main --title v{version}` with the chrome, firefox and opera production zips plus the `.crx` as assets (never the source zips). Notes follow the earlier releases: a `## Highlights` list of bold one-line user-facing changes, each with a sentence of why, ending with the compare link from the previous release tag
+2. `bun run zip:all` builds the production zips into `build/`: `vlc-shortcuts-for-youtube-{version}-{chrome,firefox,opera}-production.zip` plus `-firefox-source.zip`/`-opera-source.zip` (AMO and Opera require the reviewable source zip; only Firefox's carries a README with build instructions, since the repo is open source)
+3. Run `bunx web-ext-deploy env --auto-fetch-credentials` (`web-ext-deploy` is not a project dep - always invoke it via `bunx`) - always `--dry-run` FIRST to validate creds + inputs without uploading, then re-run without `--dry-run` to publish. It reads whichever gitignored per-store `chrome.env`/`firefox.env`/`opera.env` files are PRESENT and skips any store whose file is absent. Each file holds that store's creds + `ZIP="build/vlc-shortcuts-for-youtube-{version}-<browser>-production.zip"` (`{version}` is replaced by the `package.json` version) and `ZIP_SOURCE` for Firefox/Opera
+4. Push, then cut a GitHub release for every store release: `bun run crx` packs `build/vlc-shortcuts-for-youtube-{version}-chrome.crx` (signing key outside the repo, see `scripts/pack-crx.ts`), then `gh release create v{version} --target main --title v{version}` with the chrome, firefox and opera production zips plus the `.crx` as assets (never the source zips). Notes follow the earlier releases: a `## Highlights` list of bold one-line user-facing changes, each with a sentence of why, ending with the compare link from the previous release tag
 - ALWAYS pass `--auto-fetch-credentials`: it fetches the volatile creds and saves them back to the `.env` (Opera `SESSIONID`/`CSRFTOKEN` via Playwright, Chrome `REFRESH_TOKEN` via OAuth). Both may open a browser for an interactive login. `--publish-only chrome firefox` narrows to a subset of the PRESENT stores; per-store changelogs via `--firefox-changelog`/`--opera-changelog`
 - The `*.env` credential files are gitignored and must never be committed
 - The Firefox add-on ID comes from the `GECKO_ID` env var, falling back to `vlc-controls-in-youtube@avi12.com` - kept from the old name vlc-controls-in-youtube, since AMO ties the listing to this ID

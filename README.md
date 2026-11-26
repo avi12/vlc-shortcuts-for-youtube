@@ -89,12 +89,12 @@ Music has no miniplayer or 360° videos, and keeps its own <kbd>G</kbd> navigati
 
 ## Requirements for setting up
 
-Install [Node.js](https://nodejs.org) 22+ and [pnpm](https://pnpm.io/installation)
+Install [Node.js](https://nodejs.org) 22+ and [Bun](https://bun.com) 1.4.5
 
 ## Install dependencies
 
 ```shell
-pnpm i
+bun install
 ```
 
 ## Start the dev server & run in a test browser
@@ -105,19 +105,19 @@ swapping the new code into the open YouTube tabs without reloading them.
 ### Chrome
 
 ```shell
-pnpm dev
+bun run dev
 ```
 
 ### Firefox
 
 ```shell
-pnpm dev:firefox
+bun run dev:firefox
 ```
 
 ### Opera
 
 ```shell
-pnpm dev:opera
+bun run dev:opera
 ```
 
 ## Build
@@ -128,7 +128,7 @@ after installing the dependencies.
 ### Chrome
 
 ```shell
-pnpm build
+bun run build
 ```
 
 The unpacked extension is written to `build/chrome-mv3-production/`.
@@ -136,7 +136,7 @@ The unpacked extension is written to `build/chrome-mv3-production/`.
 ### Firefox
 
 ```shell
-pnpm build:firefox
+bun run build:firefox
 ```
 
 The unpacked extension is written to `build/firefox-mv3-production/`.
@@ -144,7 +144,7 @@ The unpacked extension is written to `build/firefox-mv3-production/`.
 ### Opera
 
 ```shell
-pnpm build:opera
+bun run build:opera
 ```
 
 The unpacked extension is written to `build/opera-mv3-production/`.
@@ -152,7 +152,7 @@ The unpacked extension is written to `build/opera-mv3-production/`.
 ### All browsers at once
 
 ```shell
-pnpm build:all
+bun run build:all
 ```
 
 ## Zip
@@ -162,19 +162,19 @@ Each command builds the extension and zips it into `build/`.
 ### Chrome
 
 ```shell
-pnpm zip
+bun run zip
 ```
 
 To also pack a signed `.crx`:
 
 ```shell
-pnpm crx
+bun run crx
 ```
 
 ### Firefox
 
 ```shell
-pnpm zip:firefox
+bun run zip:firefox
 ```
 
 Also writes the source zip that Firefox Add-ons requires.
@@ -182,7 +182,7 @@ Also writes the source zip that Firefox Add-ons requires.
 ### Opera
 
 ```shell
-pnpm zip:opera
+bun run zip:opera
 ```
 
 Also writes the source zip that Opera Add-ons requires.
@@ -190,7 +190,7 @@ Also writes the source zip that Opera Add-ons requires.
 ### All browsers at once
 
 ```shell
-pnpm zip:all
+bun run zip:all
 ```
 
 ## License
