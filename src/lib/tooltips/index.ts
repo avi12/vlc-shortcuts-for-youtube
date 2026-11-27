@@ -1,3 +1,4 @@
+import { isElement } from "@/lib/dom-guards";
 import { applyOverride, createOverrideRecords, restoreOverride } from "@/lib/dom-overrides";
 import { isVlcControlsEnabled, onEnabledChange, unlessRetired } from "@/lib/enabled-flag";
 import { PLAYER_SELECTOR } from "@/lib/player";
@@ -248,7 +249,7 @@ function observeTooltipText(elButton: Element) {
 
 function handleButtonEnter(event: Event) {
   const elTarget = event.target;
-  const elButton = elTarget instanceof Element ? elTarget.closest(HOVERABLE_BUTTON_SELECTOR) : null;
+  const elButton = isElement(elTarget) ? elTarget.closest(HOVERABLE_BUTTON_SELECTOR) : null;
   elHoveredButton = elButton;
 
   if (!elButton) {
@@ -262,7 +263,7 @@ function handleButtonEnter(event: Event) {
 function handleAttributeMutations(mutations: MutationRecord[]) {
   for (const mutation of mutations) {
     const elTarget = mutation.target;
-    const isShortcutButton = elTarget instanceof Element && elTarget.matches(SHORTCUT_BUTTON_SELECTOR);
+    const isShortcutButton = isElement(elTarget) && elTarget.matches(SHORTCUT_BUTTON_SELECTOR);
     if (!isShortcutButton) {
       continue;
     }

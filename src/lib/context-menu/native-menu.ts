@@ -1,5 +1,5 @@
-import { functionSchema } from "@/lib/player";
 import {
+  createClassGuard,
   findOwnMethodName,
   hasClassSourceMarkers,
   hasOwnMethods,
@@ -10,7 +10,8 @@ import {
   readOwnFunction,
   writeMethod
 } from "@/lib/player-namespace";
-import { createTypeGuard, z } from "@/lib/zod";
+import { z } from "@/lib/zod";
+import { createLazyGuard, METHOD_SCHEMA } from "@/lib/zod-guard";
 
 // YouTube's own right-click menu, the panel stack it lives in, and the row list of whichever panel is open
 const CONTEXT_MENU_SELECTOR = ".ytp-contextmenu";
@@ -93,44 +94,47 @@ declare global {
   var vlcControlsPanelMenuRegistry: PanelMenuRegistry | undefined;
 }
 
-const componentSchema = z.object({
-  element: z.instanceof(HTMLElement),
-  dispose: functionSchema
-});
+function createComponentSchema() {
+  return z.looseObject({
+    element: z.instanceof(HTMLElement),
+    dispose: METHOD_SCHEMA
+  });
+}
 
-const isPanelMenu = createTypeGuard<NativePanelMenu>(componentSchema.extend({ menuItems: componentSchema }));
-const isPopup = createTypeGuard<NativePopup>(componentSchema.extend({ hide: functionSchema }));
+const isPanelMenuShape = createLazyGuard(() => createComponentSchema().extend({ menuItems: createComponentSchema() }));
+const isPopupShape = createLazyGuard(() => createComponentSchema().extend({ hide: METHOD_SCHEMA }));
 
-const isMenuItemClass = createTypeGuard<MenuItemClass>(
-  z.custom(value => hasOwnMethods({
-    value,
-    methodNames: MENU_ITEM_OWN_METHODS
-  }))
-);
+// The schemas check the shape, and YouTube's method signatures, which no schema can check, come with the type
+function isPanelMenu(value: unknown): value is NativePanelMenu {
+  return isPanelMenuShape(value);
+}
 
-const isChoiceItemClass = createTypeGuard<ChoiceItemClass>(
-  z.custom(value => hasOwnMethods({
-    value,
-    methodNames: CHOICE_ITEM_OWN_METHODS
-  }) && hasClassSourceMarkers({
-    value,
-    markers: CHOICE_ITEM_MARKERS
-  }))
-);
+function isPopup(value: unknown): value is NativePopup {
+  return isPopupShape(value);
+}
 
-const isItemTemplateFactory = createTypeGuard<ItemTemplateFactory>(
-  z.custom(value => hasSourceMarkers({
-    value,
-    markers: ITEM_TEMPLATE_MARKERS
-  }))
-);
+const isMenuItemClass = createClassGuard<MenuItemClass>(value => hasOwnMethods({
+  value,
+  methodNames: MENU_ITEM_OWN_METHODS
+}));
 
-const isPanelMenuClass = createTypeGuard<{ prototype: object }>(
-  z.custom(value => hasClassSourceMarkers({
-    value,
-    markers: PANEL_MENU_MARKERS
-  }))
-);
+const isChoiceItemClass = createClassGuard<ChoiceItemClass>(value => hasOwnMethods({
+  value,
+  methodNames: CHOICE_ITEM_OWN_METHODS
+}) && hasClassSourceMarkers({
+  value,
+  markers: CHOICE_ITEM_MARKERS
+}));
+
+const isItemTemplateFactory = createClassGuard<ItemTemplateFactory>(value => hasSourceMarkers({
+  value,
+  markers: ITEM_TEMPLATE_MARKERS
+}));
+
+const isPanelMenuClass = createClassGuard<{ prototype: object }>(value => hasClassSourceMarkers({
+  value,
+  markers: PANEL_MENU_MARKERS
+}));
 
 // Kept on the page rather than in this script: a newer copy of this script (the extension reloaded or updated into
 // an open tab) inherits the menus YouTube has already built, and never wraps YouTube's row list a second time

@@ -1,3 +1,4 @@
+import { isElement, isHtmlElement } from "@/lib/dom-guards";
 import { isMediaActive, type YoutubePlayer } from "@/lib/player";
 import { isMusicSite } from "@/lib/site";
 import { isPlayerFocusKey } from "@/lib/youtube-keymap";
@@ -16,11 +17,11 @@ const ACTIVATABLE_SELECTOR = "button, a[href], summary, [role='button'], [role='
 
 function getEventElement(event: Event) {
   const [target] = event.composedPath();
-  return target instanceof Element ? target : null;
+  return isElement(target) ? target : null;
 }
 
 function isEditableElement(element: Element) {
-  const isContentEditable = element instanceof HTMLElement && element.isContentEditable;
+  const isContentEditable = isHtmlElement(element) && element.isContentEditable;
   return isContentEditable || element.matches(EDITABLE_SELECTOR);
 }
 
@@ -35,7 +36,7 @@ function getFocusedElement() {
 // Keys typed into a text box (search, comments, live chat) stay the text box's. The whole event path is checked,
 // since a field inside a web component's shadow root is invisible to closest() from the event's target
 function isTypingInTextBox(event: KeyboardEvent) {
-  const isPathEditable = event.composedPath().some(target => target instanceof Element && isEditableElement(target));
+  const isPathEditable = event.composedPath().some(target => isElement(target) && isEditableElement(target));
   const elFocused = getFocusedElement();
   return isPathEditable || elFocused !== null && isEditableElement(elFocused);
 }

@@ -1,3 +1,4 @@
+import { isHtmlElement } from "@/lib/dom-guards";
 import {
   addYoutubeRow,
   buildGroups,
@@ -69,7 +70,7 @@ function createGroupElement({ title, rows }: HotkeyGroup<never>) {
 export function applyDomFallback(elDialog: Element) {
   const elSections = elDialog.querySelector(SECTION_SELECTOR)?.parentElement;
   const isApplied = elDialog.querySelector(`[${FALLBACK_ATTRIBUTE}]`) !== null;
-  const shouldSkipFallback = !(elSections instanceof HTMLElement) || isApplied;
+  const shouldSkipFallback = !isHtmlElement(elSections) || isApplied;
   if (shouldSkipFallback) {
     return;
   }
@@ -86,7 +87,7 @@ export function applyDomFallback(elDialog: Element) {
 export function removeDomFallback(elDialog: Element) {
   elDialog.querySelector(`[${FALLBACK_ATTRIBUTE}]`)?.remove();
   const elSections = elDialog.querySelector(`[${HIDDEN_BY_FALLBACK_ATTRIBUTE}]`);
-  if (!(elSections instanceof HTMLElement)) {
+  if (!isHtmlElement(elSections)) {
     return;
   }
 

@@ -1,6 +1,11 @@
-import { functionSchema } from "@/lib/player";
-import { hasOwnMethods, onPlayerNamespace, type PlayerNamespace } from "@/lib/player-namespace";
-import { createTypeGuard, z } from "@/lib/zod";
+import {
+  createClassGuard,
+  hasOwnMethods,
+  onPlayerNamespace,
+  type PlayerNamespace
+} from "@/lib/player-namespace";
+import { z } from "@/lib/zod";
+import { createGuard, createLazyGuard, METHOD_SCHEMA } from "@/lib/zod-guard";
 
 interface BezelRegistry {
   bezelsByLayer: WeakMap<Element, BezelComponent>;
@@ -36,29 +41,34 @@ interface BezelTimer {
 
 type BezelClass = new () => BezelComponent;
 
-const isBezelComponent = createTypeGuard<BezelComponent>(
-  z.object({
-    element: z.instanceof(HTMLElement),
-    updateValue: functionSchema,
-    show: functionSchema,
-    hide: functionSchema
+const isBezelShape = createLazyGuard(() => z.looseObject({
+  element: z.instanceof(HTMLElement),
+  updateValue: METHOD_SCHEMA,
+  show: METHOD_SCHEMA,
+  hide: METHOD_SCHEMA
+}));
+
+const isTimerShape = createGuard(
+  z.looseObject({
+    isActive: METHOD_SCHEMA,
+    start: METHOD_SCHEMA,
+    stop: METHOD_SCHEMA
   })
 );
 
-const isBezelTimer = createTypeGuard<BezelTimer>(
-  z.object({
-    isActive: functionSchema,
-    start: functionSchema,
-    stop: functionSchema
-  })
-);
+// The schemas check the shape, and YouTube's method signatures, which no schema can check, come with the type
+function isBezelComponent(value: unknown): value is BezelComponent {
+  return isBezelShape(value);
+}
 
-const isBezelClass = createTypeGuard<BezelClass>(
-  z.custom(value => hasOwnMethods({
-    value,
-    methodNames: BEZEL_OWN_METHODS
-  }))
-);
+function isBezelTimer(value: unknown): value is BezelTimer {
+  return isTimerShape(value);
+}
+
+const isBezelClass = createClassGuard<BezelClass>(value => hasOwnMethods({
+  value,
+  methodNames: BEZEL_OWN_METHODS
+}));
 
 // Kept on the page rather than in this script: a newer copy of the script (the extension reloaded or updated into an
 // open tab) inherits the bezels YouTube has already shown, and never wraps YouTube's bezel methods a second time

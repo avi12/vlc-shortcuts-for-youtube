@@ -1,12 +1,11 @@
 import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import type { YoutubePlayer } from "@/lib/player";
 import { z } from "@/lib/zod";
+import { createGuard, METHOD_SCHEMA } from "@/lib/zod-guard";
 
 const AUDIO_TRACK_SCHEMA = z.looseObject({ id: z.string() });
 // getLanguageInfo() carries YouTube's own localized track name ("English (US) original")
-const NAMED_AUDIO_TRACK_SCHEMA = z.looseObject({
-  getLanguageInfo: z.custom<() => unknown>(value => typeof value === "function")
-});
+const isNamedAudioTrack = createGuard(z.looseObject({ getLanguageInfo: METHOD_SCHEMA }));
 const LANGUAGE_INFO_SCHEMA = z.looseObject({ name: z.string() });
 
 const MULTIPLE_TRACKS_MIN = 2;
@@ -31,12 +30,11 @@ function isSameTrack({ track, activeTrack }: {
 }
 
 function readTrackName(track: unknown) {
-  const parsedTrack = NAMED_AUDIO_TRACK_SCHEMA.safeParse(track);
-  if (!parsedTrack.success) {
+  if (!isNamedAudioTrack(track)) {
     return;
   }
 
-  const parsedInfo = LANGUAGE_INFO_SCHEMA.safeParse(parsedTrack.data.getLanguageInfo.call(track));
+  const parsedInfo = LANGUAGE_INFO_SCHEMA.safeParse(track.getLanguageInfo());
   return parsedInfo.success ? parsedInfo.data.name : undefined;
 }
 

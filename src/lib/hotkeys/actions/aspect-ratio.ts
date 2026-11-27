@@ -1,3 +1,4 @@
+import { isHtmlElement } from "@/lib/dom-guards";
 import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import { getVideo, isMainVideo, isSphericalVideo, type YoutubePlayer } from "@/lib/player";
 
@@ -83,8 +84,7 @@ export function resetAspectRatio() {
   resizeObserver?.disconnect();
   resizeObserver = null;
   for (const elPlayer of document.querySelectorAll(`.${ASPECT_RATIO_CLASS}`)) {
-    const isPlayerElement = elPlayer instanceof HTMLElement;
-    if (isPlayerElement) {
+    if (isHtmlElement(elPlayer)) {
       clearAspectRatio(elPlayer);
     }
   }

@@ -1,5 +1,5 @@
-import { functionSchema } from "@/lib/player";
-import { createTypeGuard, z } from "@/lib/zod";
+import { z } from "@/lib/zod";
+import { createGuard, isMethod } from "@/lib/zod-guard";
 
 // The global YouTube's player script (base.js) declares and fills with its component classes:
 // `var _yt_player={};(function(g){...})(_yt_player)`
@@ -69,21 +69,26 @@ export function onPlayerNamespace(callback: NamespaceCallback) {
   installCatcher();
 }
 
-// Reading a minified component means reaching for names TypeScript cannot know, so each reach is guarded
-const isConstructor = createTypeGuard<{ prototype: unknown }>(
-  z.custom(value => typeof value === "function" && "prototype" in value)
-);
+const isFunctionObject = createGuard(z.instanceof(Function));
 
-const isObjectRecord = createTypeGuard<Record<string, unknown>>(
-  z.custom(value => typeof value === "object" && value !== null)
-);
+// A minified class is told apart by what its code is made of, which no schema can express, so the caller's check
+// decides and the class is typed as what that check stands for
+export function createClassGuard<Class>(isMatch: (value: unknown) => boolean) {
+  return (value: unknown): value is Class => isFunctionObject(value) && isMatch(value);
+}
+
+// A component's minified members are reached by name. No schema: a loose one would read every property, getters
+// included
+function isIndexable(target: object): target is Record<string, unknown> {
+  return target !== null;
+}
 
 function readPrototype(value: unknown) {
-  if (!isConstructor(value)) {
+  if (!isFunctionObject(value)) {
     return null;
   }
 
-  const { prototype } = value;
+  const prototype: unknown = value.prototype;
   const isObjectPrototype = typeof prototype === "object" && prototype !== null;
   return isObjectPrototype ? prototype : null;
 }
@@ -93,12 +98,8 @@ export function readMethod({ target, name }: {
   target: object;
   name: string;
 }) {
-  if (!isObjectRecord(target)) {
-    return null;
-  }
-
-  const parsed = functionSchema.safeParse(target[name]);
-  return parsed.success ? parsed.data : null;
+  const method = isIndexable(target) ? target[name] : null;
+  return isMethod(method) ? method : null;
 }
 
 export function writeMethod({ target, name, method }: {
@@ -106,7 +107,7 @@ export function writeMethod({ target, name, method }: {
   name: string;
   method: (...parameters: unknown[]) => unknown;
 }) {
-  if (isObjectRecord(target)) {
+  if (isIndexable(target)) {
     target[name] = method;
   }
 }
@@ -116,8 +117,8 @@ export function readOwnFunction({ target, name }: {
   target: object;
   name: string;
 }) {
-  const parsed = functionSchema.safeParse(Object.getOwnPropertyDescriptor(target, name)?.value);
-  return parsed.success ? parsed.data : null;
+  const method: unknown = Object.getOwnPropertyDescriptor(target, name)?.value;
+  return isMethod(method) ? method : null;
 }
 
 function readOwnMethodNames(prototype: object) {
@@ -125,8 +126,7 @@ function readOwnMethodNames(prototype: object) {
 }
 
 function readSource(value: unknown) {
-  const parsed = functionSchema.safeParse(value);
-  return parsed.success ? parsed.data.toString() : "";
+  return isMethod(value) ? value.toString() : "";
 }
 
 // A class's own source plus its methods': what it is made of, as opposed to what the compiler called it

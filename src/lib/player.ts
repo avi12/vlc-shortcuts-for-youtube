@@ -1,5 +1,7 @@
+import { isHtmlElement, isVideoElement } from "@/lib/dom-guards";
 import { isMusicSite } from "@/lib/site";
-import { createTypeGuard, z } from "@/lib/zod";
+import { z } from "@/lib/zod";
+import { createGuard, VOID_METHOD_SCHEMA } from "@/lib/zod-guard";
 
 // Every YouTube player shares this class: the watch page's, Shorts' and the embed's
 export const PLAYER_SELECTOR = ".html5-video-player";
@@ -27,75 +29,103 @@ enum PlayerState {
   CUED = CUED_STATE_CODE
 }
 
-export interface YoutubePlayer extends HTMLElement {
-  playVideo(): void;
-  pauseVideo(): void;
-  getPlayerState(): PlayerState;
-  seekTo(seconds: number, allowSeekAhead: boolean): void;
-  getCurrentTime(): number;
-  getDuration(): number;
-  getVolume(): number;
-  setVolume(volume: number): void;
-  isMuted(): boolean;
-  mute(): void;
-  unMute(): void;
-  getPlaybackRate(): number;
-  setPlaybackRate(rate: number): void;
-  getAvailablePlaybackRates(): number[];
-  nextVideo?(): void;
-  previousVideo?(): void;
-  getOption?(module: string, option: string, parameters?: Record<string, unknown>): unknown;
-  setOption?(module: string, option: string, value: unknown): void;
-  loadModule?(module: string): void;
-  unloadModule?(module: string): void;
-  getAudioTrack?(): unknown;
-  getAvailableAudioTracks?(): unknown;
-  setAudioTrack?(track: unknown): unknown;
-  setLoopVideo?(isLoop: boolean): void;
-  getVideoData?(): unknown;
-  getPlayerResponse?(): unknown;
-  hideControls?(): void;
-  showControls?(): void;
-  getSphericalProperties?(): unknown;
-  getPlaybackQuality?(): string;
-  getPreferredQuality?(): string;
-  getAvailableQualityData?(): unknown;
-  setPlaybackQualityRange?(minimumQuality: string, maximumQuality: string): void;
-}
-
-function isFunctionValue(value: unknown) {
-  return typeof value === "function";
-}
-
-export const functionSchema = z.custom<(...parameters: unknown[]) => unknown>(isFunctionValue);
-
-const playerApiSchema = z.object({
-  playVideo: functionSchema,
-  pauseVideo: functionSchema,
-  getPlayerState: functionSchema,
-  seekTo: functionSchema,
-  getCurrentTime: functionSchema,
-  getDuration: functionSchema,
-  getVolume: functionSchema,
-  setVolume: functionSchema,
-  isMuted: functionSchema,
-  mute: functionSchema,
-  unMute: functionSchema,
-  getPlaybackRate: functionSchema,
-  setPlaybackRate: functionSchema,
-  getAvailablePlaybackRates: functionSchema
+const NUMBER_GETTER_SCHEMA = z.function({
+  input: [],
+  output: z.number()
+});
+const NUMBER_SETTER_SCHEMA = z.function({
+  input: [z.number()],
+  output: z.void()
+});
+const STRING_GETTER_SCHEMA = z.function({
+  input: [],
+  output: z.string()
+});
+const STRING_SETTER_SCHEMA = z.function({
+  input: [z.string()],
+  output: z.void()
+});
+const UNKNOWN_GETTER_SCHEMA = z.function({
+  input: [],
+  output: z.unknown()
 });
 
-const isPlayerApi = createTypeGuard<Omit<YoutubePlayer, keyof HTMLElement>>(playerApiSchema);
+// The methods of YouTube's player element: the ones every player has, then the ones only some of them do
+const playerApiSchema = z.looseObject({
+  playVideo: VOID_METHOD_SCHEMA,
+  pauseVideo: VOID_METHOD_SCHEMA,
+  getPlayerState: z.function({
+    input: [],
+    output: z.enum(PlayerState)
+  }),
+  seekTo: z.function({
+    input: [z.number(), z.boolean()],
+    output: z.void()
+  }),
+  getCurrentTime: NUMBER_GETTER_SCHEMA,
+  getDuration: NUMBER_GETTER_SCHEMA,
+  getVolume: NUMBER_GETTER_SCHEMA,
+  setVolume: NUMBER_SETTER_SCHEMA,
+  isMuted: z.function({
+    input: [],
+    output: z.boolean()
+  }),
+  mute: VOID_METHOD_SCHEMA,
+  unMute: VOID_METHOD_SCHEMA,
+  getPlaybackRate: NUMBER_GETTER_SCHEMA,
+  setPlaybackRate: NUMBER_SETTER_SCHEMA,
+  getAvailablePlaybackRates: z.function({
+    input: [],
+    output: z.array(z.number())
+  }),
+  nextVideo: VOID_METHOD_SCHEMA.optional(),
+  previousVideo: VOID_METHOD_SCHEMA.optional(),
+  getOption: z.function({
+    input: [z.string(), z.string(), z.record(z.string(), z.unknown()).optional()],
+    output: z.unknown()
+  }).optional(),
+  setOption: z.function({
+    input: [z.string(), z.string(), z.unknown()],
+    output: z.void()
+  }).optional(),
+  loadModule: STRING_SETTER_SCHEMA.optional(),
+  unloadModule: STRING_SETTER_SCHEMA.optional(),
+  getAudioTrack: UNKNOWN_GETTER_SCHEMA.optional(),
+  getAvailableAudioTracks: UNKNOWN_GETTER_SCHEMA.optional(),
+  setAudioTrack: z.function({
+    input: [z.unknown()],
+    output: z.unknown()
+  }).optional(),
+  setLoopVideo: z.function({
+    input: [z.boolean()],
+    output: z.void()
+  }).optional(),
+  getVideoData: UNKNOWN_GETTER_SCHEMA.optional(),
+  getPlayerResponse: UNKNOWN_GETTER_SCHEMA.optional(),
+  hideControls: VOID_METHOD_SCHEMA.optional(),
+  showControls: VOID_METHOD_SCHEMA.optional(),
+  getSphericalProperties: UNKNOWN_GETTER_SCHEMA.optional(),
+  getPlaybackQuality: STRING_GETTER_SCHEMA.optional(),
+  getPreferredQuality: STRING_GETTER_SCHEMA.optional(),
+  getAvailableQualityData: UNKNOWN_GETTER_SCHEMA.optional(),
+  setPlaybackQualityRange: z.function({
+    input: [z.string(), z.string()],
+    output: z.void()
+  }).optional()
+});
+
+export type YoutubePlayer = HTMLElement & z.infer<typeof playerApiSchema>;
+
+const isPlayerApi = createGuard(playerApiSchema);
 
 function isYoutubePlayer(element: Element | null): element is YoutubePlayer {
-  return element instanceof HTMLElement && isPlayerApi(element);
+  return isHtmlElement(element) && isPlayerApi(element);
 }
 
-const videoDataSchema = z.object({ title: z.string() });
+const videoDataSchema = z.looseObject({ title: z.string() });
 
 // A 360° video reports its view; any other video reports an empty object
-const sphericalPropertiesSchema = z.object({ fov: z.number() });
+const sphericalPropertiesSchema = z.looseObject({ fov: z.number() });
 
 // Re-queried on every call: YouTube's SPA swaps players and <video> sources without a reload, and keeps the
 // watch page's player mounted but hidden while Shorts plays in its own
@@ -111,7 +141,7 @@ export function getPlayer() {
 
 export function getVideo(player: YoutubePlayer) {
   const elVideo = player.querySelector(MAIN_VIDEO_SELECTOR);
-  return elVideo instanceof HTMLVideoElement ? elVideo : null;
+  return isVideoElement(elVideo) ? elVideo : null;
 }
 
 export function getPlayerKind(player: YoutubePlayer) {
@@ -132,7 +162,7 @@ export function isShortsPlayer(player: YoutubePlayer) {
 }
 
 export function isMainVideo(target: EventTarget | null) {
-  return target instanceof HTMLVideoElement && target.matches(`${PLAYER_SELECTOR} ${MAIN_VIDEO_SELECTOR}`);
+  return isVideoElement(target) &&target.matches(`${PLAYER_SELECTOR} ${MAIN_VIDEO_SELECTOR}`);
 }
 
 export function getVideoTitle(player: YoutubePlayer) {
