@@ -48,7 +48,7 @@
   "overrides": [
     {
       "files": [
-        "./scripts/*.ts",
+        "./scripts/**/*.ts",
         "**/*.config.ts",
         "**/*.config.js",
         "**/*.config.mjs"

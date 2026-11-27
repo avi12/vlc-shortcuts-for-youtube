@@ -89,10 +89,10 @@ The extension replaces YouTube's player keyboard controls with VLC's hotkeys, re
 - Informal tone
 
 # Linting
-After each modification, lint with oxlint and Stylelint, and typecheck:
-- `bun run lint` runs `oxlint --type-aware --fix && bun run fallow`; oxlint owns logic, type-aware and style rules, and the fallow dead-code audit follows
-- `bun run stylelint` runs stylelint over `src/**/*.css` with `--fix`
-- `bun run typecheck`
+After each modification, run `bun run lint`; an exemption goes in a config file with its reason, never as a lint-disable comment:
+- `bun run lint` (`scripts/lint/lint.ts`) runs every step side by side, even after one fails: type-aware oxlint (`lint:oxlint`), Stylelint (`lint:stylelint`), `typecheck` (`tsrs`) and `fallow`
+- Type-aware oxlint runs through tsrs's `tsrs-lint`, never Go's tsgolint: `scripts/lint/type-aware-environment.ts` is the one place that points oxlint at it, so run it through `bun run lint:oxlint` rather than by hand
+- `bun run lint:fix` runs the oxlint and Stylelint fixers; the pre-commit hook (simple-git-hooks, config in `lint-staged.config.js`) runs them and fallow on the staged files - never skip it
 - After every bug fix, feature, or refactor - anything that removes or rewires code - run a fallow dead-code audit and clean up what it flags as newly unused (imports, helpers, exports, whole files) so changes never leave orphans behind. Act on the audit by hand - never run `fallow fix`
   - The config is `/.fallowrc.json` (entry `src/entrypoints/**`). It carries NO ignore lists - only `health` thresholds and `unused-enum-members: warn`. Run fallow from the repo root
   - `bun run fallow` (= `fallow audit --base HEAD`) is the incremental gate; `bunx fallow dead-code --root .` is the full sweep

@@ -24,12 +24,16 @@
     "zip:opera": "wxt zip -b opera",
     "zip:all": "bunx concurrently \"bun run zip\" \"bun run zip:firefox\" \"bun run zip:opera\" --names \"Chrome ,Firefox,Opera  \"",
     "crx": "bun run zip && tsx scripts/pack-crx.ts",
-    "lint": "avi12-lint",
-    "lint:fix": "avi12-lint --fix",
+    "lint": "tsx scripts/lint/lint.ts",
+    "lint:fix": "tsx scripts/lint/oxlint.ts --fix && bun run stylelint",
     "stylelint": "stylelint \"src/**/*.css\" --fix --allow-empty-input",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsrs --noEmit",
     "fallow": "fallow audit --base HEAD",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "lint:oxlint": "tsx scripts/lint/oxlint.ts",
+    "lint:stylelint": "stylelint \"src/**/*.css\" --allow-empty-input",
+    "prepare": "simple-git-hooks",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@webext-core/messaging": "^4.0.0",
@@ -41,10 +45,9 @@
     "crx3": "2.0.0",
     "fallow": "2.103.0",
     "fflate": "^0.8.3",
-    "lint-config": "github:avi12/lint-config#v0.13.1",
+    "lint-config": "github:avi12/lint-config#v0.13.2",
     "oxfmt": "^0.80.0",
     "oxlint": "1.90.0",
-    "oxlint-tsgolint": "7.0.2004",
     "postcss": "^8.5.30",
     "postcss-html": "^1.8.1",
     "stylelint": "^17.14.0",
@@ -53,12 +56,18 @@
     "typescript": "6.0.3",
     "vite": "^8.3.2",
     "web-ext-run": "^0.2.4",
-    "wxt": "^0.21.4"
+    "wxt": "^0.21.4",
+    "tsrs": "7.1.0-beta.tsrs5",
+    "lint-staged": "^17.6.0",
+    "simple-git-hooks": "^2.14.0"
   },
   "packageManager": "bun@1.4.5",
   "trustedDependencies": [
     "esbuild",
     "spawn-sync",
     "unrs-resolver"
-  ]
+  ],
+  "simple-git-hooks": {
+    "pre-commit": "bun run lint-staged"
+  }
 }
