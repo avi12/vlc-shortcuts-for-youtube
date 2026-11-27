@@ -39,6 +39,7 @@ export enum VlcAction {
   CYCLE_SUBTITLES = "cycle-subtitles",
   CYCLE_SUBTITLES_REVERSE = "cycle-subtitles-reverse",
   CYCLE_AUDIO_TRACK = "cycle-audio-track",
+  CYCLE_AUDIO_TRACK_REVERSE = "cycle-audio-track-reverse",
   CYCLE_ASPECT_RATIO = "cycle-aspect-ratio",
   TOGGLE_LOOP = "toggle-loop",
   SHUFFLE = "shuffle",
@@ -389,6 +390,15 @@ export const VLC_BINDINGS: VlcBinding[] = [
     section: KeymapSection.GENERAL,
     label: "Cycle audio track",
     combos: [{ key: "b" }]
+  },
+  {
+    action: VlcAction.CYCLE_AUDIO_TRACK_REVERSE,
+    section: KeymapSection.GENERAL,
+    label: "Cycle audio track in reverse",
+    combos: [{
+      key: "b",
+      isAlt: true
+    }]
   },
   {
     action: VlcAction.CYCLE_ASPECT_RATIO,

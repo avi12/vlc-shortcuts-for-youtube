@@ -1,6 +1,7 @@
 import { cycleAspectRatio } from "@/lib/hotkeys/actions/aspect-ratio";
 import { cycleAudioTrack } from "@/lib/hotkeys/actions/audio-tracks";
 import { toggleControls } from "@/lib/hotkeys/actions/controls-visibility";
+import { CycleDirection } from "@/lib/hotkeys/actions/cycle-direction";
 import { FrameDirection, stepFrame } from "@/lib/hotkeys/actions/frame-step";
 import { shuffle } from "@/lib/hotkeys/actions/music-queue";
 import {
@@ -15,7 +16,7 @@ import {
 } from "@/lib/hotkeys/actions/playback";
 import { takeSnapshot } from "@/lib/hotkeys/actions/snapshot";
 import { resetSpeed, SpeedDirection, stepFineSpeed, stepPresetSpeed } from "@/lib/hotkeys/actions/speed";
-import { CycleDirection, cycleSubtitles } from "@/lib/hotkeys/actions/subtitles";
+import { cycleSubtitles } from "@/lib/hotkeys/actions/subtitles";
 import { stepVolume, toggleMute, VolumeDirection } from "@/lib/hotkeys/actions/volume";
 import { seekNatively } from "@/lib/hotkeys/native/seek";
 import { holdYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
@@ -59,6 +60,13 @@ function createVolumeHandler(direction: VolumeDirection) {
 
 function createSubtitlesHandler(direction: CycleDirection) {
   return (player: YoutubePlayer) => cycleSubtitles({
+    player,
+    direction
+  });
+}
+
+function createAudioTrackHandler(direction: CycleDirection) {
+  return (player: YoutubePlayer) => cycleAudioTrack({
     player,
     direction
   });
@@ -114,7 +122,8 @@ const ACTION_HANDLERS: Record<VlcAction, ActionHandler> = {
   [VlcAction.NORMAL_SPEED]: resetSpeed,
   [VlcAction.CYCLE_SUBTITLES]: createSubtitlesHandler(CycleDirection.FORWARD),
   [VlcAction.CYCLE_SUBTITLES_REVERSE]: createSubtitlesHandler(CycleDirection.BACKWARD),
-  [VlcAction.CYCLE_AUDIO_TRACK]: cycleAudioTrack,
+  [VlcAction.CYCLE_AUDIO_TRACK]: createAudioTrackHandler(CycleDirection.FORWARD),
+  [VlcAction.CYCLE_AUDIO_TRACK_REVERSE]: createAudioTrackHandler(CycleDirection.BACKWARD),
   [VlcAction.CYCLE_ASPECT_RATIO]: cycleAspectRatio,
   [VlcAction.TOGGLE_LOOP]: toggleLoop,
   [VlcAction.SHUFFLE]: shuffle,

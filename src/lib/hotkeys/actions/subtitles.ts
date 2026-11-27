@@ -1,12 +1,8 @@
+import type { CycleDirection } from "@/lib/hotkeys/actions/cycle-direction";
 import { dispatchYoutubeHotkey } from "@/lib/hotkeys/youtube-hotkey-dispatch";
 import type { YoutubePlayer } from "@/lib/player";
 import { YOUTUBE_HOTKEYS } from "@/lib/youtube-keymap";
 import { z } from "@/lib/zod";
-
-export enum CycleDirection {
-  FORWARD = 1,
-  BACKWARD = -1
-}
 
 const CAPTIONS_MODULE = "captions";
 // Where VLC's subtitle menu starts, since YouTube's own caption list has no row for it

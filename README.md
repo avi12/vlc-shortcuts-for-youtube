@@ -48,6 +48,7 @@ Press <kbd>Shift</kbd> + <kbd>/</kbd> on YouTube for the full list in your own l
 |                   <kbd>↑</kbd>/<kbd>↓</kbd> | Volume up/down, up to 200% like VLC        |
 |              <kbd>Shift</kbd> + mouse wheel | Volume up/down                             |
 |                                <kbd>B</kbd> | Cycle audio track                          |
+|               <kbd>Alt</kbd> + <kbd>B</kbd> | Cycle audio track in reverse               |
 |                                <kbd>A</kbd> | Cycle aspect ratio                         |
 |             <kbd>Shift</kbd> + <kbd>S</kbd> | Take snapshot                              |
 |              <kbd>Ctrl</kbd> + <kbd>H</kbd> | Hide/show controls                         |

@@ -1,3 +1,4 @@
+import { CycleDirection } from "@/lib/hotkeys/actions/cycle-direction";
 import { showStatusInNativeBezel } from "@/lib/hotkeys/native/status-bezel";
 import type { YoutubePlayer } from "@/lib/player";
 import { z } from "@/lib/zod";
@@ -92,7 +93,10 @@ export function selectAudioTrack({ player, name }: {
   });
 }
 
-export function cycleAudioTrack(player: YoutubePlayer) {
+export function cycleAudioTrack({ player, direction }: {
+  player: YoutubePlayer;
+  direction: CycleDirection;
+}) {
   const tracks = readNamedTracks(player).map(({ track }) => track);
   const activeTrack = player.getAudioTrack?.();
   const setAudioTrack = player.setAudioTrack?.bind(player);
@@ -109,7 +113,10 @@ export function cycleAudioTrack(player: YoutubePlayer) {
     track,
     activeTrack
   }));
-  const nextTrack = tracks[(iActive + 1) % tracks.length];
+  // With no active track among them, cycling starts at either end
+  const isBackwardFromNowhere = iActive === -1 && direction === CycleDirection.BACKWARD;
+  const iStart = isBackwardFromNowhere ? 0 : iActive;
+  const nextTrack = tracks[(iStart + direction + tracks.length) % tracks.length];
   setAudioTrack(nextTrack);
   showTrack({
     player,
