@@ -6,7 +6,7 @@
 import { PROJECT_ROOT } from "./project-root";
 import { spawn } from "node:child_process";
 
-const STEPS = ["lint:oxlint", "lint:stylelint", "typecheck", "fallow"];
+const STEPS = ["lint:oxlint", "lint:stylelint", "typecheck", "fallow", "lint:rust"];
 const MILLISECONDS_PER_SECOND = 1000;
 
 function runStep(name: string) {

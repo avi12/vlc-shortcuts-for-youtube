@@ -41,9 +41,12 @@ keys/
 # fallow cache
 .fallow/
 
-# Isolated dev browser profiles cloned by the dev server (scripts/dev-*.ts) - contain cookies, tokens
+# Isolated dev browser profiles cloned by the dev server (tools/) - contain cookies, tokens
 user-profiles/
 
-# Dev-server session logs (scripts/dev-shared.ts)
+# Dev-server session logs (tools/)
 .dev-logs/
 .verify/
+
+# Rust build output of the dev server
+target/

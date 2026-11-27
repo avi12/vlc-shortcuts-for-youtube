@@ -4,7 +4,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { defineConfig } from "wxt";
 
 const EXTENSION_NAME = "VLC Shortcuts for YouTube";
-export const FALLBACK_GECKO_ID = "vlc-controls-in-youtube@avi12.com";
+const FALLBACK_GECKO_ID = "vlc-controls-in-youtube@avi12.com";
 // Firefox reads the data_collection_permissions key AMO requires from 140 on. Chromium before 137 reports a held
 // key's auto-repeats as KeyboardEvent.repeat false while another key (Shift, Ctrl) is also held, so toggles like
 // Shift+S would re-fire
@@ -47,7 +47,7 @@ async function addReadmeToSourcesZip({ zipPath, instructions }: {
   await writeFile(zipPath, zipSync(entries));
 }
 
-// The dev browsers' cloned profiles live in user-profiles/ (see scripts/dev-*.ts); Vite's watcher would otherwise
+// The dev browsers' cloned profiles live in user-profiles/ (see tools/); Vite's watcher would otherwise
 // crawl them and hit EBUSY on files the running browser holds. WXT replaces server.watch wholesale, so a plugin
 // config hook (deep-merged) is the only way to extend the ignore list
 const ignoreDevProfilesInWatcher = {
@@ -113,7 +113,9 @@ export default defineConfig({
       ".claude/**",
       "user-profiles/**",
       ".dev-logs/**",
-      ".fallow/**"
+      ".fallow/**",
+      "dev-server/**",
+      "tools/**"
     ],
     artifactTemplate: "{{name}}-{{version}}-{{browser}}-{{mode}}.zip",
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
@@ -121,7 +123,7 @@ export default defineConfig({
   vite: () => ({
     plugins: [ignoreDevProfilesInWatcher],
     build: {
-      // Only the dev server's builds (scripts/dev.ts) carry source maps; the store build ships none
+      // Only the dev server's builds (tools/) carry source maps; the store build ships none
       sourcemap: process.env.WXT_INLINE_SOURCEMAPS === "1" ? "inline" : false
     }
   }),

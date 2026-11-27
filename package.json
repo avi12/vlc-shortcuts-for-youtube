@@ -11,10 +11,13 @@
   "repository": "https://github.com/avi12/vlc-shortcuts-for-youtube",
   "homepage": "https://github.com/avi12/vlc-shortcuts-for-youtube",
   "scripts": {
-    "dev": "tsx scripts/dev.ts",
-    "dev:firefox": "tsx scripts/dev.ts --firefox",
-    "dev:firefox:no-marionette": "tsx scripts/dev.ts --firefox --no-marionette",
-    "dev:opera": "tsx scripts/dev.ts --opera",
+    "dev": "bun run devtool dev",
+    "dev:firefox": "bun run devtool dev --firefox",
+    "dev:firefox:no-marionette": "bun run devtool dev --firefox --no-marionette",
+    "dev:opera": "bun run devtool dev --opera",
+    "devtool": "cargo run --release --quiet --manifest-path tools/Cargo.toml --",
+    "dev-server:test": "cargo test --manifest-path dev-server/Cargo.toml",
+    "tools:test": "cargo test --manifest-path tools/Cargo.toml",
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox --mv3",
     "build:opera": "wxt build -b opera",
@@ -32,6 +35,7 @@
     "postinstall": "wxt prepare",
     "lint:oxlint": "tsx scripts/lint/oxlint.ts",
     "lint:stylelint": "stylelint \"src/**/*.css\" --allow-empty-input",
+    "lint:rust": "avi12-lint --only=rust",
     "prepare": "simple-git-hooks",
     "lint-staged": "lint-staged"
   },
@@ -41,7 +45,6 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
-    "chokidar": "^5.0.0",
     "crx3": "2.0.0",
     "fallow": "2.103.0",
     "fflate": "^0.8.3",
@@ -49,13 +52,11 @@
     "oxfmt": "^0.80.0",
     "oxlint": "1.90.0",
     "postcss": "^8.5.30",
-    "postcss-html": "^1.8.1",
     "stylelint": "^17.14.0",
     "stylelint-config-ccb": "^3.32.0",
     "tsx": "^4.23.15",
     "typescript": "6.0.3",
     "vite": "^8.3.2",
-    "web-ext-run": "^0.2.4",
     "wxt": "^0.21.4",
     "tsrs": "7.1.0-beta.tsrs5",
     "lint-staged": "^17.6.0",
@@ -67,10 +68,10 @@
     "spawn-sync",
     "unrs-resolver"
   ],
-  "simple-git-hooks": {
-    "pre-commit": "bun run lint-staged"
-  },
   "patchedDependencies": {
     "zod@4.6.7": "patches/zod.patch"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bun run lint-staged"
   }
 }

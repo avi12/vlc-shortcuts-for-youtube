@@ -49,6 +49,7 @@
     {
       "files": [
         "./scripts/**/*.ts",
+        "./tools/assets/*.mjs",
         "**/*.config.ts",
         "**/*.config.js",
         "**/*.config.mjs"

@@ -89,7 +89,8 @@ Music has no miniplayer or 360° videos, and keeps its own <kbd>G</kbd> navigati
 
 ## Requirements for setting up
 
-Install [Node.js](https://nodejs.org) 22+ and [Bun](https://bun.com) 1.4.5
+Install [Node.js](https://nodejs.org) 22+ and [Bun](https://bun.com) 1.4.5  
+The dev server is written in Rust, so developing also needs [Rust](https://rustup.rs)
 
 ## Install dependencies
 

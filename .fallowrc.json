@@ -5,6 +5,8 @@
   ],
   "entry": [
     "src/entrypoints/**",
+    "tools/assets/*.mjs",
+    "dev-server/assets/*.js",
     "web-ext.config.ts"
   ],
   "health": {
